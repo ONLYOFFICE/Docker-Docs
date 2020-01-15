@@ -15,8 +15,7 @@ services:
       - REDIS_SERVER_PORT=6379
     stdin_open: true
     restart: always
-    networks:
-      - onlyoffice
+
     ports:
       - '80:80'
       - '443:443'
@@ -44,8 +43,6 @@ services:
       - '3000'
       - '8000'
       - '8080'
-    networks:
-      - onlyoffice
     volumes_from:
      - onlyoffice-documentserver-data
 
@@ -53,8 +50,6 @@ services:
     container_name: onlyoffice-redis
     image: redis
     restart: always
-    networks:
-     - onlyoffice
     expose:
       - '6379'
 
@@ -62,8 +57,6 @@ services:
     container_name: onlyoffice-rabbitmq
     image: rabbitmq
     restart: always
-    networks:
-     - onlyoffice
     expose:
       - '5672'
 
@@ -73,17 +66,11 @@ services:
     environment:
       - POSTGRES_DB=onlyoffice
       - POSTGRES_USER=onlyoffice
-    networks:
-      - onlyoffice
     restart: always
     expose:
       - '5432'
     volumes:
       - postgresql_data:/var/lib/postgresql
-
-networks:
-  onlyoffice:
-    driver: 'bridge'
 
 volumes:
   postgresql_data:
