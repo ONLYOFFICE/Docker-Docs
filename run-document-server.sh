@@ -36,9 +36,6 @@ JSON="json -q -f ${ONLYOFFICE_DEFAULT_CONFIG}"
 JSON_LOG="json -q -f ${ONLYOFFICE_LOG4JS_CONFIG}"
 JSON_EXAMPLE="json -q -f ${ONLYOFFICE_EXAMPLE_CONFIG}"
 
-LOCAL_SERVICES=()
-
-
 create_local_configs(){
 	for i in $ONLYOFFICE_DEFAULT_CONFIG $ONLYOFFICE_EXAMPLE_CONFIG; do
 		if [ ! -f ${i} ]; then
