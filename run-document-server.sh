@@ -3,24 +3,25 @@
 # Define '**' behavior explicitly
 shopt -s globstar
 
-APP_DIR="/var/www/onlyoffice/documentserver"
-DATA_DIR="/var/www/onlyoffice/Data"
-LOG_DIR="/var/log/onlyoffice"
+APP_DIR="/var/www/${COMPANY_NAME}/documentserver"
+DATA_DIR="/var/www/${COMPANY_NAME}/Data"
+LOG_DIR="/var/log/${COMPANY_NAME}"
 DS_LOG_DIR="${LOG_DIR}/documentserver"
-LIB_DIR="/var/lib/onlyoffice"
-CONF_DIR="/etc/onlyoffice/documentserver"
+LIB_DIR="/var/lib/${COMPANY_NAME}"
+DS_LIB_DIR="${LIB_DIR}/documentserver"
+CONF_DIR="/etc/${COMPANY_NAME}/documentserver"
 
 ONLYOFFICE_DATA_CONTAINER=${ONLYOFFICE_DATA_CONTAINER:-false}
 ONLYOFFICE_DATA_CONTAINER_HOST=${ONLYOFFICE_DATA_CONTAINER_HOST:-localhost}
 ONLYOFFICE_DS_NODE_HOST=${ONLYOFFICE_DS_NODE_HOST:-localhost}
 ONLYOFFICE_DATA_CONTAINER_PORT=80
 
-SYSCONF_TEMPLATES_DIR="/app/onlyoffice/setup/config"
+SYSCONF_TEMPLATES_DIR="/app/ds/setup/config"
 
 NGINX_ONLYOFFICE_PATH="${CONF_DIR}/nginx"
-NGINX_ONLYOFFICE_CONF="${NGINX_ONLYOFFICE_PATH}/onlyoffice-documentserver.conf"
+NGINX_ONLYOFFICE_CONF="${NGINX_ONLYOFFICE_PATH}/ds.conf"
 NGINX_ONLYOFFICE_EXAMPLE_PATH="${CONF_DIR}-example/nginx"
-NGINX_ONLYOFFICE_EXAMPLE_CONF="${NGINX_ONLYOFFICE_EXAMPLE_PATH}/includes/onlyoffice-documentserver-example.conf"
+NGINX_ONLYOFFICE_EXAMPLE_CONF="${NGINX_ONLYOFFICE_EXAMPLE_PATH}/includes/ds-example.conf"
 
 NGINX_CONFIG_PATH="/etc/nginx/nginx.conf"
 
@@ -32,9 +33,10 @@ ONLYOFFICE_DEFAULT_CONFIG=${CONF_DIR}/local.json
 ONLYOFFICE_LOG4JS_CONFIG=${CONF_DIR}/log4js/production.json
 ONLYOFFICE_EXAMPLE_CONFIG=${CONF_DIR}-example/local.json
 
-JSON="json -q -f ${ONLYOFFICE_DEFAULT_CONFIG}"
-JSON_LOG="json -q -f ${ONLYOFFICE_LOG4JS_CONFIG}"
-JSON_EXAMPLE="json -q -f ${ONLYOFFICE_EXAMPLE_CONFIG}"
+JSON_BIN=${APP_DIR}/npm/node_modules/.bin/json
+JSON="${JSON_BIN} -q -f ${ONLYOFFICE_DEFAULT_CONFIG}"
+JSON_LOG="${JSON_BIN} -q -f ${ONLYOFFICE_LOG4JS_CONFIG}"
+JSON_EXAMPLE="${JSON_BIN} -q -f ${ONLYOFFICE_EXAMPLE_CONFIG}"
 
 create_local_configs(){
 	for i in $ONLYOFFICE_DEFAULT_CONFIG $ONLYOFFICE_EXAMPLE_CONFIG; do
@@ -48,7 +50,7 @@ create_local_configs(){
 tune_local_configs(){
 	for i in $ONLYOFFICE_DEFAULT_CONFIG $ONLYOFFICE_EXAMPLE_CONFIG $ONLYOFFICE_LOG4JS_CONFIG; do
 		if [ -f ${i} ]; then
-			chown onlyoffice:onlyoffice -R ${i}
+			chown ds:ds -R ${i}
 		fi
   	done
 }
@@ -230,9 +232,9 @@ update_nginx_settings(){
   cp ${SYSCONF_TEMPLATES_DIR}/nginx/nginx.conf ${NGINX_CONFIG_PATH}
 
   sed 's/\(server \)localhost\(.*\)/'"\1${ONLYOFFICE_DS_NODE_HOST}\2"'/' \
-    -i ${NGINX_ONLYOFFICE_PATH}/includes/onlyoffice-http.conf
+    -i ${NGINX_ONLYOFFICE_PATH}/includes/http-common.conf
 
-  ln -sf ${NGINX_ONLYOFFICE_PATH}/onlyoffice-documentserver.conf.template ${NGINX_ONLYOFFICE_CONF}
+  ln -sf ${NGINX_ONLYOFFICE_PATH}/ds.conf.tmpl ${NGINX_ONLYOFFICE_CONF}
 
   if [ -f "${NGINX_ONLYOFFICE_EXAMPLE_CONF}" ]; then
     sed 's/linux/docker/' -i ${NGINX_ONLYOFFICE_EXAMPLE_CONF}
@@ -259,9 +261,14 @@ done
 
 mkdir -p ${DS_LOG_DIR}-example
 
+# create app folders
+for i in App_Data/cache/files App_Data/docbuilder; do
+  mkdir -p "${DS_LIB_DIR}/$i"
+done
+
 # change folder rights
 for i in ${LOG_DIR} ${LIB_DIR} ${DATA_DIR}; do
-  chown -R onlyoffice:onlyoffice "$i"
+  chown -R ds:ds "$i"
   chmod -R 755 "$i"
 done
 
