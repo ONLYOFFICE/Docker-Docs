@@ -38,11 +38,6 @@ JSON_EXAMPLE="json -q -f ${ONLYOFFICE_EXAMPLE_CONFIG}"
 
 LOCAL_SERVICES=()
 
-PG_ROOT=/var/lib/postgresql
-PG_VERSION=9.5
-PG_NAME=main
-PGDATA=${PG_ROOT}/${PG_VERSION}/${PG_NAME}
-PG_NEW_CLUSTER=false
 
 create_local_configs(){
 	for i in $ONLYOFFICE_DEFAULT_CONFIG $ONLYOFFICE_EXAMPLE_CONFIG; do
@@ -63,10 +58,10 @@ tune_local_configs(){
 
 
 init_setting(){
-  POSTGRESQL_SERVER_HOST=${POSTGRESQL_SERVER_HOST:-localhost}
-  POSTGRESQL_SERVER_PORT=${POSTGRESQL_SERVER_PORT:-5432}
-  POSTGRESQL_SERVER_DB_NAME=${POSTGRESQL_SERVER_DB_NAME:-onlyoffice}
-  POSTGRESQL_SERVER_USER=${POSTGRESQL_SERVER_USER:-onlyoffice}
+  DB_HOST=${DB_HOST:-localhost}
+  DB_PORT=${DB_PORT:-5432}
+  DB_NAME=${DB_NAME:-onlyoffice}
+  DB_USER=${DB_USER:-onlyoffice}
   
   RABBITMQ_SERVER_URL=${RABBITMQ_SERVER_URL:-"amqp://guest:guest@localhost"}
   parse_rabbitmq_url
@@ -78,11 +73,11 @@ init_setting(){
 }
 
 read_setting(){
-  POSTGRESQL_SERVER_HOST=${POSTGRESQL_SERVER_HOST:-$(${JSON} services.CoAuthoring.sql.dbHost)}
-  POSTGRESQL_SERVER_PORT=${POSTGRESQL_SERVER_PORT:-5432}
-  POSTGRESQL_SERVER_DB_NAME=${POSTGRESQL_SERVER_DB_NAME:-$(${JSON} services.CoAuthoring.sql.dbName)}
-  POSTGRESQL_SERVER_USER=${POSTGRESQL_SERVER_USER:-$(${JSON} services.CoAuthoring.sql.dbUser)}
-  POSTGRESQL_SERVER_PASS=${POSTGRESQL_SERVER_PASS:-$(${JSON} services.CoAuthoring.sql.dbPass)}
+  DB_HOST=${DB_HOST:-$(${JSON} services.CoAuthoring.sql.dbHost)}
+  DB_PORT=${DB_PORT:-5432}
+  DB_NAME=${DB_NAME:-$(${JSON} services.CoAuthoring.sql.dbName)}
+  DB_USER=${DB_USER:-$(${JSON} services.CoAuthoring.sql.dbUser)}
+  DB_PASS=${DB_PASS:-$(${JSON} services.CoAuthoring.sql.dbPass)}
 
   RABBITMQ_SERVER_URL=${RABBITMQ_SERVER_URL:-$(${JSON} rabbitmq.url)}
   parse_rabbitmq_url
@@ -142,7 +137,7 @@ waiting_for_connection(){
 }
 
 waiting_for_postgresql(){
-  waiting_for_connection ${POSTGRESQL_SERVER_HOST} ${POSTGRESQL_SERVER_PORT} "postgresql"
+  waiting_for_connection ${DB_HOST} ${DB_PORT} "postgresql"
 }
 
 waiting_for_rabbitmq(){
@@ -159,11 +154,11 @@ update_postgresql_settings(){
 	${JSON} -I -e "if(this.services===undefined)this.services={};"
 	${JSON} -I -e "if(this.services.CoAuthoring===undefined)this.services.CoAuthoring={};"
 	${JSON} -I -e "if(this.services.CoAuthoring.sql===undefined)this.services.CoAuthoring.sql={};"
-  ${JSON} -I -e "this.services.CoAuthoring.sql.dbHost = '${POSTGRESQL_SERVER_HOST}'"
-  ${JSON} -I -e "this.services.CoAuthoring.sql.dbPort = '${POSTGRESQL_SERVER_PORT}'"
-  ${JSON} -I -e "this.services.CoAuthoring.sql.dbName = '${POSTGRESQL_SERVER_DB_NAME}'"
-  ${JSON} -I -e "this.services.CoAuthoring.sql.dbUser = '${POSTGRESQL_SERVER_USER}'"
-  ${JSON} -I -e "this.services.CoAuthoring.sql.dbPass = '${POSTGRESQL_SERVER_PASS}'"
+  ${JSON} -I -e "this.services.CoAuthoring.sql.dbHost = '${DB_HOST}'"
+  ${JSON} -I -e "this.services.CoAuthoring.sql.dbPort = '${DB_PORT}'"
+  ${JSON} -I -e "this.services.CoAuthoring.sql.dbName = '${DB_NAME}'"
+  ${JSON} -I -e "this.services.CoAuthoring.sql.dbUser = '${DB_USER}'"
+  ${JSON} -I -e "this.services.CoAuthoring.sql.dbPass = '${DB_PASS}'"
 }
 
 update_rabbitmq_setting(){
@@ -221,38 +216,15 @@ update_jwt_settings(){
   fi
 }
 
-create_postgresql_cluster(){
-  local pg_conf_dir=/etc/postgresql/${PG_VERSION}/${PG_NAME}
-  local postgresql_conf=$pg_conf_dir/postgresql.conf
-  local hba_conf=$pg_conf_dir/pg_hba.conf
-
-  mv $postgresql_conf $postgresql_conf.backup
-  mv $hba_conf $hba_conf.backup
-
-  pg_createcluster ${PG_VERSION} ${PG_NAME}
-}
-
-create_postgresql_db(){
-  sudo -u postgres psql -c "CREATE DATABASE onlyoffice;"
-  sudo -u postgres psql -c "CREATE USER onlyoffice WITH password 'onlyoffice';"
-  sudo -u postgres psql -c "GRANT ALL privileges ON DATABASE onlyoffice TO onlyoffice;"
-}
-
 create_postgresql_tbl(){
-  CONNECTION_PARAMS="-h${POSTGRESQL_SERVER_HOST} -U${POSTGRESQL_SERVER_USER} -w"
-  if [ -n "${POSTGRESQL_SERVER_PASS}" ]; then
-    export PGPASSWORD=${POSTGRESQL_SERVER_PASS}
+  CONNECTION_PARAMS="-h${DB_HOST} -U${DB_USER} -w"
+  if [ -n "${DB_PASS}" ]; then
+    export PGPASSWORD=${DB_PASS}
   fi
 
   PSQL="psql -q $CONNECTION_PARAMS"
-  CREATEDB="createdb $CONNECTION_PARAMS"
 
-  # Create db on remote server
-  #if $PSQL -lt | cut -d\| -f 1 | grep -qw | grep 0; then
-  #  $CREATEDB $POSTGRESQL_SERVER_DB_NAME
-  #fi
-
-  $PSQL -d "${POSTGRESQL_SERVER_DB_NAME}" -f "${APP_DIR}/server/schema/postgresql/createdb.sql"
+  $PSQL -d "${DB_NAME}" -f "${APP_DIR}/server/schema/postgresql/createdb.sql"
 }
 
 update_nginx_settings(){
