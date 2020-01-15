@@ -63,7 +63,7 @@ init_setting(){
   DB_NAME=${DB_NAME:-onlyoffice}
   DB_USER=${DB_USER:-onlyoffice}
   
-  RABBITMQ_SERVER_URL=${RABBITMQ_SERVER_URL:-"amqp://guest:guest@localhost"}
+  AMQP_URI=${AMQP_URI:-"amqp://guest:guest@localhost"}
   parse_rabbitmq_url
 
   REDIS_SERVER_HOST=${REDIS_SERVER_HOST:-localhost}
@@ -79,7 +79,7 @@ read_setting(){
   DB_USER=${DB_USER:-$(${JSON} services.CoAuthoring.sql.dbUser)}
   DB_PASS=${DB_PASS:-$(${JSON} services.CoAuthoring.sql.dbPass)}
 
-  RABBITMQ_SERVER_URL=${RABBITMQ_SERVER_URL:-$(${JSON} rabbitmq.url)}
+  AMQP_URI=${AMQP_URI:-$(${JSON} rabbitmq.url)}
   parse_rabbitmq_url
 
   REDIS_SERVER_HOST=${REDIS_SERVER_HOST:-$(${JSON} services.CoAuthoring.redis.host)}
@@ -89,7 +89,7 @@ read_setting(){
 }
 
 parse_rabbitmq_url(){
-  local amqp=${RABBITMQ_SERVER_URL}
+  local amqp=${AMQP_URI}
 
   # extract the protocol
   local proto="$(echo $amqp | grep :// | sed -e's,^\(.*://\).*,\1,g')"
@@ -163,7 +163,7 @@ update_postgresql_settings(){
 
 update_rabbitmq_setting(){
   ${JSON} -I -e "if(this.rabbitmq===undefined)this.rabbitmq={};"
-  ${JSON} -I -e "this.rabbitmq.url = '${RABBITMQ_SERVER_URL}'"
+  ${JSON} -I -e "this.rabbitmq.url = '${AMQP_URI}'"
 }
 
 update_redis_settings(){
