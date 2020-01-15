@@ -15,25 +15,14 @@ ONLYOFFICE_DATA_CONTAINER_HOST=${ONLYOFFICE_DATA_CONTAINER_HOST:-localhost}
 ONLYOFFICE_DS_NODE_HOST=${ONLYOFFICE_DS_NODE_HOST:-localhost}
 ONLYOFFICE_DATA_CONTAINER_PORT=80
 
-SSL_CERTIFICATES_DIR="${DATA_DIR}/certs"
-SSL_CERTIFICATE_PATH=${SSL_CERTIFICATE_PATH:-${SSL_CERTIFICATES_DIR}/onlyoffice.crt}
-SSL_KEY_PATH=${SSL_KEY_PATH:-${SSL_CERTIFICATES_DIR}/onlyoffice.key}
-CA_CERTIFICATES_PATH=${CA_CERTIFICATES_PATH:-${SSL_CERTIFICATES_DIR}/ca-certificates.pem}
-SSL_DHPARAM_PATH=${SSL_DHPARAM_PATH:-${SSL_CERTIFICATES_DIR}/dhparam.pem}
-SSL_VERIFY_CLIENT=${SSL_VERIFY_CLIENT:-off}
-ONLYOFFICE_HTTPS_HSTS_ENABLED=${ONLYOFFICE_HTTPS_HSTS_ENABLED:-true}
-ONLYOFFICE_HTTPS_HSTS_MAXAGE=${ONLYOFFICE_HTTPS_HSTS_MAXAGE:-31536000}
 SYSCONF_TEMPLATES_DIR="/app/onlyoffice/setup/config"
 
-NGINX_CONFD_PATH="/etc/nginx/conf.d";
 NGINX_ONLYOFFICE_PATH="${CONF_DIR}/nginx"
 NGINX_ONLYOFFICE_CONF="${NGINX_ONLYOFFICE_PATH}/onlyoffice-documentserver.conf"
 NGINX_ONLYOFFICE_EXAMPLE_PATH="${CONF_DIR}-example/nginx"
 NGINX_ONLYOFFICE_EXAMPLE_CONF="${NGINX_ONLYOFFICE_EXAMPLE_PATH}/includes/onlyoffice-documentserver-example.conf"
 
 NGINX_CONFIG_PATH="/etc/nginx/nginx.conf"
-NGINX_WORKER_PROCESSES=${NGINX_WORKER_PROCESSES:-1}
-NGINX_WORKER_CONNECTIONS=${NGINX_WORKER_CONNECTIONS:-$(ulimit -n)}
 
 JWT_ENABLED=${JWT_ENABLED:-false}
 JWT_SECRET=${JWT_SECRET:-secret}
@@ -268,47 +257,13 @@ create_postgresql_tbl(){
 
 update_nginx_settings(){
 
-  cp ${SYSCONF_TEMPLATES_DIR}/nginx/nginx.conf /etc/nginx/nginx.conf
   # Set up nginx
-  sed 's/^worker_processes.*/'"worker_processes ${NGINX_WORKER_PROCESSES};"'/' -i ${NGINX_CONFIG_PATH}
-  sed 's/worker_connections.*/'"worker_connections ${NGINX_WORKER_CONNECTIONS};"'/' -i ${NGINX_CONFIG_PATH}
-  sed 's/access_log.*/'"access_log off;"'/' -i ${NGINX_CONFIG_PATH}
+  cp ${SYSCONF_TEMPLATES_DIR}/nginx/nginx.conf ${NGINX_CONFIG_PATH}
 
   sed 's/\(server \)localhost\(.*\)/'"\1${ONLYOFFICE_DS_NODE_HOST}\2"'/' \
     -i ${NGINX_ONLYOFFICE_PATH}/includes/onlyoffice-http.conf
 
-  # setup HTTPS
-  if [ -f "${SSL_CERTIFICATE_PATH}" -a -f "${SSL_KEY_PATH}" ]; then
-    cp -f ${NGINX_ONLYOFFICE_PATH}/onlyoffice-documentserver-ssl.conf.template ${NGINX_ONLYOFFICE_CONF}
-
-    # configure nginx
-    sed 's,{{SSL_CERTIFICATE_PATH}},'"${SSL_CERTIFICATE_PATH}"',' -i ${NGINX_ONLYOFFICE_CONF}
-    sed 's,{{SSL_KEY_PATH}},'"${SSL_KEY_PATH}"',' -i ${NGINX_ONLYOFFICE_CONF}
-
-    # turn on http2
-    sed 's,\(443 ssl\),\1 http2,' -i ${NGINX_ONLYOFFICE_CONF}
-
-    # if dhparam path is valid, add to the config, otherwise remove the option
-    if [ -r "${SSL_DHPARAM_PATH}" ]; then
-      sed 's,\(\#* *\)\?\(ssl_dhparam \).*\(;\)$,'"\2${SSL_DHPARAM_PATH}\3"',' -i ${NGINX_ONLYOFFICE_CONF}
-    else
-      sed '/ssl_dhparam/d' -i ${NGINX_ONLYOFFICE_CONF}
-    fi
-
-    sed 's,\(ssl_verify_client \).*\(;\)$,'"\1${SSL_VERIFY_CLIENT}\2"',' -i ${NGINX_ONLYOFFICE_CONF}
-
-    if [ -f "${CA_CERTIFICATES_PATH}" ]; then
-      sed '/ssl_verify_client/a '"ssl_client_certificate ${CA_CERTIFICATES_PATH}"';' -i ${NGINX_ONLYOFFICE_CONF}
-    fi
-
-    if [ "${ONLYOFFICE_HTTPS_HSTS_ENABLED}" == "true" ]; then
-      sed 's,\(max-age=\).*\(;\)$,'"\1${ONLYOFFICE_HTTPS_HSTS_MAXAGE}\2"',' -i ${NGINX_ONLYOFFICE_CONF}
-    else
-      sed '/max-age=/d' -i ${NGINX_ONLYOFFICE_CONF}
-    fi
-  else
-    ln -sf ${NGINX_ONLYOFFICE_PATH}/onlyoffice-documentserver.conf.template ${NGINX_ONLYOFFICE_CONF}
-  fi
+  ln -sf ${NGINX_ONLYOFFICE_PATH}/onlyoffice-documentserver.conf.template ${NGINX_ONLYOFFICE_CONF}
 
   if [ -f "${NGINX_ONLYOFFICE_EXAMPLE_CONF}" ]; then
     sed 's/linux/docker/' -i ${NGINX_ONLYOFFICE_EXAMPLE_CONF}
