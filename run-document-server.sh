@@ -4,87 +4,33 @@
 shopt -s globstar
 
 APP_DIR="/var/www/${COMPANY_NAME}/documentserver"
-DATA_DIR="/var/www/${COMPANY_NAME}/Data"
 LOG_DIR="/var/log/${COMPANY_NAME}"
 DS_LOG_DIR="${LOG_DIR}/documentserver"
 LIB_DIR="/var/lib/${COMPANY_NAME}"
 DS_LIB_DIR="${LIB_DIR}/documentserver"
 CONF_DIR="/etc/${COMPANY_NAME}/documentserver"
 
-ONLYOFFICE_DATA_CONTAINER=${ONLYOFFICE_DATA_CONTAINER:-false}
-ONLYOFFICE_DATA_CONTAINER_HOST=${ONLYOFFICE_DATA_CONTAINER_HOST:-localhost}
-ONLYOFFICE_DS_NODE_HOST=${ONLYOFFICE_DS_NODE_HOST:-localhost}
-ONLYOFFICE_DATA_CONTAINER_PORT=80
+DATA_CONTAINER=${DATA_CONTAINER:-false}
+DATA_CONTAINER_HOST=${DATA_CONTAINER_HOST:-localhost}
+DATA_CONTAINER_PORT=8888
 
-SYSCONF_TEMPLATES_DIR="/app/ds/setup/config"
-
-NGINX_ONLYOFFICE_PATH="${CONF_DIR}/nginx"
-NGINX_ONLYOFFICE_CONF="${NGINX_ONLYOFFICE_PATH}/ds.conf"
-NGINX_ONLYOFFICE_EXAMPLE_PATH="${CONF_DIR}-example/nginx"
-NGINX_ONLYOFFICE_EXAMPLE_CONF="${NGINX_ONLYOFFICE_EXAMPLE_PATH}/includes/ds-example.conf"
-
-NGINX_CONFIG_PATH="/etc/nginx/nginx.conf"
-
-JWT_ENABLED=${JWT_ENABLED:-false}
-JWT_SECRET=${JWT_SECRET:-secret}
-JWT_HEADER=${JWT_HEADER:-Authorization}
-
-ONLYOFFICE_DEFAULT_CONFIG=${CONF_DIR}/local.json
-ONLYOFFICE_LOG4JS_CONFIG=${CONF_DIR}/log4js/production.json
-ONLYOFFICE_EXAMPLE_CONFIG=${CONF_DIR}-example/local.json
+DEFAULT_CONFIG=${CONF_DIR}/local.json
 
 JSON_BIN=${APP_DIR}/npm/node_modules/.bin/json
-JSON="${JSON_BIN} -q -f ${ONLYOFFICE_DEFAULT_CONFIG}"
-JSON_LOG="${JSON_BIN} -q -f ${ONLYOFFICE_LOG4JS_CONFIG}"
-JSON_EXAMPLE="${JSON_BIN} -q -f ${ONLYOFFICE_EXAMPLE_CONFIG}"
-
-create_local_configs(){
-	for i in $ONLYOFFICE_DEFAULT_CONFIG $ONLYOFFICE_EXAMPLE_CONFIG; do
-		if [ ! -f ${i} ]; then
-      install -m 640 -D /dev/null ${i}
-			echo {} > ${i}
-		fi
-  	done
-}
-
-tune_local_configs(){
-	for i in $ONLYOFFICE_DEFAULT_CONFIG $ONLYOFFICE_EXAMPLE_CONFIG $ONLYOFFICE_LOG4JS_CONFIG; do
-		if [ -f ${i} ]; then
-			chown ds:ds -R ${i}
-		fi
-  	done
-}
-
-
-init_setting(){
-  DB_HOST=${DB_HOST:-localhost}
-  DB_PORT=${DB_PORT:-5432}
-  DB_NAME=${DB_NAME:-onlyoffice}
-  DB_USER=${DB_USER:-onlyoffice}
-  
-  AMQP_URI=${AMQP_URI:-"amqp://guest:guest@localhost"}
-  parse_rabbitmq_url
-
-  REDIS_SERVER_HOST=${REDIS_SERVER_HOST:-localhost}
-  REDIS_SERVER_PORT=${REDIS_SERVER_PORT:-6379}
-
-  DS_LOG_LEVEL=${DS_LOG_LEVEL:-all}
-}
+JSON="${JSON_BIN} -q -f ${DEFAULT_CONFIG}"
 
 read_setting(){
-  DB_HOST=${DB_HOST:-$(${JSON} services.CoAuthoring.sql.dbHost)}
-  DB_PORT=${DB_PORT:-5432}
-  DB_NAME=${DB_NAME:-$(${JSON} services.CoAuthoring.sql.dbName)}
-  DB_USER=${DB_USER:-$(${JSON} services.CoAuthoring.sql.dbUser)}
-  DB_PASS=${DB_PASS:-$(${JSON} services.CoAuthoring.sql.dbPass)}
+  DB_HOST=$(${JSON} services.CoAuthoring.sql.dbHost)
+  DB_PORT=$(${JSON} services.CoAuthoring.sql.dbPort)
+  DB_NAME=$(${JSON} services.CoAuthoring.sql.dbName)
+  DB_USER=$(${JSON} services.CoAuthoring.sql.dbUser)
+  DB_PASS=$(${JSON} services.CoAuthoring.sql.dbPass)
 
-  AMQP_URI=${AMQP_URI:-$(${JSON} rabbitmq.url)}
+  AMQP_URI=$(${JSON} rabbitmq.url)
   parse_rabbitmq_url
 
-  REDIS_SERVER_HOST=${REDIS_SERVER_HOST:-$(${JSON} services.CoAuthoring.redis.host)}
-  REDIS_SERVER_PORT=${REDIS_SERVER_PORT:-6379}
-
-  DS_LOG_LEVEL=${DS_LOG_LEVEL:-$(${JSON_LOG} categories.default.level)}
+  REDIS_SERVER_HOST=$(${JSON} services.CoAuthoring.redis.host)
+  REDIS_SERVER_PORT=6379
 }
 
 parse_rabbitmq_url(){
@@ -147,72 +93,7 @@ waiting_for_redis(){
   waiting_for_connection ${REDIS_SERVER_HOST} ${REDIS_SERVER_PORT} "redis"
 }
 waiting_for_datacontainer(){
-  waiting_for_connection ${ONLYOFFICE_DATA_CONTAINER_HOST} ${ONLYOFFICE_DATA_CONTAINER_PORT} "data"
-}
-update_postgresql_settings(){
-	${JSON} -I -e "if(this.services===undefined)this.services={};"
-	${JSON} -I -e "if(this.services.CoAuthoring===undefined)this.services.CoAuthoring={};"
-	${JSON} -I -e "if(this.services.CoAuthoring.sql===undefined)this.services.CoAuthoring.sql={};"
-  ${JSON} -I -e "this.services.CoAuthoring.sql.dbHost = '${DB_HOST}'"
-  ${JSON} -I -e "this.services.CoAuthoring.sql.dbPort = '${DB_PORT}'"
-  ${JSON} -I -e "this.services.CoAuthoring.sql.dbName = '${DB_NAME}'"
-  ${JSON} -I -e "this.services.CoAuthoring.sql.dbUser = '${DB_USER}'"
-  ${JSON} -I -e "this.services.CoAuthoring.sql.dbPass = '${DB_PASS}'"
-}
-
-update_rabbitmq_setting(){
-  ${JSON} -I -e "if(this.rabbitmq===undefined)this.rabbitmq={};"
-  ${JSON} -I -e "this.rabbitmq.url = '${AMQP_URI}'"
-}
-
-update_redis_settings(){
-	${JSON} -I -e "if(this.services===undefined)this.services={};"
-	${JSON} -I -e "if(this.services.CoAuthoring===undefined)this.services.CoAuthoring={};"
-	${JSON} -I -e "if(this.services.CoAuthoring.redis===undefined)this.services.CoAuthoring.redis={};"
-  ${JSON} -I -e "this.services.CoAuthoring.redis.host = '${REDIS_SERVER_HOST}'"
-  ${JSON} -I -e "this.services.CoAuthoring.redis.port = '${REDIS_SERVER_PORT}'"
-}
-
-update_jwt_settings(){
-  ${JSON} -I -e "if(this.services===undefined)this.services={};"
-	${JSON} -I -e "if(this.services.CoAuthoring===undefined)this.services.CoAuthoring={};"
-	${JSON} -I -e "if(this.services.CoAuthoring.token===undefined)this.services.CoAuthoring.token={};"
-
-  if [ "${JWT_ENABLED}" == "true" -o "${JWT_ENABLED}" == "false" ]; then
-  	${JSON} -I -e "if(this.services.CoAuthoring.token.enable===undefined)this.services.CoAuthoring.token.enable={};"
-		${JSON} -I -e "if(this.services.CoAuthoring.token.enable.request===undefined)this.services.CoAuthoring.token.enable.request={};"
-    ${JSON} -I -e "this.services.CoAuthoring.token.enable.browser = ${JWT_ENABLED}"
-    ${JSON} -I -e "this.services.CoAuthoring.token.enable.request.inbox = ${JWT_ENABLED}"
-    ${JSON} -I -e "this.services.CoAuthoring.token.enable.request.outbox = ${JWT_ENABLED}"
-  fi
-
-	${JSON} -I -e "if(this.services.CoAuthoring.secret===undefined)this.services.CoAuthoring.secret={};"
-
-	${JSON} -I -e "if(this.services.CoAuthoring.secret.inbox===undefined)this.services.CoAuthoring.secret.inbox={};"
-	${JSON} -I -e "this.services.CoAuthoring.secret.inbox.string = '${JWT_SECRET}'"
-
-	${JSON} -I -e "if(this.services.CoAuthoring.secret.outbox===undefined)this.services.CoAuthoring.secret.outbox={};"
-	${JSON} -I -e "this.services.CoAuthoring.secret.outbox.string = '${JWT_SECRET}'"
-
-	${JSON} -I -e "if(this.services.CoAuthoring.secret.session===undefined)this.services.CoAuthoring.secret.session={};"
-	${JSON} -I -e "this.services.CoAuthoring.secret.session.string = '${JWT_SECRET}'"
-
-	${JSON} -I -e "if(this.services.CoAuthoring.token.inbox===undefined)this.services.CoAuthoring.token.inbox={};"
-	${JSON} -I -e "this.services.CoAuthoring.token.inbox.header = '${JWT_HEADER}'"
-
-	${JSON} -I -e "if(this.services.CoAuthoring.token.outbox===undefined)this.services.CoAuthoring.token.outbox={};"
-	${JSON} -I -e "this.services.CoAuthoring.token.outbox.header = '${JWT_HEADER}'"
-
-  if [ -f "${ONLYOFFICE_EXAMPLE_CONFIG}" ]; then
-		${JSON_EXAMPLE} -I -e "if(this.server===undefined)this.server={};"
-		${JSON_EXAMPLE} -I -e "if(this.server.token===undefined)this.server.token={};"
-
-		if [ "${JWT_ENABLED}" == "true" -o "${JWT_ENABLED}" == "false" ]; then
-			${JSON_EXAMPLE} -I -e "this.server.token.enable = ${JWT_ENABLED}"
-		fi
-		${JSON_EXAMPLE} -I -e "this.server.token.secret = '${JWT_SECRET}'"
-		${JSON_EXAMPLE} -I -e "this.server.token.authorizationHeader = '${JWT_HEADER}'"
-  fi
+  waiting_for_connection ${DATA_CONTAINER_HOST} ${DATA_CONTAINER_PORT} "data"
 }
 
 create_postgresql_tbl(){
@@ -226,33 +107,6 @@ create_postgresql_tbl(){
   $PSQL -d "${DB_NAME}" -f "${APP_DIR}/server/schema/postgresql/createdb.sql"
 }
 
-update_nginx_settings(){
-
-  # Set up nginx
-  cp ${SYSCONF_TEMPLATES_DIR}/nginx/nginx.conf ${NGINX_CONFIG_PATH}
-
-  sed 's/\(server \)localhost\(.*\)/'"\1${ONLYOFFICE_DS_NODE_HOST}\2"'/' \
-    -i ${NGINX_ONLYOFFICE_PATH}/includes/http-common.conf
-
-  ln -sf ${NGINX_ONLYOFFICE_PATH}/ds.conf.tmpl ${NGINX_ONLYOFFICE_CONF}
-
-  if [ -f "${NGINX_ONLYOFFICE_EXAMPLE_CONF}" ]; then
-    sed 's/linux/docker/' -i ${NGINX_ONLYOFFICE_EXAMPLE_CONF}
-  fi
-}
-
-update_supervisor_settings(){
-  # Copy modified supervisor config
-  cp ${SYSCONF_TEMPLATES_DIR}/supervisor/supervisord.conf /etc/supervisord.conf
-}
-
-update_log_settings(){
-   ${JSON_LOG} -I -e "this.categories.default.level = '${DS_LOG_LEVEL}'"
-}
-
-update_logrotate_settings(){
-  sed 's|\(^su\b\).*|\1 root root|' -i /etc/logrotate.conf
-}
 
 # create base folders
 for i in converter docservice spellchecker metrics gc; do
@@ -266,31 +120,14 @@ for i in App_Data/cache/files App_Data/docbuilder; do
   mkdir -p "${DS_LIB_DIR}/$i"
 done
 
-# change folder rights
-for i in ${LOG_DIR} ${LIB_DIR} ${DATA_DIR}; do
-  chown -R ds:ds "$i"
-  chmod -R 755 "$i"
-done
-
 documentserver-generate-allfonts.sh true
 
-if [ ${ONLYOFFICE_DATA_CONTAINER} = "true" ]; then
-  create_local_configs
-  init_setting
+if [ ${DATA_CONTAINER} = "true" ]; then
+  read_setting
 
-  update_log_settings
-  update_jwt_settings
-
-  update_postgresql_settings
   waiting_for_postgresql
   create_postgresql_tbl
 
-  update_rabbitmq_setting
-  update_redis_settings
-
-  tune_local_configs
-
-  update_nginx_settings
   nginx -g 'daemon off;'
 else
   waiting_for_datacontainer
@@ -300,6 +137,5 @@ else
   waiting_for_rabbitmq
   waiting_for_redis
 
-  update_supervisor_settings
   supervisord -n -c /etc/supervisord.conf
 fi
