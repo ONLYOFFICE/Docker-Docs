@@ -5,7 +5,7 @@ services:
     build:
       context: .
       target: proxy
-    image: ${COMPANY_NAME}/4testing-ds-base:proxy
+    image: ${COMPANY_NAME}/${PRODUCT_NAME}-proxy:${PRODUCT_VERSION}
     environment:
       - DOCSERVICE_HOST_PORT=docservice:8000
       - SPELLCHECKER_HOST_PORT=spellchecker:8080
@@ -26,7 +26,7 @@ services:
     build:
       context: .
       target: docservice
-    image: ${COMPANY_NAME}/4testing-ds-base:docservice
+    image: ${COMPANY_NAME}/${PRODUCT_NAME}-docservice:${PRODUCT_VERSION}
     container_name: docservice
     environment:
       - DB_HOST=postgresql
@@ -50,7 +50,7 @@ services:
     build:
       context: .
       target: converter
-    image: ${COMPANY_NAME}/4testing-ds-base:converter
+    image: ${COMPANY_NAME}/${PRODUCT_NAME}-converter:${PRODUCT_VERSION}
     container_name: converter
     environment:
       - DB_HOST=postgresql
@@ -72,7 +72,7 @@ services:
     build:
       context: .
       target: spellchecker
-    image: ${COMPANY_NAME}/4testing-ds-base:spellchecker
+    image: ${COMPANY_NAME}/${PRODUCT_NAME}-spellchecker:${PRODUCT_VERSION}
     container_name: spellchecker
     environment:
       - DB_HOST=postgresql
@@ -96,7 +96,7 @@ services:
     build:
       context: .
       target: example
-    image: ${COMPANY_NAME}/4testing-ds-base:example
+    image: ${COMPANY_NAME}/${PRODUCT_NAME}-example:${PRODUCT_VERSION}
     container_name: example
     environment:
       - DB_HOST=postgresql
@@ -135,7 +135,7 @@ services:
     build:
       context: .
       target: db
-    image: ${COMPANY_NAME}/4testing-ds-base:db
+    image: ${COMPANY_NAME}/${PRODUCT_NAME}-db:${PRODUCT_VERSION}
     environment:
       - POSTGRES_DB=mydb
       - POSTGRES_USER=myuser
