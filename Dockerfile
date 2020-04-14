@@ -53,6 +53,7 @@ VOLUME /var/lib/$COMPANY_NAME /var/www/$COMPANY_NAME/documentserver-example/publ
 USER 101
 
 FROM ds-base AS proxy
+    EXAMPLE_HOST_PORT=localhost:3000
 EXPOSE 8888
 ENTRYPOINT envsubst < /etc/nginx/includes/http-upstream.conf > /tmp/http-upstream.conf && exec nginx -g 'daemon off;'
 
