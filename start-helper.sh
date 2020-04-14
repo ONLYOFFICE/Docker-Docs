@@ -20,6 +20,11 @@ export NODE_CONFIG='{
   "rabbitmq": {
     "url": "'${AMQP_URI:-"amqp://guest:guest@localhost"}'"
   },
+  "FileConverter": {
+    "converter": {
+        "maxprocesscount": 0.001
+    }  
+  }
 }'
 
 exec "$@"
