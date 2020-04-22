@@ -7,8 +7,8 @@ export NODE_CONFIG='{
       "sql": {
         "dbHost": "'${DB_HOST:-localhost}'",
         "dbPort": '${DB_PORT:-5432}',
-        "dbName": "'${DB_NAME:-onlyoffice}'",
-        "dbUser": "'${DB_USER:-onlyoffice}'",
+        "dbUser": "'${DB_USER:=onlyoffice}'",
+        "dbName": "'${DB_NAME:-${DB_USER}}'",
         "dbPass": "'${DB_PWD:-onlyoffice}'"
       },
       "redis": {
