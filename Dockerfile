@@ -1,4 +1,4 @@
-FROM centos:7
+FROM centos:7 AS ds-base
 
 LABEL maintainer Ascensio System SIA <support@onlyoffice.com>
 
@@ -11,31 +11,69 @@ RUN yum -y install \
         epel-release \
         curl \
         sudo && \
-    curl -sL https://rpm.nodesource.com/setup_8.x | bash - && \
     yum -y updateinfo && \
     groupadd --system --gid 101 ds && \
     useradd --system -g ds --no-create-home --shell /sbin/nologin --uid 101 ds && \
     yum -y install \
+        gettext \
         $PRODUCT_URL \
         nc && \
     chmod a+r /etc/$COMPANY_NAME/documentserver*/*.json && \
     chmod a+r /etc/$COMPANY_NAME/documentserver/log4js/*.json && \
-    sed '/user=.*/d' -i /etc/supervisord.d/ds-*.ini && \
     sed 's,\(listen.\+:\)\([0-9]\+\)\(.*;\),'"\18888\3"',' \
-        -i /etc/nginx/conf.d/ds.conf
-
-RUN chmod 755 /var/log/nginx && \
+        -i /etc/nginx/conf.d/ds.conf && \
+    sed '/error_log.*/d' -i /etc/nginx/includes/ds-common.conf && \
+    chmod 755 /var/log/nginx && \
     ln -sf /dev/stderr /var/log/nginx/error.log
 
-COPY config/nginx/includes/http-common.conf /etc/nginx/includes/http-common.conf
 COPY config/nginx/nginx.conf /etc/nginx/nginx.conf
-COPY config/supervisor/supervisord.conf /etc/supervisord.conf
-COPY run-document-server.sh /app/ds/run-document-server.sh
+COPY config/nginx/includes/http-common.conf /etc/nginx/includes/http-common.conf
+COPY config/nginx/includes/http-upstream.conf /etc/nginx/includes/http-upstream.conf
+COPY start-helper.sh /app/start-helper.sh
+COPY example-start-helper.sh /app/example-start-helper.sh
 
-EXPOSE 8000 8080 3000 8888
+RUN chmod a+x /app/*.sh && \
+    mkdir -p \
+        /var/lib/$COMPANY_NAME/documentserver/App_Data/cache/files \
+        /var/lib/$COMPANY_NAME/documentserver/App_Data/docbuilder \
+        /var/www/$COMPANY_NAME/documentserver-example/public/files && \
+    documentserver-generate-allfonts.sh true
 
-VOLUME /var/log/$COMPANY_NAME /var/lib/$COMPANY_NAME /var/www/onlyoffice/$COMPANY_NAME-example/public/files /var/log/nginx
+VOLUME /var/lib/$COMPANY_NAME /var/www/$COMPANY_NAME/documentserver-example/public/files
 
 USER 101
 
-ENTRYPOINT /app/ds/run-document-server.sh
+FROM ds-base AS proxy
+ENV DOCSERVICE_HOST_PORT=localhost:8000 \
+    SPELLCHECKER_HOST_PORT=localhost:8080 \
+    EXAMPLE_HOST_PORT=localhost:3000
+EXPOSE 8888
+ENTRYPOINT envsubst < /etc/nginx/includes/http-upstream.conf > /tmp/http-upstream.conf && exec nginx -g 'daemon off;'
+
+FROM ds-base as ds-service
+ENV NODE_ENV=production-linux \
+    NODE_CONFIG_DIR=/etc/$COMPANY_NAME/documentserver
+
+FROM ds-service AS docservice
+EXPOSE 8000
+ENTRYPOINT /app/start-helper.sh /var/www/$COMPANY_NAME/documentserver/server/DocService/docservice
+
+FROM ds-service AS converter
+ENTRYPOINT /app/start-helper.sh /var/www/$COMPANY_NAME/documentserver/server/FileConverter/converter
+
+FROM ds-service AS spellchecker
+EXPOSE 8080
+ENTRYPOINT /app/start-helper.sh /var/www/$COMPANY_NAME/documentserver/server/SpellChecker/spellchecker
+
+#FROM ds-base AS metrics
+#CMD [""]
+#ENTRYPOINT /app/start-helper.sh /var/www/$COMPANY_NAME/documentserver/server/Metrics/metrics /var/www/$COMPANY_NAME/documentserver/server/Metrics/metrics/config/config.js
+
+FROM ds-base AS example
+ENV NODE_ENV=production-linux \
+    NODE_CONFIG_DIR=/etc/$COMPANY_NAME/documentserver-example
+ENTRYPOINT /app/example-start-helper.sh /var/www/$COMPANY_NAME/documentserver-example/example
+
+FROM postgres:9.5 AS db
+ARG COMPANY_NAME=onlyoffice
+COPY --from=ds-base /var/www/$COMPANY_NAME/documentserver/server/schema/postgresql/createdb.sql /docker-entrypoint-initdb.d/

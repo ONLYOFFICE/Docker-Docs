@@ -1,44 +1,118 @@
-version: '2'
+version: '2.3'
 services:
   proxy:
     container_name: proxy
     build:
       context: .
+      target: proxy
+    image: ${COMPANY_NAME}/${PRODUCT_NAME}-proxy:${PRODUCT_VERSION}
     environment:
-      - DATA_CONTAINER=true
+      - DOCSERVICE_HOST_PORT=docservice:8000
+      - SPELLCHECKER_HOST_PORT=spellchecker:8080
+      - EXAMPLE_HOST_PORT=example:3000
     stdin_open: true
     restart: always
-
     ports:
       - '80:8888'
-    volumes:
-       - /etc/${COMPANY_NAME}
-       - /var/www/${COMPANY_NAME}/Data
-      # - ./var/log/ds:/var/log/${COMPANY_NAME}
-      # - ./var/lib/ds:/var/lib/${COMPANY_NAME}
-      # - ./var/log/nginx:/var/log/nginx
-      # - ./var/lib/example:/var/www/${COMPANY_NAME}/documentserver-example/public/files
-       - /usr/share/fonts
-       - ./local.json:/etc/${COMPANY_NAME}/documentserver/local.json
-       - ./http-upstream.conf:/etc/nginx/includes/http-upstream.conf
+#    volumes:
+#      - /etc/${COMPANY_NAME}
+#      - /var/www/${COMPANY_NAME}/Data
+#      - ./var/lib/ds:/var/lib/${COMPANY_NAME}/documentserver/App_Data/cache/files
+#      - ./var/lib/example:/var/www/${COMPANY_NAME}/documentserver-example/public/files
+#      - /usr/share/fonts
+#      - ./http-upstream.conf:/etc/nginx/includes/http-upstream.conf
        
-  ds:
+  docservice:
     build:
       context: .
-    container_name: ds
+      target: docservice
+    image: ${COMPANY_NAME}/${PRODUCT_NAME}-docservice:${PRODUCT_VERSION}
+    container_name: docservice
+    environment:
+      - DB_HOST=postgresql
+      - DB_NAME=mydb
+      - DB_USER=myuser
+      - REDIST_SERVER_HOST=redis
+      - AMQP_URI=amqp://guest:guest@rabbitmq
     depends_on:
       - proxy
       - postgresql
       - redis
       - rabbitmq
+    stdin_open: true
+    restart: always
+    expose:
+      - '8000'
+    volumes_from:
+     - proxy
+
+  converter:
+    build:
+      context: .
+      target: converter
+    image: ${COMPANY_NAME}/${PRODUCT_NAME}-converter:${PRODUCT_VERSION}
+    container_name: converter
     environment:
-      - DATA_CONTAINER_HOST=proxy
+      - DB_HOST=postgresql
+      - DB_NAME=mydb
+      - DB_USER=myuser
+      - REDIST_SERVER_HOST=redis
+      - AMQP_URI=amqp://guest:guest@rabbitmq
+    depends_on:
+      - proxy
+      - postgresql
+      - redis
+      - rabbitmq
+    stdin_open: true
+    restart: always
+    volumes_from:
+     - proxy
+
+  spellchecker:
+    build:
+      context: .
+      target: spellchecker
+    image: ${COMPANY_NAME}/${PRODUCT_NAME}-spellchecker:${PRODUCT_VERSION}
+    container_name: spellchecker
+    environment:
+      - DB_HOST=postgresql
+      - DB_NAME=mydb
+      - DB_USER=myuser
+      - REDIST_SERVER_HOST=redis
+      - AMQP_URI=amqp://guest:guest@rabbitmq
+    depends_on:
+      - proxy
+      - postgresql
+      - redis
+      - rabbitmq
+    stdin_open: true
+    restart: always
+    expose:
+      - '8080'
+    volumes_from:
+     - proxy
+
+  example:
+    build:
+      context: .
+      target: example
+    image: ${COMPANY_NAME}/${PRODUCT_NAME}-example:${PRODUCT_VERSION}
+    container_name: example
+    environment:
+      - DB_HOST=postgresql
+      - DB_NAME=mydb
+      - DB_USER=myuser
+      - REDIST_SERVER_HOST=redis
+      - AMQP_URI=amqp://guest:guest@rabbitmq
+    depends_on:
+      - proxy
+      - postgresql
+      - redis
+      - rabbitmq
     stdin_open: true
     restart: always
     expose:
       - '3000'
-      - '8000'
-      - '8080'
     volumes_from:
      - proxy
 
@@ -58,10 +132,14 @@ services:
 
   postgresql:
     container_name: postgresql
-    image: postgres:9.5
+    build:
+      context: .
+      target: db
+    image: ${COMPANY_NAME}/${PRODUCT_NAME}-db:${PRODUCT_VERSION}
     environment:
       - POSTGRES_DB=mydb
       - POSTGRES_USER=myuser
+      - POSTGRES_HOST_AUTH_METHOD=trust
     restart: always
     expose:
       - '5432'
