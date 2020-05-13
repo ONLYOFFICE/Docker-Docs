@@ -2,6 +2,12 @@
 set -e
 
 export NODE_CONFIG='{
+  "statsd": {
+    "useMetrics": '${METRICS_ENABLED:-false}',
+		"host": "'${METRICS_HOST:-localhost}'",
+		"port": '${METRICS_PORT:-8125}',
+		"prefix": "'${METRICS_PREFIX:-ds.}'"
+	},
   "services": {
     "CoAuthoring": {
       "sql": {

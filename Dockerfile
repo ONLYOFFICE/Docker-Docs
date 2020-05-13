@@ -65,9 +65,9 @@ FROM ds-service AS spellchecker
 EXPOSE 8080
 ENTRYPOINT /app/start-helper.sh /var/www/$COMPANY_NAME/documentserver/server/SpellChecker/spellchecker
 
-#FROM ds-base AS metrics
-#CMD [""]
-#ENTRYPOINT /app/start-helper.sh /var/www/$COMPANY_NAME/documentserver/server/Metrics/metrics /var/www/$COMPANY_NAME/documentserver/server/Metrics/metrics/config/config.js
+FROM statsd/statsd AS metrics
+ARG COMPANY_NAME=onlyoffice
+COPY --from=ds-base /var/www/$COMPANY_NAME/documentserver/server/Metrics/config/config.js /usr/src/app/config.js
 
 FROM ds-base AS example
 ENV NODE_ENV=production-linux \

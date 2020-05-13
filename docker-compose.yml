@@ -34,11 +34,14 @@ services:
       - DB_USER=myuser
       - REDIST_SERVER_HOST=redis
       - AMQP_URI=amqp://guest:guest@rabbitmq
+      - METRICS_HOST=metrics
+      - METRICS_ENABLED=true
     depends_on:
       - proxy
       - postgresql
       - redis
       - rabbitmq
+      - metrics
     stdin_open: true
     restart: always
     expose:
@@ -58,11 +61,14 @@ services:
       - DB_USER=myuser
       - REDIST_SERVER_HOST=redis
       - AMQP_URI=amqp://guest:guest@rabbitmq
+      - METRICS_HOST=metrics
+      - METRICS_ENABLED=true
     depends_on:
       - proxy
       - postgresql
       - redis
       - rabbitmq
+      - metrics
     stdin_open: true
     restart: always
     volumes_from:
@@ -80,11 +86,14 @@ services:
       - DB_USER=myuser
       - REDIST_SERVER_HOST=redis
       - AMQP_URI=amqp://guest:guest@rabbitmq
+      - METRICS_HOST=metrics
+      - METRICS_ENABLED=true
     depends_on:
       - proxy
       - postgresql
       - redis
       - rabbitmq
+      - metrics
     stdin_open: true
     restart: always
     expose:
@@ -92,6 +101,15 @@ services:
     volumes_from:
      - proxy
 
+  metrics:
+    build:
+      context: .
+      target: metrics
+    container_name: metrics
+    expose:
+      - '8125'
+      - '8126'
+  
   example:
     build:
       context: .
