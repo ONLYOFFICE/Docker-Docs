@@ -135,7 +135,6 @@ services:
     build:
       context: .
       target: db
-    image: ${COMPANY_NAME}/${PRODUCT_NAME}-db:${PRODUCT_VERSION}
     environment:
       - POSTGRES_DB=mydb
       - POSTGRES_USER=myuser
