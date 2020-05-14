@@ -32,7 +32,6 @@ COPY config/nginx/nginx.conf /etc/nginx/nginx.conf
 COPY config/nginx/includes/http-common.conf /etc/nginx/includes/http-common.conf
 COPY config/nginx/includes/http-upstream.conf /etc/nginx/includes/http-upstream.conf
 COPY start-helper.sh /app/start-helper.sh
-COPY example-start-helper.sh /app/example-start-helper.sh
 
 RUN chmod a+x /app/*.sh && \
     mkdir -p \
@@ -79,9 +78,9 @@ ENV COMPANY_NAME=$COMPANY_NAME \
 EXPOSE 8000
 COPY --from=ds-base /etc/$COMPANY_NAME/documentserver-example /etc/$COMPANY_NAME/documentserver-example
 COPY --from=ds-base /var/www/$COMPANY_NAME/documentserver-example /var/www/$COMPANY_NAME/documentserver-example
-COPY example-start-helper.sh /app/
-RUN chmod a+x /app/example-start-helper.sh
-ENTRYPOINT /app/example-start-helper.sh /var/www/$COMPANY_NAME/documentserver-example/example
+COPY example-docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod a+x /usr/local/bin/docker-entrypoint.sh
+ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver-example/example
 
 FROM postgres:9.5 AS db
 ARG COMPANY_NAME=onlyoffice
