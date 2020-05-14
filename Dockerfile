@@ -71,9 +71,16 @@ FROM statsd/statsd AS metrics
 ARG COMPANY_NAME=onlyoffice
 COPY --from=ds-base /var/www/$COMPANY_NAME/documentserver/server/Metrics/config/config.js /usr/src/app/config.js
 
-FROM ds-base AS example
-ENV NODE_ENV=production-linux \
+FROM centos:7 AS example
+ARG COMPANY_NAME=onlyoffice
+ENV COMPANY_NAME=$COMPANY_NAME \
+    NODE_ENV=production-linux \
     NODE_CONFIG_DIR=/etc/$COMPANY_NAME/documentserver-example
+EXPOSE 8000
+COPY --from=ds-base /etc/$COMPANY_NAME/documentserver-example /etc/$COMPANY_NAME/documentserver-example
+COPY --from=ds-base /var/www/$COMPANY_NAME/documentserver-example /var/www/$COMPANY_NAME/documentserver-example
+COPY example-start-helper.sh /app/
+RUN chmod a+x /app/example-start-helper.sh
 ENTRYPOINT /app/example-start-helper.sh /var/www/$COMPANY_NAME/documentserver-example/example
 
 FROM postgres:9.5 AS db
