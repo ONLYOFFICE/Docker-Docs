@@ -24,7 +24,9 @@ RUN yum -y install \
         -i /etc/nginx/conf.d/ds.conf && \
     sed '/error_log.*/d' -i /etc/nginx/includes/ds-common.conf && \
     chmod 755 /var/log/nginx && \
-    ln -sf /dev/stderr /var/log/nginx/error.log
+    ln -sf /dev/stderr /var/log/nginx/error.log && \
+    yum clean all && \
+    rm -rf /var/tmp/yum-*
 
 COPY config/nginx/nginx.conf /etc/nginx/nginx.conf
 COPY config/nginx/includes/http-common.conf /etc/nginx/includes/http-common.conf
