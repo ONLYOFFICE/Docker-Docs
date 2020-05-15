@@ -81,6 +81,7 @@ ARG COMPANY_NAME=onlyoffice
 COPY --from=ds-base /var/www/$COMPANY_NAME/documentserver/server/Metrics/config/config.js /usr/src/app/config.js
 
 FROM centos:7 AS example
+LABEL maintainer Ascensio System SIA <support@onlyoffice.com>
 ARG COMPANY_NAME=onlyoffice
 ENV COMPANY_NAME=$COMPANY_NAME \
     NODE_ENV=production-linux \
