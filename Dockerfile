@@ -70,7 +70,6 @@ ENV COMPANY_NAME=$COMPANY_NAME \
     NODE_CONFIG_DIR=/etc/$COMPANY_NAME/documentserver
 EXPOSE 8080
 COPY --from=ds-base /etc/$COMPANY_NAME/documentserver/log4js /etc/$COMPANY_NAME/documentserver/log4js
-COPY --from=ds-base /etc/$COMPANY_NAME/documentserver/logrotate /etc/$COMPANY_NAME/documentserver/logrotate
 COPY --from=ds-base /etc/$COMPANY_NAME/documentserver/*.json /etc/$COMPANY_NAME/documentserver/
 COPY --from=ds-base /var/www/$COMPANY_NAME/documentserver/server/SpellChecker /var/www/$COMPANY_NAME/documentserver/server/SpellChecker
 COPY start-helper.sh /usr/local/bin/docker-entrypoint.sh
