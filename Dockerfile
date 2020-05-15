@@ -63,6 +63,7 @@ FROM ds-service AS converter
 ENTRYPOINT /app/start-helper.sh /var/www/$COMPANY_NAME/documentserver/server/FileConverter/converter
 
 FROM centos:7 AS spellchecker
+LABEL maintainer Ascensio System SIA <support@onlyoffice.com>
 ARG COMPANY_NAME=onlyoffice
 ENV COMPANY_NAME=$COMPANY_NAME \
     NODE_ENV=production-linux \
