@@ -36,11 +36,10 @@ COPY docker-entrypoint.sh /usr/local/bin/
 RUN chmod a+x /usr/local/bin/*.sh && \
     mkdir -p \
         /var/lib/$COMPANY_NAME/documentserver/App_Data/cache/files \
-        /var/lib/$COMPANY_NAME/documentserver/App_Data/docbuilder \
-        /var/www/$COMPANY_NAME/documentserver-example/public/files && \
+        /var/lib/$COMPANY_NAME/documentserver/App_Data/docbuilder && \
     documentserver-generate-allfonts.sh true
 
-VOLUME /var/lib/$COMPANY_NAME /var/www/$COMPANY_NAME/documentserver-example/public/files
+VOLUME /var/lib/$COMPANY_NAME
 
 USER 101
 
@@ -81,6 +80,7 @@ ARG COMPANY_NAME=onlyoffice
 COPY --from=ds-base /var/www/$COMPANY_NAME/documentserver/server/Metrics/config/config.js /usr/src/app/config.js
 
 FROM centos:7 AS example
+LABEL maintainer Ascensio System SIA <support@onlyoffice.com>
 ARG COMPANY_NAME=onlyoffice
 ENV COMPANY_NAME=$COMPANY_NAME \
     NODE_ENV=production-linux \
@@ -89,7 +89,9 @@ EXPOSE 8000
 COPY --from=ds-base /etc/$COMPANY_NAME/documentserver-example /etc/$COMPANY_NAME/documentserver-example
 COPY --from=ds-base /var/www/$COMPANY_NAME/documentserver-example /var/www/$COMPANY_NAME/documentserver-example
 COPY example-docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
-RUN chmod a+x /usr/local/bin/docker-entrypoint.sh
+RUN chmod a+x /usr/local/bin/docker-entrypoint.sh && \
+    mkdir -p /var/www/$COMPANY_NAME/documentserver-example/public/files
+VOLUME /var/www/$COMPANY_NAME/documentserver-example/public/files
 ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver-example/example
 
 FROM postgres:9.5 AS db
