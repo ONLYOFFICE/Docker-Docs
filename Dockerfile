@@ -62,9 +62,17 @@ ENTRYPOINT /app/start-helper.sh /var/www/$COMPANY_NAME/documentserver/server/Doc
 FROM ds-service AS converter
 ENTRYPOINT /app/start-helper.sh /var/www/$COMPANY_NAME/documentserver/server/FileConverter/converter
 
-FROM ds-service AS spellchecker
+FROM centos:7 AS spellchecker
+ARG COMPANY_NAME=onlyoffice
+ENV COMPANY_NAME=$COMPANY_NAME \
+    NODE_ENV=production-linux \
+    NODE_CONFIG_DIR=/etc/$COMPANY_NAME/documentserver
 EXPOSE 8080
-ENTRYPOINT /app/start-helper.sh /var/www/$COMPANY_NAME/documentserver/server/SpellChecker/spellchecker
+COPY --from=ds-base /etc/$COMPANY_NAME/documentserver /etc/$COMPANY_NAME/documentserver
+COPY --from=ds-base /var/www/$COMPANY_NAME/documentserver/server/SpellChecker /var/www/$COMPANY_NAME/documentserver/server/SpellChecker
+COPY start-helper.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod a+x /usr/local/bin/docker-entrypoint.sh
+ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/SpellChecker/spellchecker
 
 FROM statsd/statsd AS metrics
 ARG COMPANY_NAME=onlyoffice
