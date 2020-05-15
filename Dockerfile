@@ -31,9 +31,9 @@ RUN yum -y install \
 COPY config/nginx/nginx.conf /etc/nginx/nginx.conf
 COPY config/nginx/includes/http-common.conf /etc/nginx/includes/http-common.conf
 COPY config/nginx/includes/http-upstream.conf /etc/nginx/includes/http-upstream.conf
-COPY start-helper.sh /app/start-helper.sh
+COPY docker-entrypoint.sh /usr/local/bin/
 
-RUN chmod a+x /app/*.sh && \
+RUN chmod a+x /usr/local/bin/*.sh && \
     mkdir -p \
         /var/lib/$COMPANY_NAME/documentserver/App_Data/cache/files \
         /var/lib/$COMPANY_NAME/documentserver/App_Data/docbuilder \
@@ -57,14 +57,24 @@ ENV NODE_ENV=production-linux \
 
 FROM ds-service AS docservice
 EXPOSE 8000
-ENTRYPOINT /app/start-helper.sh /var/www/$COMPANY_NAME/documentserver/server/DocService/docservice
+ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/DocService/docservice
 
 FROM ds-service AS converter
-ENTRYPOINT /app/start-helper.sh /var/www/$COMPANY_NAME/documentserver/server/FileConverter/converter
+ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/FileConverter/converter
 
-FROM ds-service AS spellchecker
+FROM centos:7 AS spellchecker
+LABEL maintainer Ascensio System SIA <support@onlyoffice.com>
+ARG COMPANY_NAME=onlyoffice
+ENV COMPANY_NAME=$COMPANY_NAME \
+    NODE_ENV=production-linux \
+    NODE_CONFIG_DIR=/etc/$COMPANY_NAME/documentserver
 EXPOSE 8080
-ENTRYPOINT /app/start-helper.sh /var/www/$COMPANY_NAME/documentserver/server/SpellChecker/spellchecker
+COPY --from=ds-base /etc/$COMPANY_NAME/documentserver/log4js /etc/$COMPANY_NAME/documentserver/log4js
+COPY --from=ds-base /etc/$COMPANY_NAME/documentserver/*.json /etc/$COMPANY_NAME/documentserver/
+COPY --from=ds-base /var/www/$COMPANY_NAME/documentserver/server/SpellChecker /var/www/$COMPANY_NAME/documentserver/server/SpellChecker
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod a+x /usr/local/bin/docker-entrypoint.sh
+ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/SpellChecker/spellchecker
 
 FROM statsd/statsd AS metrics
 ARG COMPANY_NAME=onlyoffice
