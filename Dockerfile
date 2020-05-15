@@ -85,13 +85,17 @@ ARG COMPANY_NAME=onlyoffice
 ENV COMPANY_NAME=$COMPANY_NAME \
     NODE_ENV=production-linux \
     NODE_CONFIG_DIR=/etc/$COMPANY_NAME/documentserver-example
+RUN groupadd --system --gid 101 ds && \
+    useradd --system -g ds --no-create-home --shell /sbin/nologin --uid 101 ds
 EXPOSE 8000
 COPY --from=ds-base /etc/$COMPANY_NAME/documentserver-example /etc/$COMPANY_NAME/documentserver-example
 COPY --from=ds-base /var/www/$COMPANY_NAME/documentserver-example /var/www/$COMPANY_NAME/documentserver-example
 COPY example-docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod a+x /usr/local/bin/docker-entrypoint.sh && \
-    mkdir -p /var/www/$COMPANY_NAME/documentserver-example/public/files
-VOLUME /var/www/$COMPANY_NAME/documentserver-example/public/files
+    mkdir -p /var/lib/$COMPANY_NAME/documentserver-example/files && \
+    chown -R ds:ds /var/lib/$COMPANY_NAME/documentserver-example/files
+VOLUME /var/lib/$COMPANY_NAME/documentserver-example/files
+USER 101
 ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver-example/example
 
 FROM postgres:9.5 AS db
