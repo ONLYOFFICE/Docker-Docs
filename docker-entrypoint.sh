@@ -52,7 +52,7 @@ export NODE_CONFIG='{
     }
   },
   "rabbitmq": {
-    "url": "'${AMQP_URI:-"amqp://guest:guest@localhost"}'"
+    "url": "'${AMQP_URI:-${AMQP_PROTO:-amqp}://${AMQP_USER:-guest}:${AMQP_PWD:-guest}@${AMQP_HOST:-localhost}}'"
   },
   "FileConverter": {
     "converter": {
