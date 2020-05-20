@@ -6,8 +6,9 @@ ARG COMPANY_NAME=onlyoffice
 ENV COMPANY_NAME=$COMPANY_NAME \
     NODE_ENV=production-linux \
     NODE_CONFIG_DIR=/etc/$COMPANY_NAME/documentserver
-RUN groupadd --system --gid 101 ds \
-    && useradd --system -g ds --no-create-home --shell /sbin/nologin --uid 101 ds
+RUN groupadd --system --gid 101 ds && \
+    useradd --system -g ds --no-create-home --shell /sbin/nologin --uid 101 ds && \
+    rm -f /var/log/{lastlog,tallylog}
 
 FROM ds-base AS ds-service
 ARG PRODUCT_URL=http://download.onlyoffice.com/install/documentserver/linux/onlyoffice-documentserver-ie.x86_64.rpm
