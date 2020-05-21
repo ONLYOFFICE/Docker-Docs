@@ -45,17 +45,17 @@ RUN chmod a+x /usr/local/bin/*.sh && \
 
 VOLUME /var/lib/$COMPANY_NAME
 
+USER 101
+
 FROM ds-service AS proxy
 ENV DOCSERVICE_HOST_PORT=localhost:8000 \
     SPELLCHECKER_HOST_PORT=localhost:8080 \
     EXAMPLE_HOST_PORT=localhost:3000
 EXPOSE 8888
-USER 101
 ENTRYPOINT envsubst < /etc/nginx/includes/http-upstream.conf > /tmp/http-upstream.conf && exec nginx -g 'daemon off;'
 
 FROM ds-service AS docservice
 EXPOSE 8000
-USER 101
 ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/DocService/docservice
 
 FROM ds-base AS converter
@@ -100,7 +100,6 @@ RUN chmod +x /usr/local/bin/*.sh && \
         /var/lib/$COMPANY_NAME/documentserver-example/files && \
     chown -R ds:ds /var/lib/$COMPANY_NAME
 VOLUME /var/lib/$COMPANY_NAME /var/lib/$COMPANY_NAME/documentserver-example/files
-USER 101
 ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/FileConverter/converter
 
 FROM ds-base AS spellchecker
@@ -117,7 +116,6 @@ COPY --from=ds-service \
         /var/www/$COMPANY_NAME/documentserver/server/SpellChecker
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/*.sh
-USER 101
 ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/SpellChecker/spellchecker
 
 FROM statsd/statsd AS metrics
@@ -134,7 +132,6 @@ RUN chmod a+x /usr/local/bin/docker-entrypoint.sh && \
     mkdir -p /var/lib/$COMPANY_NAME/documentserver-example/files && \
     chown -R ds:ds /var/lib/$COMPANY_NAME/documentserver-example/files
 VOLUME /var/lib/$COMPANY_NAME/documentserver-example/files
-USER 101
 ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver-example/example
 
 FROM postgres:9.5 AS db
