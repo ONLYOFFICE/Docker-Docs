@@ -46,11 +46,42 @@ VOLUME /var/lib/$COMPANY_NAME
 
 USER 101
 
-FROM ds-service AS proxy
+FROM ds-base AS proxy
 ENV DOCSERVICE_HOST_PORT=localhost:8000 \
     SPELLCHECKER_HOST_PORT=localhost:8080 \
     EXAMPLE_HOST_PORT=localhost:3000
 EXPOSE 8888
+RUN yum -y install epel-release sudo && \
+    yum -y updateinfo && \
+    yum -y install gettext nginx && \
+    yum clean all
+COPY config/nginx/nginx.conf /etc/nginx/nginx.conf
+COPY --from=ds-service \
+    /etc/onlyoffice/documentserver/nginx/ds.conf \
+    /etc/nginx/conf.d/
+COPY --from=ds-service \
+    /etc/onlyoffice/documentserver/nginx/includes/ds-common.conf \
+    /etc/onlyoffice/documentserver/nginx/includes/ds-docservice.conf \
+    /etc/onlyoffice/documentserver-example/nginx/includes/ds-example.conf \
+    /etc/onlyoffice/documentserver/nginx/includes/ds-spellchecker.conf \
+    /etc/nginx/includes/
+COPY \
+    config/nginx/includes/http-common.conf \
+    config/nginx/includes/http-upstream.conf \
+    /etc/nginx/includes/
+COPY --from=ds-service \
+    /var/www/$COMPANY_NAME/documentserver/web-apps \
+    /var/www/$COMPANY_NAME/documentserver/web-apps
+RUN sed 's,\(listen.\+:\)\([0-9]\+\)\(.*;\),'"\18888\3"',' \
+        -i /etc/nginx/conf.d/ds.conf && \
+    sed '/error_log.*/d' -i /etc/nginx/includes/ds-common.conf && \
+    chmod 755 /var/log/nginx && \
+    ln -sf /dev/stderr /var/log/nginx/error.log
+RUN mkdir -p \
+        /var/lib/$COMPANY_NAME/documentserver/App_Data/cache/files \
+        /var/lib/$COMPANY_NAME/documentserver/App_Data/docbuilder \
+        /var/lib/$COMPANY_NAME/documentserver-example/files
+VOLUME /var/lib/$COMPANY_NAME /var/lib/$COMPANY_NAME/documentserver-example/files
 ENTRYPOINT envsubst < /etc/nginx/includes/http-upstream.conf > /tmp/http-upstream.conf && exec nginx -g 'daemon off;'
 
 FROM ds-service AS docservice
