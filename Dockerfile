@@ -70,8 +70,17 @@ COPY \
     config/nginx/includes/http-upstream.conf \
     /etc/nginx/includes/
 COPY --from=ds-service \
+    /var/www/$COMPANY_NAME/documentserver/sdkjs \
+    /var/www/$COMPANY_NAME/documentserver/sdkjs
+COPY --from=ds-service \
+    /var/www/$COMPANY_NAME/documentserver/sdkjs-plugins \
+    /var/www/$COMPANY_NAME/documentserver/sdkjs-plugins
+COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/web-apps \
     /var/www/$COMPANY_NAME/documentserver/web-apps
+COPY --from=ds-service \
+    /var/www/$COMPANY_NAME/documentserver-example/welcome \
+    /var/www/$COMPANY_NAME/documentserver-example/welcome
 RUN sed 's,\(listen.\+:\)\([0-9]\+\)\(.*;\),'"\18888\3"',' \
         -i /etc/nginx/conf.d/ds.conf && \
     sed '/error_log.*/d' -i /etc/nginx/includes/ds-common.conf && \
