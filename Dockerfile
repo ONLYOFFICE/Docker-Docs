@@ -105,11 +105,18 @@ ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/Fil
 
 FROM ds-base AS spellchecker
 EXPOSE 8080
-COPY --from=ds-service /etc/$COMPANY_NAME/documentserver/log4js /etc/$COMPANY_NAME/documentserver/log4js
-COPY --from=ds-service /etc/$COMPANY_NAME/documentserver/*.json /etc/$COMPANY_NAME/documentserver/
-COPY --from=ds-service /var/www/$COMPANY_NAME/documentserver/server/SpellChecker /var/www/$COMPANY_NAME/documentserver/server/SpellChecker
+COPY --from=ds-service \
+        /etc/$COMPANY_NAME/documentserver/default.json \
+        /etc/$COMPANY_NAME/documentserver/production-linux.json \
+        /etc/$COMPANY_NAME/documentserver/
+COPY --from=ds-service \
+        /etc/$COMPANY_NAME/documentserver/log4js/production.json \
+        /etc/$COMPANY_NAME/documentserver/log4js/
+COPY --from=ds-service \
+        /var/www/$COMPANY_NAME/documentserver/server/SpellChecker \
+        /var/www/$COMPANY_NAME/documentserver/server/SpellChecker
 COPY docker-entrypoint.sh /usr/local/bin/
-RUN chmod a+x /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/*.sh
 USER 101
 ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/SpellChecker/spellchecker
 
