@@ -59,56 +59,56 @@ ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/Doc
 
 FROM ds-base AS converter
 COPY --from=ds-service \
-        /etc/$COMPANY_NAME/documentserver/default.json \
-        /etc/$COMPANY_NAME/documentserver/production-linux.json \
-        /etc/$COMPANY_NAME/documentserver/
+    /etc/$COMPANY_NAME/documentserver/default.json \
+    /etc/$COMPANY_NAME/documentserver/production-linux.json \
+    /etc/$COMPANY_NAME/documentserver/
 COPY --from=ds-service \
-        /etc/$COMPANY_NAME/documentserver/log4js/production.json \
-        /etc/$COMPANY_NAME/documentserver/log4js/
+    /etc/$COMPANY_NAME/documentserver/log4js/production.json \
+    /etc/$COMPANY_NAME/documentserver/log4js/
 COPY --from=ds-service \
-        /var/www/$COMPANY_NAME/documentserver/core-fonts \
-        /var/www/$COMPANY_NAME/documentserver/core-fonts
+    /var/www/$COMPANY_NAME/documentserver/core-fonts \
+    /var/www/$COMPANY_NAME/documentserver/core-fonts
 COPY --from=ds-service \
-        /var/www/$COMPANY_NAME/documentserver/fonts \
-        /var/www/$COMPANY_NAME/documentserver/fonts
+    /var/www/$COMPANY_NAME/documentserver/fonts \
+    /var/www/$COMPANY_NAME/documentserver/fonts
 COPY --from=ds-service \
-        /var/www/$COMPANY_NAME/documentserver/sdkjs \
-        /var/www/$COMPANY_NAME/documentserver/sdkjs
+    /var/www/$COMPANY_NAME/documentserver/sdkjs \
+    /var/www/$COMPANY_NAME/documentserver/sdkjs
 COPY --from=ds-service \
-        /var/www/$COMPANY_NAME/documentserver/server/FileConverter \
-        /var/www/$COMPANY_NAME/documentserver/server/FileConverter
+    /var/www/$COMPANY_NAME/documentserver/server/FileConverter \
+    /var/www/$COMPANY_NAME/documentserver/server/FileConverter
 COPY --from=ds-service \
-        /var/www/$COMPANY_NAME/documentserver/web-apps \
-        /var/www/$COMPANY_NAME/documentserver/web-apps
+    /var/www/$COMPANY_NAME/documentserver/web-apps \
+    /var/www/$COMPANY_NAME/documentserver/web-apps
 COPY --from=ds-service \
-        /usr/lib64/libgraphics.so \
-        /usr/lib64/libdoctrenderer.so \
-        /usr/lib64/libkernel.so \
-        /usr/lib64/libicudata.so.58 \
-        /usr/lib64/libicuuc.so.58 \
-        /usr/lib64/libDjVuFile.so \
-        /usr/lib64/libPdfReader.so \
-        /usr/lib64/libPdfWriter.so \
-        /usr/lib64/libHtmlFile.so \
-        /usr/lib64/libHtmlRenderer.so \
-        /usr/lib64/libUnicodeConverter.so \
-        /usr/lib64/libXpsFile.so \
-        /usr/lib64/
+    /usr/lib64/libgraphics.so \
+    /usr/lib64/libdoctrenderer.so \
+    /usr/lib64/libkernel.so \
+    /usr/lib64/libicudata.so.58 \
+    /usr/lib64/libicuuc.so.58 \
+    /usr/lib64/libDjVuFile.so \
+    /usr/lib64/libPdfReader.so \
+    /usr/lib64/libPdfWriter.so \
+    /usr/lib64/libHtmlFile.so \
+    /usr/lib64/libHtmlRenderer.so \
+    /usr/lib64/libUnicodeConverter.so \
+    /usr/lib64/libXpsFile.so \
+    /usr/lib64/
 COPY docker-entrypoint.sh /usr/local/bin/
 ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/FileConverter/converter
 
 FROM ds-base AS spellchecker
 EXPOSE 8080
 COPY --from=ds-service \
-        /etc/$COMPANY_NAME/documentserver/default.json \
-        /etc/$COMPANY_NAME/documentserver/production-linux.json \
-        /etc/$COMPANY_NAME/documentserver/
+    /etc/$COMPANY_NAME/documentserver/default.json \
+    /etc/$COMPANY_NAME/documentserver/production-linux.json \
+    /etc/$COMPANY_NAME/documentserver/
 COPY --from=ds-service \
-        /etc/$COMPANY_NAME/documentserver/log4js/production.json \
-        /etc/$COMPANY_NAME/documentserver/log4js/
+    /etc/$COMPANY_NAME/documentserver/log4js/production.json \
+    /etc/$COMPANY_NAME/documentserver/log4js/
 COPY --from=ds-service \
-        /var/www/$COMPANY_NAME/documentserver/server/SpellChecker \
-        /var/www/$COMPANY_NAME/documentserver/server/SpellChecker
+    /var/www/$COMPANY_NAME/documentserver/server/SpellChecker \
+    /var/www/$COMPANY_NAME/documentserver/server/SpellChecker
 COPY docker-entrypoint.sh /usr/local/bin/
 ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/SpellChecker/spellchecker
 
@@ -119,8 +119,12 @@ COPY --from=ds-service /var/www/$COMPANY_NAME/documentserver/server/Metrics/conf
 FROM ds-base AS example
 ENV NODE_CONFIG_DIR=/etc/$COMPANY_NAME/documentserver-example
 EXPOSE 8000
-COPY --from=ds-service /etc/$COMPANY_NAME/documentserver-example /etc/$COMPANY_NAME/documentserver-example
-COPY --from=ds-service /var/www/$COMPANY_NAME/documentserver-example /var/www/$COMPANY_NAME/documentserver-example
+COPY --from=ds-service \
+    /etc/$COMPANY_NAME/documentserver-example \
+    /etc/$COMPANY_NAME/documentserver-example
+COPY --from=ds-service \
+    /var/www/$COMPANY_NAME/documentserver-example \
+    /var/www/$COMPANY_NAME/documentserver-example
 COPY example-docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN mkdir -p /var/lib/$COMPANY_NAME/documentserver-example/files && \
     chown -R ds:ds /var/lib/$COMPANY_NAME/documentserver-example/files
