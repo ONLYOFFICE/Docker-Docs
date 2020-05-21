@@ -79,9 +79,8 @@ RUN sed 's,\(listen.\+:\)\([0-9]\+\)\(.*;\),'"\18888\3"',' \
     ln -sf /dev/stderr /var/log/nginx/error.log && \
     mkdir -p \
         /var/lib/$COMPANY_NAME/documentserver/App_Data/cache/files \
-        /var/lib/$COMPANY_NAME/documentserver/App_Data/docbuilder \
-        /var/lib/$COMPANY_NAME/documentserver-example/files
-VOLUME /var/lib/$COMPANY_NAME /var/lib/$COMPANY_NAME/documentserver-example/files
+        /var/lib/$COMPANY_NAME/documentserver/App_Data/docbuilder
+VOLUME /var/lib/$COMPANY_NAME
 ENTRYPOINT envsubst < /etc/nginx/includes/http-upstream.conf > /tmp/http-upstream.conf && exec nginx -g 'daemon off;'
 
 FROM ds-service AS docservice
