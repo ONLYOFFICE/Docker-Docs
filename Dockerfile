@@ -79,6 +79,9 @@ COPY --from=ds-service \
         /var/www/$COMPANY_NAME/documentserver/server/FileConverter \
         /var/www/$COMPANY_NAME/documentserver/server/FileConverter
 COPY --from=ds-service \
+        /var/www/$COMPANY_NAME/documentserver/web-apps \
+        /var/www/$COMPANY_NAME/documentserver/web-apps
+COPY --from=ds-service \
         /usr/lib64/libgraphics.so \
         /usr/lib64/libdoctrenderer.so \
         /usr/lib64/libkernel.so \
@@ -93,13 +96,7 @@ COPY --from=ds-service \
         /usr/lib64/libXpsFile.so \
         /usr/lib64/
 COPY docker-entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/*.sh && \
-    mkdir -p \
-        /var/lib/$COMPANY_NAME/documentserver/App_Data/cache/files \
-        /var/lib/$COMPANY_NAME/documentserver/App_Data/docbuilder \
-        /var/lib/$COMPANY_NAME/documentserver-example/files && \
-    chown -R ds:ds /var/lib/$COMPANY_NAME
-VOLUME /var/lib/$COMPANY_NAME /var/lib/$COMPANY_NAME/documentserver-example/files
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/FileConverter/converter
 
 FROM ds-base AS spellchecker
