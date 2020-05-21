@@ -58,7 +58,48 @@ EXPOSE 8000
 USER 101
 ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/DocService/docservice
 
-FROM ds-service AS converter
+FROM ds-base AS converter
+COPY --from=ds-service \
+        /etc/$COMPANY_NAME/documentserver/default.json \
+        /etc/$COMPANY_NAME/documentserver/production-linux.json \
+        /etc/$COMPANY_NAME/documentserver/
+COPY --from=ds-service \
+        /etc/$COMPANY_NAME/documentserver/log4js/production.json \
+        /etc/$COMPANY_NAME/documentserver/log4js/
+COPY --from=ds-service \
+        /var/www/$COMPANY_NAME/documentserver/core-fonts \
+        /var/www/$COMPANY_NAME/documentserver/core-fonts
+COPY --from=ds-service \
+        /var/www/$COMPANY_NAME/documentserver/fonts \
+        /var/www/$COMPANY_NAME/documentserver/fonts
+COPY --from=ds-service \
+        /var/www/$COMPANY_NAME/documentserver/sdkjs \
+        /var/www/$COMPANY_NAME/documentserver/sdkjs
+COPY --from=ds-service \
+        /var/www/$COMPANY_NAME/documentserver/server/FileConverter \
+        /var/www/$COMPANY_NAME/documentserver/server/FileConverter
+COPY --from=ds-service \
+        /usr/lib64/libgraphics.so \
+        /usr/lib64/libdoctrenderer.so \
+        /usr/lib64/libkernel.so \
+        /usr/lib64/libicudata.so.58 \
+        /usr/lib64/libicuuc.so.58 \
+        /usr/lib64/libDjVuFile.so \
+        /usr/lib64/libPdfReader.so \
+        /usr/lib64/libPdfWriter.so \
+        /usr/lib64/libHtmlFile.so \
+        /usr/lib64/libHtmlRenderer.so \
+        /usr/lib64/libUnicodeConverter.so \
+        /usr/lib64/libXpsFile.so \
+        /usr/lib64/
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/*.sh && \
+    mkdir -p \
+        /var/lib/$COMPANY_NAME/documentserver/App_Data/cache/files \
+        /var/lib/$COMPANY_NAME/documentserver/App_Data/docbuilder \
+        /var/lib/$COMPANY_NAME/documentserver-example/files && \
+    chown -R ds:ds /var/lib/$COMPANY_NAME
+VOLUME /var/lib/$COMPANY_NAME /var/lib/$COMPANY_NAME/documentserver-example/files
 USER 101
 ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/FileConverter/converter
 
