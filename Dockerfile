@@ -37,8 +37,7 @@ COPY config/nginx/includes/http-common.conf /etc/nginx/includes/http-common.conf
 COPY config/nginx/includes/http-upstream.conf /etc/nginx/includes/http-upstream.conf
 COPY docker-entrypoint.sh /usr/local/bin/
 
-RUN chmod a+x /usr/local/bin/*.sh && \
-    mkdir -p \
+RUN mkdir -p \
         /var/lib/$COMPANY_NAME/documentserver/App_Data/cache/files \
         /var/lib/$COMPANY_NAME/documentserver/App_Data/docbuilder && \
     documentserver-generate-allfonts.sh true
@@ -96,7 +95,6 @@ COPY --from=ds-service \
         /usr/lib64/libXpsFile.so \
         /usr/lib64/
 COPY docker-entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/FileConverter/converter
 
 FROM ds-base AS spellchecker
@@ -112,7 +110,6 @@ COPY --from=ds-service \
         /var/www/$COMPANY_NAME/documentserver/server/SpellChecker \
         /var/www/$COMPANY_NAME/documentserver/server/SpellChecker
 COPY docker-entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/*.sh
 ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/SpellChecker/spellchecker
 
 FROM statsd/statsd AS metrics
@@ -125,8 +122,7 @@ EXPOSE 8000
 COPY --from=ds-service /etc/$COMPANY_NAME/documentserver-example /etc/$COMPANY_NAME/documentserver-example
 COPY --from=ds-service /var/www/$COMPANY_NAME/documentserver-example /var/www/$COMPANY_NAME/documentserver-example
 COPY example-docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
-RUN chmod a+x /usr/local/bin/docker-entrypoint.sh && \
-    mkdir -p /var/lib/$COMPANY_NAME/documentserver-example/files && \
+RUN mkdir -p /var/lib/$COMPANY_NAME/documentserver-example/files && \
     chown -R ds:ds /var/lib/$COMPANY_NAME/documentserver-example/files
 VOLUME /var/lib/$COMPANY_NAME/documentserver-example/files
 ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver-example/example
