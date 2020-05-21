@@ -76,8 +76,8 @@ RUN sed 's,\(listen.\+:\)\([0-9]\+\)\(.*;\),'"\18888\3"',' \
         -i /etc/nginx/conf.d/ds.conf && \
     sed '/error_log.*/d' -i /etc/nginx/includes/ds-common.conf && \
     chmod 755 /var/log/nginx && \
-    ln -sf /dev/stderr /var/log/nginx/error.log
-RUN mkdir -p \
+    ln -sf /dev/stderr /var/log/nginx/error.log && \
+    mkdir -p \
         /var/lib/$COMPANY_NAME/documentserver/App_Data/cache/files \
         /var/lib/$COMPANY_NAME/documentserver/App_Data/docbuilder \
         /var/lib/$COMPANY_NAME/documentserver-example/files
