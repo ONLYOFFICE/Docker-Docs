@@ -84,7 +84,8 @@ RUN sed 's,\(listen.\+:\)\([0-9]\+\)\(.*;\),'"\18888\3"',' \
     ln -sf /dev/stderr /var/log/nginx/error.log && \
     mkdir -p \
         /var/lib/$COMPANY_NAME/documentserver/App_Data/cache/files \
-        /var/lib/$COMPANY_NAME/documentserver/App_Data/docbuilder
+        /var/lib/$COMPANY_NAME/documentserver/App_Data/docbuilder && \
+    chown -R ds:ds /var/lib/$COMPANY_NAME/documentserver
 VOLUME /var/lib/$COMPANY_NAME
 USER ds
 ENTRYPOINT envsubst < /etc/nginx/includes/http-upstream.conf > /tmp/http-upstream.conf && exec nginx -g 'daemon off;'
