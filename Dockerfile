@@ -67,12 +67,15 @@ ARG COMPANY_NAME=onlyoffice
 ENV COMPANY_NAME=$COMPANY_NAME \
     NODE_ENV=production-linux \
     NODE_CONFIG_DIR=/etc/$COMPANY_NAME/documentserver
+RUN groupadd --system --gid 101 ds && \
+    useradd --system -g ds --no-create-home --shell /sbin/nologin --uid 101 ds
 EXPOSE 8080
 COPY --from=ds-base /etc/$COMPANY_NAME/documentserver/log4js /etc/$COMPANY_NAME/documentserver/log4js
 COPY --from=ds-base /etc/$COMPANY_NAME/documentserver/*.json /etc/$COMPANY_NAME/documentserver/
 COPY --from=ds-base /var/www/$COMPANY_NAME/documentserver/server/SpellChecker /var/www/$COMPANY_NAME/documentserver/server/SpellChecker
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN chmod a+x /usr/local/bin/docker-entrypoint.sh
+USER 101
 ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/SpellChecker/spellchecker
 
 FROM statsd/statsd AS metrics
