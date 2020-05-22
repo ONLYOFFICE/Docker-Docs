@@ -86,12 +86,12 @@ RUN sed 's,\(listen.\+:\)\([0-9]\+\)\(.*;\),'"\18888\3"',' \
         /var/lib/$COMPANY_NAME/documentserver/App_Data/cache/files \
         /var/lib/$COMPANY_NAME/documentserver/App_Data/docbuilder
 VOLUME /var/lib/$COMPANY_NAME
-USER 101
+USER ds
 ENTRYPOINT envsubst < /etc/nginx/includes/http-upstream.conf > /tmp/http-upstream.conf && exec nginx -g 'daemon off;'
 
 FROM ds-service AS docservice
 EXPOSE 8000
-USER 101
+USER ds
 ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/DocService/docservice
 
 FROM ds-base AS converter
@@ -132,7 +132,7 @@ COPY --from=ds-service \
     /usr/lib64/libXpsFile.so \
     /usr/lib64/
 COPY docker-entrypoint.sh /usr/local/bin/
-USER 101
+USER ds
 ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/FileConverter/converter
 
 FROM ds-base AS spellchecker
@@ -148,7 +148,7 @@ COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/server/SpellChecker \
     /var/www/$COMPANY_NAME/documentserver/server/SpellChecker
 COPY docker-entrypoint.sh /usr/local/bin/
-USER 101
+USER ds
 ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/SpellChecker/spellchecker
 
 FROM statsd/statsd AS metrics
@@ -168,7 +168,7 @@ COPY example-docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN mkdir -p /var/lib/$COMPANY_NAME/documentserver-example/files && \
     chown -R ds:ds /var/lib/$COMPANY_NAME/documentserver-example/files
 VOLUME /var/lib/$COMPANY_NAME/documentserver-example/files
-USER 101
+USER ds
 ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver-example/example
 
 FROM postgres:9.5 AS db
