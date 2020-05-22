@@ -8,7 +8,7 @@ ENV COMPANY_NAME=$COMPANY_NAME \
     NODE_CONFIG_DIR=/etc/$COMPANY_NAME/documentserver
 RUN groupadd --system --gid 101 ds && \
     useradd --system -g ds --no-create-home --shell /sbin/nologin --uid 101 ds && \
-    rm -f /var/log/{lastlog,tallylog}
+    rm -f /var/log/*log
 
 FROM ds-base AS ds-service
 ARG PRODUCT_URL=http://download.onlyoffice.com/install/documentserver/linux/onlyoffice-documentserver-ie.x86_64.rpm
@@ -30,7 +30,9 @@ RUN yum -y install \
     chmod 755 /var/log/nginx && \
     ln -sf /dev/stderr /var/log/nginx/error.log && \
     yum clean all && \
-    rm -rf /var/tmp/yum-*
+    rm -rf \
+        /var/log/*log \
+        /var/tmp/yum-*
 
 COPY config/nginx/nginx.conf /etc/nginx/nginx.conf
 COPY config/nginx/includes/http-common.conf /etc/nginx/includes/http-common.conf
@@ -52,7 +54,8 @@ EXPOSE 8888
 RUN yum -y install epel-release sudo && \
     yum -y updateinfo && \
     yum -y install gettext nginx && \
-    yum clean all
+    yum clean all && \
+    rm -f /var/log/*log
 COPY config/nginx/nginx.conf /etc/nginx/nginx.conf
 COPY --from=ds-service \
     /etc/onlyoffice/documentserver/nginx/ds.conf \
