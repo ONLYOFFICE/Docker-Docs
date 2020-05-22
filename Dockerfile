@@ -24,11 +24,6 @@ RUN yum -y install \
         nc && \
     chmod a+r /etc/$COMPANY_NAME/documentserver*/*.json && \
     chmod a+r /etc/$COMPANY_NAME/documentserver/log4js/*.json && \
-    sed 's,\(listen.\+:\)\([0-9]\+\)\(.*;\),'"\18888\3"',' \
-        -i /etc/nginx/conf.d/ds.conf && \
-    sed '/error_log.*/d' -i /etc/nginx/includes/ds-common.conf && \
-    chmod 755 /var/log/nginx && \
-    ln -sf /dev/stderr /var/log/nginx/error.log && \
     yum clean all && \
     rm -rf \
         /var/log/*log \
