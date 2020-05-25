@@ -96,8 +96,22 @@ VOLUME /var/lib/$COMPANY_NAME
 USER ds
 ENTRYPOINT envsubst < /etc/nginx/includes/http-upstream.conf > /tmp/http-upstream.conf && exec nginx -g 'daemon off;'
 
-FROM ds-service AS docservice
+FROM ds-base AS docservice
 EXPOSE 8000
+COPY --from=ds-service \
+    /etc/$COMPANY_NAME/documentserver/default.json \
+    /etc/$COMPANY_NAME/documentserver/production-linux.json \
+    /etc/$COMPANY_NAME/documentserver/
+COPY --from=ds-service \
+    /etc/$COMPANY_NAME/documentserver/log4js/production.json \
+    /etc/$COMPANY_NAME/documentserver/log4js/
+COPY --from=ds-service \
+    /var/www/$COMPANY_NAME/documentserver/sdkjs-plugins \
+    /var/www/$COMPANY_NAME/documentserver/sdkjs-plugins
+COPY --from=ds-service \
+    /var/www/$COMPANY_NAME/documentserver/server/DocService \
+    /var/www/$COMPANY_NAME/documentserver/server/DocService
+COPY docker-entrypoint.sh /usr/local/bin/
 USER ds
 ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/DocService/docservice
 
