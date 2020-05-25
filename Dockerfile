@@ -12,24 +12,9 @@ RUN groupadd --system --gid 101 ds && \
 
 FROM ds-base AS ds-service
 ARG PRODUCT_URL=http://download.onlyoffice.com/install/documentserver/linux/onlyoffice-documentserver-ie.x86_64.rpm
-
-RUN yum -y install \
-        epel-release \
-        curl \
-        sudo && \
-    yum -y updateinfo && \
-    yum -y install \
-        gettext \
-        $PRODUCT_URL \
-        nc && \
+RUN rpm -ivh $PRODUCT_URL --nodeps && \
     chmod a+r /etc/$COMPANY_NAME/documentserver*/*.json && \
-    chmod a+r /etc/$COMPANY_NAME/documentserver/log4js/*.json && \
-    yum clean all && \
-    rm -rf \
-        /var/log/*log \
-        /var/tmp/yum-* && \
-    documentserver-generate-allfonts.sh true
-
+    chmod a+r /etc/$COMPANY_NAME/documentserver/log4js/*.json
 VOLUME /var/lib/$COMPANY_NAME
 
 FROM ds-base AS proxy
