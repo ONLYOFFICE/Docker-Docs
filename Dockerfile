@@ -27,16 +27,7 @@ RUN yum -y install \
     yum clean all && \
     rm -rf \
         /var/log/*log \
-        /var/tmp/yum-*
-
-COPY config/nginx/nginx.conf /etc/nginx/nginx.conf
-COPY config/nginx/includes/http-common.conf /etc/nginx/includes/http-common.conf
-COPY config/nginx/includes/http-upstream.conf /etc/nginx/includes/http-upstream.conf
-COPY docker-entrypoint.sh /usr/local/bin/
-
-RUN mkdir -p \
-        /var/lib/$COMPANY_NAME/documentserver/App_Data/cache/files \
-        /var/lib/$COMPANY_NAME/documentserver/App_Data/docbuilder && \
+        /var/tmp/yum-* && \
     documentserver-generate-allfonts.sh true
 
 VOLUME /var/lib/$COMPANY_NAME
