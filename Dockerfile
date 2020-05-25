@@ -15,7 +15,6 @@ ARG PRODUCT_URL=http://download.onlyoffice.com/install/documentserver/linux/only
 RUN rpm -ivh $PRODUCT_URL --nodeps && \
     chmod a+r /etc/$COMPANY_NAME/documentserver*/*.json && \
     chmod a+r /etc/$COMPANY_NAME/documentserver/log4js/*.json
-VOLUME /var/lib/$COMPANY_NAME
 
 FROM ds-base AS proxy
 ENV DOCSERVICE_HOST_PORT=localhost:8000 \
