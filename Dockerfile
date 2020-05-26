@@ -31,9 +31,11 @@ RUN yum -y install \
 COPY config/nginx/nginx.conf /etc/nginx/nginx.conf
 COPY config/nginx/includes/http-common.conf /etc/nginx/includes/http-common.conf
 COPY config/nginx/includes/http-upstream.conf /etc/nginx/includes/http-upstream.conf
+COPY fonts/* /var/www/$COMPANY_NAME/documentserver/core-fonts/custom/
 COPY docker-entrypoint.sh /usr/local/bin/
 
 RUN chmod a+x /usr/local/bin/*.sh && \
+    chown -R ds:ds /var/www/$COMPANY_NAME/documentserver/core-fonts/custom && \
     mkdir -p \
         /var/lib/$COMPANY_NAME/documentserver/App_Data/cache/files \
         /var/lib/$COMPANY_NAME/documentserver/App_Data/docbuilder && \
