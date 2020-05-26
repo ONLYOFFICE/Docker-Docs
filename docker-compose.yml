@@ -33,7 +33,7 @@ services:
       - DB_NAME=mydb
       - DB_USER=myuser
       - REDIST_SERVER_HOST=redis
-      - AMQP_URI=amqp://guest:guest@rabbitmq
+      - AMQP_HOST=rabbitmq
       - METRICS_HOST=metrics
       - METRICS_ENABLED=true
     depends_on:
@@ -60,7 +60,7 @@ services:
       - DB_NAME=mydb
       - DB_USER=myuser
       - REDIST_SERVER_HOST=redis
-      - AMQP_URI=amqp://guest:guest@rabbitmq
+      - AMQP_HOST=rabbitmq
       - METRICS_HOST=metrics
       - METRICS_ENABLED=true
     depends_on:
@@ -85,7 +85,7 @@ services:
       - DB_NAME=mydb
       - DB_USER=myuser
       - REDIST_SERVER_HOST=redis
-      - AMQP_URI=amqp://guest:guest@rabbitmq
+      - AMQP_HOST=rabbitmq
       - METRICS_HOST=metrics
       - METRICS_ENABLED=true
     depends_on:
@@ -121,7 +121,7 @@ services:
       - DB_NAME=mydb
       - DB_USER=myuser
       - REDIST_SERVER_HOST=redis
-      - AMQP_URI=amqp://guest:guest@rabbitmq
+      - AMQP_HOST=rabbitmq
     depends_on:
       - proxy
       - postgresql
