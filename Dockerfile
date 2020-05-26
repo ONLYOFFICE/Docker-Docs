@@ -17,6 +17,9 @@ RUN useradd --no-create-home --shell /sbin/nologin nginx && \
     chmod a+r /etc/$COMPANY_NAME/documentserver*/*.json && \
     chmod a+r /etc/$COMPANY_NAME/documentserver/log4js/*.json && \
     documentserver-generate-allfonts.sh true
+COPY --chown=ds:ds \
+    fonts/* \
+    /var/www/$COMPANY_NAME/documentserver/core-fonts/custom/
 
 FROM ds-base AS proxy
 ENV DOCSERVICE_HOST_PORT=localhost:8000 \
