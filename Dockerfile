@@ -88,6 +88,7 @@ ENTRYPOINT \
         /var/www/$COMPANY_NAME/documentserver/sdkjs \
         /var/www/$COMPANY_NAME/documentserver/sdkjs-plugins \
         /var/www/$COMPANY_NAME/documentserver/web-apps \
+        /var/www/$COMPANY_NAME/documentserver-example/welcome \
         -type f \
         \( -name *.js -o -name *.json -o -name *.htm -o -name *.html -o -name *.css \) \
         -exec sh -c 'gzip -cf9 $0 > $0.gz' {} \; && \
