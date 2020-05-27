@@ -83,14 +83,14 @@ ENTRYPOINT \
         /var/www/$COMPANY_NAME/documentserver/fonts \
         -type f ! \
         -name "*.*" \
-        -exec gzip -f9 {} \; && \
+        -exec sh -c 'gzip -cf9 $0 > $0.gz' {} \; && \
     find \
         /var/www/$COMPANY_NAME/documentserver/sdkjs \
         /var/www/$COMPANY_NAME/documentserver/sdkjs-plugins \
         /var/www/$COMPANY_NAME/documentserver/web-apps \
         -type f \
         \( -name *.js -o -name *.json -o -name *.htm -o -name *.html -o -name *.css \) \
-        -exec gzip -f9 {} \; && \
+        -exec sh -c 'gzip -cf9 $0 > $0.gz' {} \; && \
     envsubst < /etc/nginx/includes/http-upstream.conf > /tmp/http-upstream.conf && \
     exec nginx -g 'daemon off;'
 
