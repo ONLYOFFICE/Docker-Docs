@@ -15,11 +15,11 @@ ARG PRODUCT_URL=http://download.onlyoffice.com/install/documentserver/linux/only
 RUN useradd --no-create-home --shell /sbin/nologin nginx && \
     rpm -ivh $PRODUCT_URL --noscripts --nodeps && \
     chmod a+r /etc/$COMPANY_NAME/documentserver*/*.json && \
-    chmod a+r /etc/$COMPANY_NAME/documentserver/log4js/*.json && \
-    documentserver-generate-allfonts.sh true
+    chmod a+r /etc/$COMPANY_NAME/documentserver/log4js/*.json
 COPY --chown=ds:ds \
     fonts/* \
     /var/www/$COMPANY_NAME/documentserver/core-fonts/custom/
+RUN documentserver-generate-allfonts.sh true
 
 FROM ds-base AS proxy
 ENV DOCSERVICE_HOST_PORT=localhost:8000 \
