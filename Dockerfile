@@ -66,15 +66,34 @@ COPY --from=ds-service \
 RUN sed 's,\(listen.\+:\)\([0-9]\+\)\(.*;\),'"\18888\3"',' \
         -i /etc/nginx/conf.d/ds.conf && \
     sed '/error_log.*/d' -i /etc/nginx/includes/ds-common.conf && \
+    sed 's/#*\s*\(gzip_static\).*/\1 on;/g' -i /etc/nginx/includes/ds-docservice.conf && \
     chmod 755 /var/log/nginx && \
     ln -sf /dev/stderr /var/log/nginx/error.log && \
     mkdir -p \
         /var/lib/$COMPANY_NAME/documentserver/App_Data/cache/files \
         /var/lib/$COMPANY_NAME/documentserver/App_Data/docbuilder && \
-    chown -R ds:ds /var/lib/$COMPANY_NAME/documentserver
+    chown -R ds:ds /var/lib/$COMPANY_NAME/documentserver && \
+    chown -R ds:ds \
+        /var/www/$COMPANY_NAME/documentserver \
+        /var/www/$COMPANY_NAME/documentserver-example
 VOLUME /var/lib/$COMPANY_NAME
 USER ds
-ENTRYPOINT envsubst < /etc/nginx/includes/http-upstream.conf > /tmp/http-upstream.conf && exec nginx -g 'daemon off;'
+ENTRYPOINT \
+    find \
+        /var/www/$COMPANY_NAME/documentserver/fonts \
+        -type f ! \
+        -name "*.*" \
+        -exec sh -c 'gzip -cf9 $0 > $0.gz' {} \; && \
+    find \
+        /var/www/$COMPANY_NAME/documentserver/sdkjs \
+        /var/www/$COMPANY_NAME/documentserver/sdkjs-plugins \
+        /var/www/$COMPANY_NAME/documentserver/web-apps \
+        /var/www/$COMPANY_NAME/documentserver-example/welcome \
+        -type f \
+        \( -name *.js -o -name *.json -o -name *.htm -o -name *.html -o -name *.css \) \
+        -exec sh -c 'gzip -cf9 $0 > $0.gz' {} \; && \
+    envsubst < /etc/nginx/includes/http-upstream.conf > /tmp/http-upstream.conf && \
+    exec nginx -g 'daemon off;'
 
 FROM ds-base AS docservice
 EXPOSE 8000
