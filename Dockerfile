@@ -85,8 +85,9 @@ ENTRYPOINT \
         -name "*.*" \
         -exec gzip -f9 {} \; && \
     find \
-        /var/www/$COMPANY_NAME/documentserver \
-        /var/www/$COMPANY_NAME/documentserver-example \
+        /var/www/$COMPANY_NAME/documentserver/sdkjs \
+        /var/www/$COMPANY_NAME/documentserver/sdkjs-plugins \
+        /var/www/$COMPANY_NAME/documentserver/web-apps \
         -type f \
         \( -name *.js -o -name *.json -o -name *.htm -o -name *.html -o -name *.css \) \
         -exec gzip -f9 {} \; && \
