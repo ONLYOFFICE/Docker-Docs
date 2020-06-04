@@ -12,14 +12,10 @@ RUN groupadd --system --gid 101 ds && \
 
 FROM ds-base AS ds-service
 ARG PRODUCT_URL=http://download.onlyoffice.com/install/documentserver/linux/onlyoffice-documentserver-ie.x86_64.rpm
-ARG LOG_LEVEL=WARN
 RUN useradd --no-create-home --shell /sbin/nologin nginx && \
     rpm -ivh $PRODUCT_URL --noscripts --nodeps && \
     chmod a+r /etc/$COMPANY_NAME/documentserver*/*.json && \
-    chmod a+r /etc/$COMPANY_NAME/documentserver/log4js/*.json && \
-    /var/www/$COMPANY_NAME/documentserver/npm/json \
-        -q -f /etc/$COMPANY_NAME/documentserver/log4js/production.json \
-        -I -e "this.categories.default.level = '$LOG_LEVEL'"
+    chmod a+r /etc/$COMPANY_NAME/documentserver/log4js/*.json
 COPY --chown=ds:ds \
     fonts/* \
     /var/www/$COMPANY_NAME/documentserver/core-fonts/custom/
@@ -105,7 +101,7 @@ COPY --from=ds-service \
     /etc/$COMPANY_NAME/documentserver/default.json \
     /etc/$COMPANY_NAME/documentserver/production-linux.json \
     /etc/$COMPANY_NAME/documentserver/
-COPY --from=ds-service \
+COPY --from=ds-service --chown=ds:ds \
     /etc/$COMPANY_NAME/documentserver/log4js/production.json \
     /etc/$COMPANY_NAME/documentserver/log4js/
 COPY --from=ds-service \
@@ -123,7 +119,7 @@ COPY --from=ds-service \
     /etc/$COMPANY_NAME/documentserver/default.json \
     /etc/$COMPANY_NAME/documentserver/production-linux.json \
     /etc/$COMPANY_NAME/documentserver/
-COPY --from=ds-service \
+COPY --from=ds-service --chown=ds:ds \
     /etc/$COMPANY_NAME/documentserver/log4js/production.json \
     /etc/$COMPANY_NAME/documentserver/log4js/
 COPY --from=ds-service \
@@ -165,7 +161,7 @@ COPY --from=ds-service \
     /etc/$COMPANY_NAME/documentserver/default.json \
     /etc/$COMPANY_NAME/documentserver/production-linux.json \
     /etc/$COMPANY_NAME/documentserver/
-COPY --from=ds-service \
+COPY --from=ds-service --chown=ds:ds \
     /etc/$COMPANY_NAME/documentserver/log4js/production.json \
     /etc/$COMPANY_NAME/documentserver/log4js/
 COPY --from=ds-service \
