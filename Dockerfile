@@ -93,6 +93,7 @@ ENTRYPOINT \
         \( -name *.js -o -name *.json -o -name *.htm -o -name *.html -o -name *.css \) \
         -exec sh -c 'gzip -cf9 $0 > $0.gz' {} \; && \
     envsubst < /etc/nginx/includes/http-upstream.conf > /tmp/http-upstream.conf && \
+    echo -e "\ngzip_proxied ${NGINX_GZIP_PROXIED:-off};\n" >> /etc/nginx/includes/ds-common.conf && \
     exec nginx -g 'daemon off;'
 
 FROM ds-base AS docservice
