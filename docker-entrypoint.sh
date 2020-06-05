@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -e
 
+if [[ -n ${LOG_LEVEL} ]]; then
+  sed 's/\(^.\+"level":\s*"\).\+\(".*$\)/\1'$LOG_LEVEL'\2/g' -i /etc/$COMPANY_NAME/documentserver/log4js/production.json
+fi
+
 export NODE_CONFIG='{
   "statsd": {
     "useMetrics": '${METRICS_ENABLED:-false}',

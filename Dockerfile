@@ -101,7 +101,7 @@ COPY --from=ds-service \
     /etc/$COMPANY_NAME/documentserver/default.json \
     /etc/$COMPANY_NAME/documentserver/production-linux.json \
     /etc/$COMPANY_NAME/documentserver/
-COPY --from=ds-service \
+COPY --from=ds-service --chown=ds:ds \
     /etc/$COMPANY_NAME/documentserver/log4js/production.json \
     /etc/$COMPANY_NAME/documentserver/log4js/
 COPY --from=ds-service \
@@ -119,7 +119,7 @@ COPY --from=ds-service \
     /etc/$COMPANY_NAME/documentserver/default.json \
     /etc/$COMPANY_NAME/documentserver/production-linux.json \
     /etc/$COMPANY_NAME/documentserver/
-COPY --from=ds-service \
+COPY --from=ds-service --chown=ds:ds \
     /etc/$COMPANY_NAME/documentserver/log4js/production.json \
     /etc/$COMPANY_NAME/documentserver/log4js/
 COPY --from=ds-service \
@@ -161,7 +161,7 @@ COPY --from=ds-service \
     /etc/$COMPANY_NAME/documentserver/default.json \
     /etc/$COMPANY_NAME/documentserver/production-linux.json \
     /etc/$COMPANY_NAME/documentserver/
-COPY --from=ds-service \
+COPY --from=ds-service --chown=ds:ds \
     /etc/$COMPANY_NAME/documentserver/log4js/production.json \
     /etc/$COMPANY_NAME/documentserver/log4js/
 COPY --from=ds-service \
