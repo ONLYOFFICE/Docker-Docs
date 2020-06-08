@@ -24,7 +24,8 @@ RUN documentserver-generate-allfonts.sh true
 FROM ds-base AS proxy
 ENV DOCSERVICE_HOST_PORT=localhost:8000 \
     SPELLCHECKER_HOST_PORT=localhost:8080 \
-    EXAMPLE_HOST_PORT=localhost:3000
+    EXAMPLE_HOST_PORT=localhost:3000 \
+    NGINX_GZIP_PROXIED=off
 EXPOSE 8888
 RUN yum -y install epel-release sudo && \
     yum -y updateinfo && \
@@ -66,6 +67,7 @@ COPY --from=ds-service \
 RUN sed 's,\(listen.\+:\)\([0-9]\+\)\(.*;\),'"\18888\3"',' \
         -i /etc/nginx/conf.d/ds.conf && \
     sed '/error_log.*/d' -i /etc/nginx/includes/ds-common.conf && \
+    echo -e "\ngzip_proxied \$NGINX_GZIP_PROXIED;\n" >> /etc/nginx/includes/ds-common.conf && \
     sed 's/#*\s*\(gzip_static\).*/\1 on;/g' -i /etc/nginx/includes/ds-docservice.conf && \
     chmod 755 /var/log/nginx && \
     ln -sf /dev/stderr /var/log/nginx/error.log && \
@@ -93,6 +95,7 @@ ENTRYPOINT \
         \( -name *.js -o -name *.json -o -name *.htm -o -name *.html -o -name *.css \) \
         -exec sh -c 'gzip -cf9 $0 > $0.gz' {} \; && \
     envsubst < /etc/nginx/includes/http-upstream.conf > /tmp/http-upstream.conf && \
+    envsubst < /etc/nginx/includes/ds-common.conf | tee /etc/nginx/includes/ds-common.conf > /dev/null && \
     exec nginx -g 'daemon off;'
 
 FROM ds-base AS docservice
