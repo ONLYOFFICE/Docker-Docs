@@ -181,6 +181,7 @@ COPY --from=ds-service \
 COPY docker-entrypoint.sh /usr/local/bin/
 USER ds
 ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/SpellChecker/spellchecker
+HEALTHCHECK --interval=10s --timeout=3s CMD curl -sf localhost:8080/index.html
 
 FROM statsd/statsd AS metrics
 ARG COMPANY_NAME=onlyoffice
