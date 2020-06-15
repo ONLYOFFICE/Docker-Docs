@@ -25,6 +25,7 @@ FROM ds-base AS proxy
 ENV DOCSERVICE_HOST_PORT=localhost:8000 \
     SPELLCHECKER_HOST_PORT=localhost:8080 \
     EXAMPLE_HOST_PORT=localhost:3000 \
+    NGINX_ACCESS_LOG=off \
     NGINX_GZIP_PROXIED=off
 EXPOSE 8888
 RUN yum -y install epel-release sudo && \
@@ -66,16 +67,19 @@ COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver-example/welcome
 RUN sed 's,\(listen.\+:\)\([0-9]\+\)\(.*;\),'"\18888\3"',' \
         -i /etc/nginx/conf.d/ds.conf && \
+    sed '/access_log.*/d' -i /etc/nginx/includes/ds-common.conf && \
     sed '/error_log.*/d' -i /etc/nginx/includes/ds-common.conf && \
     echo -e "\ngzip_proxied \$NGINX_GZIP_PROXIED;\n" >> /etc/nginx/includes/ds-common.conf && \
     sed 's/#*\s*\(gzip_static\).*/\1 on;/g' -i /etc/nginx/includes/ds-docservice.conf && \
     chmod 755 /var/log/nginx && \
+    ln -sf /dev/stdout /var/log/nginx/access.log && \
     ln -sf /dev/stderr /var/log/nginx/error.log && \
     mkdir -p \
         /var/lib/$COMPANY_NAME/documentserver/App_Data/cache/files \
         /var/lib/$COMPANY_NAME/documentserver/App_Data/docbuilder && \
-    chown -R ds:ds /var/lib/$COMPANY_NAME/documentserver && \
     chown -R ds:ds \
+        /etc/nginx \
+        /var/lib/$COMPANY_NAME/documentserver \
         /var/www/$COMPANY_NAME/documentserver \
         /var/www/$COMPANY_NAME/documentserver-example
 VOLUME /var/lib/$COMPANY_NAME
@@ -94,6 +98,10 @@ ENTRYPOINT \
         -type f \
         \( -name *.js -o -name *.json -o -name *.htm -o -name *.html -o -name *.css \) \
         -exec sh -c 'gzip -cf9 $0 > $0.gz' {} \; && \
+    if [ $NGINX_ACCESS_LOG != "off" ]; then \
+        sed 's|#*\(\s*access_log\).*;|\1 /var/log/nginx/access.log '$NGINX_ACCESS_LOG';|g' \
+            -i /etc/nginx/nginx.conf; \
+    fi && \
     envsubst < /etc/nginx/includes/http-upstream.conf > /tmp/http-upstream.conf && \
     envsubst < /etc/nginx/includes/ds-common.conf | tee /etc/nginx/includes/ds-common.conf > /dev/null && \
     exec nginx -g 'daemon off;'
