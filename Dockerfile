@@ -164,6 +164,10 @@ COPY --from=ds-service \
     /usr/lib64/libXpsFile.so \
     /usr/lib64/
 COPY docker-entrypoint.sh /usr/local/bin/
+RUN mkdir -p \
+        /var/lib/$COMPANY_NAME/documentserver/App_Data/cache/files \
+        /var/lib/$COMPANY_NAME/documentserver/App_Data/docbuilder && \
+    chown -R ds:ds /var/lib/$COMPANY_NAME/documentserver
 USER ds
 ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/FileConverter/converter
 
