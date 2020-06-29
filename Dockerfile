@@ -26,7 +26,8 @@ ENV DOCSERVICE_HOST_PORT=localhost:8000 \
     SPELLCHECKER_HOST_PORT=localhost:8080 \
     EXAMPLE_HOST_PORT=localhost:3000 \
     NGINX_ACCESS_LOG=off \
-    NGINX_GZIP_PROXIED=off
+    NGINX_GZIP_PROXIED=off \
+    NGINX_WORKER_CONNECTIONS=4096
 EXPOSE 8888
 RUN yum -y install epel-release sudo && \
     yum -y updateinfo && \
@@ -98,6 +99,8 @@ ENTRYPOINT \
         -type f \
         \( -name *.js -o -name *.json -o -name *.htm -o -name *.html -o -name *.css \) \
         -exec sh -c 'gzip -cf9 $0 > $0.gz' {} \; && \
+    sed 's|#*\(\s*worker_connections\) \d*;|\1 '$NGINX_WORKER_CONNECTIONS';|g' \
+        -i /etc/nginx/nginx.conf; && \
     if [ $NGINX_ACCESS_LOG != "off" ]; then \
         sed 's|#*\(\s*access_log\).*;|\1 /var/log/nginx/access.log '$NGINX_ACCESS_LOG';|g' \
             -i /etc/nginx/nginx.conf; \
