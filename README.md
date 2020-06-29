@@ -65,6 +65,7 @@ Below is the complete list of parameters that can be set using environment varia
 - **JWT_ENABLED**: Specifies the enabling the JSON Web Token validation by the ONLYOFFICE Document Server. Defaults to `false`.
 - **JWT_SECRET**: Defines the secret key to validate the JSON Web Token in the request to the ONLYOFFICE Document Server. Defaults to `secret`.
 - **JWT_HEADER**: Defines the http header that will be used to send the JSON Web Token. Defaults to `Authorization`.
+- **NGINX_WORKER_CONNECTIONS**: Defines the nginx config [worker_connections](http://nginx.org/en/docs/ngx_core_module.html#worker_connections) directive. Defaults to `4096`.
 
 ## Project Information
 
