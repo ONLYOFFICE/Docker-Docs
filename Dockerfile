@@ -99,8 +99,8 @@ ENTRYPOINT \
         -type f \
         \( -name *.js -o -name *.json -o -name *.htm -o -name *.html -o -name *.css \) \
         -exec sh -c 'gzip -cf9 $0 > $0.gz' {} \; && \
-    sed 's|#*\(\s*worker_connections\) \d*;|\1 '$NGINX_WORKER_CONNECTIONS';|g' \
-        -i /etc/nginx/nginx.conf; && \
+    sed 's|\(worker_connections\) [[:digit:]]*;|\1 '$NGINX_WORKER_CONNECTIONS';|g' \
+        -i /etc/nginx/nginx.conf && \
     if [ $NGINX_ACCESS_LOG != "off" ]; then \
         sed 's|#*\(\s*access_log\).*;|\1 /var/log/nginx/access.log '$NGINX_ACCESS_LOG';|g' \
             -i /etc/nginx/nginx.conf; \
