@@ -15,7 +15,8 @@ services:
     restart: always
     ports:
       - '80:8888'
-#    volumes:
+    volumes:
+      - common_data:/var/lib/${COMPANY_NAME}
 #      - /etc/${COMPANY_NAME}
 #      - /var/www/${COMPANY_NAME}/Data
 #      - ./var/lib/ds:/var/lib/${COMPANY_NAME}/documentserver/App_Data/cache/files
