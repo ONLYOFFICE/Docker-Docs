@@ -6,7 +6,6 @@ services:
       context: .
       target: proxy
     image: ${COMPANY_NAME}/${PRODUCT_NAME}-proxy:${PRODUCT_VERSION}
-    user: ds:ds
     environment:
       - DOCSERVICE_HOST_PORT=docservice:8000
       - SPELLCHECKER_HOST_PORT=spellchecker:8080
@@ -30,7 +29,6 @@ services:
       target: docservice
     image: ${COMPANY_NAME}/${PRODUCT_NAME}-docservice:${PRODUCT_VERSION}
     container_name: docservice
-    user: ds:ds
     environment:
       - DB_HOST=postgresql
       - DB_NAME=mydb
@@ -58,7 +56,6 @@ services:
       target: converter
     image: ${COMPANY_NAME}/${PRODUCT_NAME}-converter:${PRODUCT_VERSION}
     container_name: converter
-    user: ds:ds
     environment:
       - DB_HOST=postgresql
       - DB_NAME=mydb
@@ -84,7 +81,6 @@ services:
       target: spellchecker
     image: ${COMPANY_NAME}/${PRODUCT_NAME}-spellchecker:${PRODUCT_VERSION}
     container_name: spellchecker
-    user: ds:ds
     environment:
       - DB_HOST=postgresql
       - DB_NAME=mydb
@@ -121,7 +117,6 @@ services:
       target: example
     image: ${COMPANY_NAME}/${PRODUCT_NAME}-example:${PRODUCT_VERSION}
     container_name: example
-    user: ds:ds
     environment:
       - DB_HOST=postgresql
       - DB_NAME=mydb
