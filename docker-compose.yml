@@ -1,4 +1,4 @@
-version: '2.3'
+version: '3.8'
 services:
   proxy:
     container_name: proxy
@@ -14,7 +14,8 @@ services:
     restart: always
     ports:
       - '80:8888'
-#    volumes:
+    volumes:
+      - common_data:/var/lib/${COMPANY_NAME}
 #      - /etc/${COMPANY_NAME}
 #      - /var/www/${COMPANY_NAME}/Data
 #      - ./var/lib/ds:/var/lib/${COMPANY_NAME}/documentserver/App_Data/cache/files
@@ -46,8 +47,8 @@ services:
     restart: always
     expose:
       - '8000'
-    volumes_from:
-     - proxy
+    volumes:
+     - common_data:/var/lib/${COMPANY_NAME}
 
   converter:
     build:
@@ -71,8 +72,8 @@ services:
       - metrics
     stdin_open: true
     restart: always
-    volumes_from:
-     - proxy
+    volumes:
+     - common_data:/var/lib/${COMPANY_NAME}
 
   spellchecker:
     build:
@@ -98,8 +99,8 @@ services:
     restart: always
     expose:
       - '8080'
-    volumes_from:
-     - proxy
+    volumes:
+     - common_data:/var/lib/${COMPANY_NAME}
 
   metrics:
     build:
@@ -131,8 +132,8 @@ services:
     restart: always
     expose:
       - '3000'
-    volumes_from:
-     - proxy
+    volumes:
+     - common_data:/var/lib/${COMPANY_NAME}
 
   redis:
     container_name: redis
@@ -164,4 +165,5 @@ services:
       - postgresql_data:/var/lib/postgresql
 
 volumes:
+  common_data:
   postgresql_data:
