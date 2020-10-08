@@ -1,7 +1,7 @@
 * [Overview](#overview)
 * [Functionality](#functionality)
 * [Recommended System Requirements](#recommended-system-requirements)
-* [Running Docker Image](#running-docker-image)
+* [Running ONLYOFFICE Docs](#running-onlyoffice-docs)
 * [Project Information](#project-information)
 * [User Feedback and Support](#user-feedback-and-support)
 
