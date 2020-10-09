@@ -2,7 +2,7 @@
 
 ONLYOFFICE Docs is an online office suite comprising viewers and editors for texts, spreadsheets and presentations and enabling collaborative editing in real time. The suite provides maximum compatibility with Office Open XML formats: .docx, .xlsx, .pptx. 
 
-This set of images contain the same functionality as [Document Server](https://github.com/ONLYOFFICE/DocumentServer) with a different architecture: the internal services are decoupled into multiple containers.
+This set of images contain the same functionality as [Document Server](https://github.com/ONLYOFFICE/DocumentServer) but internal services are decoupled into multiple containers.
 
 ## Functionality
 
@@ -13,7 +13,7 @@ This set of images contain the same functionality as [Document Server](https://g
 * Hieroglyph support
 * Support for all the popular formats: DOC, DOCX, TXT, ODT, RTF, ODP, EPUB, ODS, XLS, XLSX, CSV, PPTX, HTML
 
-By default, ONLYOFFICE Docs includes only editors without any document management system. ONLYOFFICE Docs can be integrated either with ONLYOFFICE Groups platform (packaged as [Community Server](https://github.com/ONLYOFFICE/CommunityServer)) or with third-party sync&share solutions (e.g. Nextcloud, ownCloud, Seafile) to enable collaborative editing within their interface. 
+By default, ONLYOFFICE Docs includes only editors without any document management system. ONLYOFFICE Docs can be used as a part of [ONLYOFFICE Workspace](##onlyoffice_workspace) or with third-party sync&share solutions (e.g. Nextcloud, ownCloud, Seafile) to enable collaborative editing within their interface. 
 
 ONLYOFFICE Docs has three editions - [Community, Enterprise, and Developer](https://github.com/ONLYOFFICE/DocumentServer#onlyoffice-document-server-editions). Clustering is available only for commercial builds (Enterprise and Developer Edition).
 
@@ -99,6 +99,10 @@ License: [GNU AGPL v3.0](https://help.onlyoffice.com/products/files/doceditor.as
 ONLYOFFICE Docs on official website: [http://www.onlyoffice.com/office-suite.aspx](http://www.onlyoffice.com/office-suite.aspx "http://www.onlyoffice.com/office-suite.aspx")
 
 List of available integrations: [http://www.onlyoffice.com/all-connectors.aspx](http://www.onlyoffice.com/all-connectors.aspx "http://www.onlyoffice.com/all-connectors.aspx")
+
+## ONLYOFFICE Workspace
+
+ONLYOFFICE Docs packaged as Document Server is a part of **ONLYOFFICE Workspace** that also includes ONLYOFFICE Groups packaged as [Community Server](https://github.com/ONLYOFFICE/CommunityServer "Community Server"), [Mail Server](https://github.com/ONLYOFFICE/Docker-MailServer "Mail Server"), Control Panel and Talk (instant messaging app). 
 
 ## User feedback and support
 
