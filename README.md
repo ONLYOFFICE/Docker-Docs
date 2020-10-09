@@ -102,7 +102,7 @@ List of available integrations: [http://www.onlyoffice.com/all-connectors.aspx](
 
 ## ONLYOFFICE Workspace
 
-ONLYOFFICE Docs packaged as Document Server is a part of **ONLYOFFICE Workspace** that also includes ONLYOFFICE Groups packaged as [Community Server](https://github.com/ONLYOFFICE/CommunityServer "Community Server"), [Mail Server](https://github.com/ONLYOFFICE/Docker-MailServer "Mail Server"), Control Panel and Talk (instant messaging app). 
+ONLYOFFICE Docs packaged as Document Server is a part of **ONLYOFFICE Workspace** that also includes ONLYOFFICE Groups (packaged as [Community Server](https://github.com/ONLYOFFICE/CommunityServer "Community Server")), [Mail Server](https://github.com/ONLYOFFICE/Docker-MailServer "Mail Server"), Control Panel and Talk (instant messaging app). 
 
 ## User feedback and support
 
