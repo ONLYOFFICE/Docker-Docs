@@ -15,7 +15,7 @@ This set of images contain the same functionality as [Document Server](https://g
 
 By default, ONLYOFFICE Docs includes only editors without any document management system. ONLYOFFICE Docs can be integrated either with ONLYOFFICE Groups platform (packaged as [Community Server](https://github.com/ONLYOFFICE/CommunityServer)) or with third-party sync&share solutions (e.g. Nextcloud, ownCloud, Seafile) to enable collaborative editing within their interface. 
 
-ONLYOFFICE Docs has three editions - [Community, Enterprise, and Developer](https://github.com/ONLYOFFICE/DocumentServer#onlyoffice-document-server-editions). Clustering is available only for commercial builds (Enterprise and Developer Edition.
+ONLYOFFICE Docs has three editions - [Community, Enterprise, and Developer](https://github.com/ONLYOFFICE/DocumentServer#onlyoffice-document-server-editions). Clustering is available only for commercial builds (Enterprise and Developer Edition).
 
 ## Recommended system requirements
 
