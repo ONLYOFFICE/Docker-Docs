@@ -7,24 +7,24 @@
 
 ## Overview
 
-ONLYOFFICE Docs is an online office suite comprising viewers and editors for texts, spreadsheets and presentations, fully compatible with Office Open XML formats: .docx, .xlsx, .pptx and enabling collaborative editing in real time.
+ONLYOFFICE Docs is an online office suite comprising viewers and editors for texts, spreadsheets and presentations and enabling collaborative editing in real time. The suite provides maximum compatibility with Office Open XML formats: .docx, .xlsx, .pptx. 
 
-## Functionality ##
+This set of images contain the same functionality as [Document Server](https://github.com/ONLYOFFICE/DocumentServer) with a different architecture: the internal services are decoupled into multiple containers.
+
+## Functionality
+
 * ONLYOFFICE Document Editor
 * ONLYOFFICE Spreadsheet Editor
 * ONLYOFFICE Presentation Editor
-* ONLYOFFICE Documents application for iOS
 * Collaborative editing
 * Hieroglyph support
 * Support for all the popular formats: DOC, DOCX, TXT, ODT, RTF, ODP, EPUB, ODS, XLS, XLSX, CSV, PPTX, HTML
 
-Integrating it with ONLYOFFICE Community Server you will be able to:
-* view and edit files stored on Drive, Box, Dropbox, OneDrive, OwnCloud connected to ONLYOFFICE;
-* share files;
-* embed documents on a website;
-* manage access rights to documents.
+By default, ONLYOFFICE Docs includes only editors without any document management system. ONLYOFFICE Docs can be integrated either with ONLYOFFICE Groups platform (packaged as [Community Server](https://github.com/ONLYOFFICE/CommunityServer) or with third-party sync&share solutions (e.g. Nextcloud, ownCloud, Seafile) to enable collaborative editing within their interface. 
 
-## Recommended System Requirements
+ONLYOFFICE Docs has three editions - [Community, Enterprise, and Developer](https://github.com/ONLYOFFICE/DocumentServer#onlyoffice-document-server-editions). Clustering is available only for commercial builds (Enterprise and Developer Edition.
+
+## Recommended system requirements
 
 * **RAM**: 4 GB or more
 * **CPU**: dual-core 2 GHz or higher
@@ -36,21 +36,22 @@ Integrating it with ONLYOFFICE Community Server you will be able to:
 ## Running ONLYOFFICE Docs
 
 
-First, you have to install [docker-compose](https://docs.docker.com/compose/install "docker-compose"). Assuming you have docker-compose installed, execute the following command:
+Install [docker-compose](https://docs.docker.com/compose/install "docker-compose"). If you have docker-compose installed, execute the following command:
 
 ```bash
 docker-compose up -d
 ```
 
-To stop ONLYOFFICE Docs type:
+To stop ONLYOFFICE Docs, type:
 
 ```bash
 docker-compose down
 ```
 
-#### Available Configuration Parameters
+#### Available сonfiguration parameters
 
-ONLYOFFICE Docs consits of set of images
+ONLYOFFICE Docs consits of set of images:
+
 - onlyoffice/docs-proxy
 - onlyoffice/docs-docservice
 - onlyoffice/docs-converter
@@ -68,7 +69,6 @@ Below is the complete list of parameters for `onlyoffice/docs-proxy`.
 - **NGINX_WORKER_CONNECTIONS**: Defines the nginx config [worker_connections](https://nginx.org/en/docs/ngx_core_module.html#worker_connections) directive. Defaults to `4096`.
 
 Below is the complete list of parameters for `onlyoffice/docs-docservice`, `onlyoffice/docs-converter`, `onlyoffice/docs-spellchecker`.
-
 - **DB_HOST**: The IP address or the name of the host where the PostgreSQL server is running.
 - **DB_PORT**: The PostgreSQL server port number.
 - **DB_NAME**: The name of a PostgreSQL database to be created on the image startup.
@@ -97,15 +97,17 @@ Below is the complete list of parameters for `onlyoffice/docs-example`.
 
 ## Project Information
 
-Official website: [http://www.onlyoffice.org](http://onlyoffice.org "http://www.onlyoffice.org")
+Official website: [https://www.onlyoffice.com/](https://www.onlyoffice.com/ "https://www.onlyoffice.com/")
 
 Code repository: [https://github.com/ONLYOFFICE/DocumentServer](https://github.com/ONLYOFFICE/DocumentServer "https://github.com/ONLYOFFICE/DocumentServer")
 
 License: [GNU AGPL v3.0](https://help.onlyoffice.com/products/files/doceditor.aspx?fileid=4358397&doc=K0ZUdlVuQzQ0RFhhMzhZRVN4ZFIvaHlhUjN2eS9XMXpKR1M5WEppUk1Gcz0_IjQzNTgzOTci0 "GNU AGPL v3.0")
 
-SaaS version: [http://www.onlyoffice.com](http://www.onlyoffice.com "http://www.onlyoffice.com")
+ONLYOFFICE Docs on official website: [http://www.onlyoffice.com/office-suite.aspx](http://www.onlyoffice.com/office-suite.aspx "http://www.onlyoffice.com/office-suite.aspx")
 
-## User Feedback and Support
+List of available integrations: [http://www.onlyoffice.com/all-connectors.aspx](http://www.onlyoffice.com/all-connectors.aspx "http://www.onlyoffice.com/all-connectors.aspx"
+
+## User feedback and support
 
 If you have any problems with or questions about this image, please visit our official forum to find answers to your questions: [dev.onlyoffice.org][1] or you can ask and answer ONLYOFFICE development questions on [Stack Overflow][2].
 
