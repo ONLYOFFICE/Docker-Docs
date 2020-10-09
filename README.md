@@ -1,10 +1,3 @@
-* [Overview](#overview)
-* [Functionality](#functionality)
-* [Recommended System Requirements](#recommended-system-requirements)
-* [Running ONLYOFFICE Docs](#running-onlyoffice-docs)
-* [Project Information](#project-information)
-* [User Feedback and Support](#user-feedback-and-support)
-
 ## Overview
 
 ONLYOFFICE Docs is an online office suite comprising viewers and editors for texts, spreadsheets and presentations and enabling collaborative editing in real time. The suite provides maximum compatibility with Office Open XML formats: .docx, .xlsx, .pptx. 
