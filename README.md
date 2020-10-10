@@ -43,7 +43,7 @@ docker-compose down
 
 #### Available сonfiguration parameters
 
-ONLYOFFICE Docs consits of set of images:
+ONLYOFFICE Docs consiыts of set of images:
 
 - onlyoffice/docs-proxy
 - onlyoffice/docs-docservice
