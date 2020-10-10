@@ -67,8 +67,8 @@ Below is the complete list of parameters for `onlyoffice/docs-docservice`, `only
 - **DB_NAME**: The name of a PostgreSQL database to be created on the image startup.
 - **DB_USER**: The new user name with superuser permissions for the PostgreSQL account.
 - **DB_PWD**: The password set for the PostgreSQL account.
-- **AMQP_PROTO**: The protocol for the commection to AMQP server.
-- **AMQP_USER**: The user name for the AMQP server account.
+- **AMQP_PROTO**: The protocol for the connection to AMQP server.
+- **AMQP_USER**: The username for the AMQP server account.
 - **AMQP_PWD**: The password set for the AMQP server account.
 - **AMQP_HOST**: The IP address or the name of the host where the AMQP server is running.
 - **REDIS_SERVER_HOST**: The IP address or the name of the host where the Redis server is running.
