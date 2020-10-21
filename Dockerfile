@@ -13,6 +13,10 @@ RUN groupadd --system --gid 101 ds && \
 FROM ds-base AS ds-service
 ARG PRODUCT_URL=http://download.onlyoffice.com/install/documentserver/linux/onlyoffice-documentserver-ie.x86_64.rpm
 RUN useradd --no-create-home --shell /sbin/nologin nginx && \
+    yum -y install epel-release && \
+    yum -y updateinfo && \
+    yum -y install cabextract fontconfig xorg-x11-font-utils && \
+    rpm -i https://downloads.sourceforge.net/project/mscorefonts2/rpms/msttcore-fonts-installer-2.6-1.noarch.rpm && \
     rpm -ivh $PRODUCT_URL --noscripts --nodeps && \
     chmod a+r /etc/$COMPANY_NAME/documentserver*/*.json && \
     chmod a+r /etc/$COMPANY_NAME/documentserver/log4js/*.json
