@@ -49,7 +49,7 @@ ONLYOFFICE Docs consists of set of images:
 - onlyoffice/docs-docservice
 - onlyoffice/docs-converter
 - onlyoffice/docs-spellchecker
-- onlyoffice/example
+- onlyoffice/docs-example
 
 Each of them can be configured by environment variables. Please refer to your docker orchestrating system for details.
 
