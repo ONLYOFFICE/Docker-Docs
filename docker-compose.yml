@@ -16,12 +16,6 @@ services:
       - '80:8888'
     volumes:
       - common_data:/var/lib/${COMPANY_NAME}
-#      - /etc/${COMPANY_NAME}
-#      - /var/www/${COMPANY_NAME}/Data
-#      - ./var/lib/ds:/var/lib/${COMPANY_NAME}/documentserver/App_Data/cache/files
-#      - ./var/lib/example:/var/www/${COMPANY_NAME}/documentserver-example/public/files
-#      - /usr/share/fonts
-#      - ./http-upstream.conf:/etc/nginx/includes/http-upstream.conf
        
   docservice:
     build:
