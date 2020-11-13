@@ -5,7 +5,7 @@ services:
     build:
       context: .
       target: proxy
-    image: ${COMPANY_NAME}/${PRODUCT_NAME}-proxy:${PRODUCT_VERSION}
+    image: ${COMPANY_NAME}/${PRODUCT_NAME}-proxy${PRODUCT_EDITION}:${PRODUCT_VERSION}
     environment:
       - DOCSERVICE_HOST_PORT=docservice:8000
       - SPELLCHECKER_HOST_PORT=spellchecker:8080
@@ -15,13 +15,13 @@ services:
     ports:
       - '80:8888'
     volumes:
-      - common_data:/var/lib/${COMPANY_NAME}
+      - common_data:/var/lib/${COMPANY_NAME} 
        
   docservice:
     build:
       context: .
       target: docservice
-    image: ${COMPANY_NAME}/${PRODUCT_NAME}-docservice:${PRODUCT_VERSION}
+    image: ${COMPANY_NAME}/${PRODUCT_NAME}-docservice${PRODUCT_EDITION}:${PRODUCT_VERSION}
     container_name: docservice
     environment:
       - DB_HOST=postgresql
@@ -48,7 +48,7 @@ services:
     build:
       context: .
       target: converter
-    image: ${COMPANY_NAME}/${PRODUCT_NAME}-converter:${PRODUCT_VERSION}
+    image: ${COMPANY_NAME}/${PRODUCT_NAME}-converter${PRODUCT_EDITION}:${PRODUCT_VERSION}
     container_name: converter
     environment:
       - DB_HOST=postgresql
@@ -73,7 +73,7 @@ services:
     build:
       context: .
       target: spellchecker
-    image: ${COMPANY_NAME}/${PRODUCT_NAME}-spellchecker:${PRODUCT_VERSION}
+    image: ${COMPANY_NAME}/${PRODUCT_NAME}-spellchecker${PRODUCT_EDITION}:${PRODUCT_VERSION}
     container_name: spellchecker
     environment:
       - DB_HOST=postgresql
@@ -104,12 +104,12 @@ services:
     expose:
       - '8125'
       - '8126'
-  
+
   example:
     build:
       context: .
       target: example
-    image: ${COMPANY_NAME}/${PRODUCT_NAME}-example:${PRODUCT_VERSION}
+    image: ${COMPANY_NAME}/${PRODUCT_NAME}-example${PRODUCT_EDITION}:${PRODUCT_VERSION}
     container_name: example
     environment:
       - DB_HOST=postgresql

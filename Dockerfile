@@ -11,7 +11,8 @@ RUN groupadd --system --gid 101 ds && \
     rm -f /var/log/*log
 
 FROM ds-base AS ds-service
-ARG PRODUCT_URL=http://download.onlyoffice.com/install/documentserver/linux/onlyoffice-documentserver-ie.x86_64.rpm
+ARG PRODUCT_EDITION=
+ARG PRODUCT_URL=http://download.onlyoffice.com/install/documentserver/linux/onlyoffice-documentserver$PRODUCT_EDITION.x86_64.rpm
 RUN useradd --no-create-home --shell /sbin/nologin nginx && \
     rpm -ivh $PRODUCT_URL --noscripts --nodeps && \
     chmod a+r /etc/$COMPANY_NAME/documentserver*/*.json && \
