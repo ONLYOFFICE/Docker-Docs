@@ -84,6 +84,7 @@ Below is the complete list of parameters for `onlyoffice/docs-docservice`, `only
 - **METRICS_PREFIX**: Defines StatsD metrics prefix for backend services. Defaults to `ds.`.
 
 Below is the complete list of parameters for `onlyoffice/docs-example`.
+- **DS_URL**: Specifies ONLYOFFICE Docs server address. Defaults to `/`. You have specyfing this field to correct work ONLYOFFICE Docs Example. Example `http://onlyoffice-docs-address/`.
 - **JWT_ENABLED**: Specifies the enabling the JSON Web Token validation by the ONLYOFFICE Docs. Defaults to `false`.
 - **JWT_SECRET**: Defines the secret key to validate the JSON Web Token in the request to the ONLYOFFICE Docs. Defaults to `secret`.
 - **JWT_HEADER**: Defines the http header that will be used to send the JSON Web Token. Defaults to `Authorization`.
