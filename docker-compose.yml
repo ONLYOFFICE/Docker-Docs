@@ -113,6 +113,8 @@ services:
     container_name: example
     environment:
       - JWT_ENABLED=false
+      # Uncomment the line below and enter your ONLYOFFICE Docs address
+      # - DS_URL=http://onlyoffice-docs-address/
     depends_on:
       - proxy
     stdin_open: true
