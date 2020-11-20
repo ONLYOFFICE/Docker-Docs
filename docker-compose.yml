@@ -112,16 +112,9 @@ services:
     image: ${COMPANY_NAME}/${PRODUCT_NAME}-example${PRODUCT_EDITION}:${PRODUCT_VERSION}
     container_name: example
     environment:
-      - DB_HOST=postgresql
-      - DB_NAME=mydb
-      - DB_USER=myuser
-      - REDIST_SERVER_HOST=redis
-      - AMQP_HOST=rabbitmq
+      - JWT_ENABLED=false
     depends_on:
       - proxy
-      - postgresql
-      - redis
-      - rabbitmq
     stdin_open: true
     restart: always
     expose:
