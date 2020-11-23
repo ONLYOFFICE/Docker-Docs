@@ -18,6 +18,11 @@ RUN useradd --no-create-home --shell /sbin/nologin nginx && \
     yum -y install cabextract fontconfig xorg-x11-font-utils xorg-x11-server-utils && \
     rpm -i https://downloads.sourceforge.net/project/mscorefonts2/rpms/msttcore-fonts-installer-2.6-1.noarch.rpm && \
     rpm -ivh $PRODUCT_URL --noscripts --nodeps && \
+    mkdir -p /var/www/$COMPANY_NAME/documentserver/core-fonts/msttcore && \
+    cp -vt \
+        /var/www/$COMPANY_NAME/documentserver/core-fonts/msttcore \
+        /usr/share/fonts/msttcore/*.ttf && \
+    chown -R ds:ds /var/www/$COMPANY_NAME/documentserver/core-fonts/msttcore && \
     chmod a+r /etc/$COMPANY_NAME/documentserver*/*.json && \
     chmod a+r /etc/$COMPANY_NAME/documentserver/log4js/*.json
 COPY --chown=ds:ds \
