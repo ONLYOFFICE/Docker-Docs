@@ -160,9 +160,11 @@ COPY --from=ds-service \
     /usr/lib64/libicudata.so.58 \
     /usr/lib64/libicuuc.so.58 \
     /usr/lib64/libDjVuFile.so \
+    /usr/lib64/libEpubFile.so \
+    /usr/lib64/libFb2File.so \
     /usr/lib64/libPdfReader.so \
     /usr/lib64/libPdfWriter.so \
-    /usr/lib64/libHtmlFile.so \
+    /usr/lib64/libHtmlFile2.so \
     /usr/lib64/libHtmlRenderer.so \
     /usr/lib64/libUnicodeConverter.so \
     /usr/lib64/libXpsFile.so \
