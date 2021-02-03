@@ -106,7 +106,7 @@ services:
       - '8126'
 
   example:
-    image: ${COMPANY_NAME}/${PRODUCT_NAME}-example${PRODUCT_EDITION}:${PRODUCT_VERSION}
+    image: ${COMPANY_NAME}/${PRODUCT_NAME}-example:${PRODUCT_VERSION}
     container_name: example
     environment:
       - JWT_ENABLED=false
