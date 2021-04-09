@@ -154,6 +154,9 @@ COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/fonts \
     /var/www/$COMPANY_NAME/documentserver/fonts
 COPY --from=ds-service \
+    /usr/share/fonts \
+    /usr/share/fonts
+COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/sdkjs \
     /var/www/$COMPANY_NAME/documentserver/sdkjs
 COPY --from=ds-service \
