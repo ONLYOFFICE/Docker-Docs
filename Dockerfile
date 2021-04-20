@@ -88,14 +88,6 @@ RUN sed 's,\(listen.\+:\)\([0-9]\+\)\(.*;\),'"\18888\3"',' \
     mkdir -p \
         /var/lib/$COMPANY_NAME/documentserver/App_Data/cache/files \
         /var/lib/$COMPANY_NAME/documentserver/App_Data/docbuilder && \
-    chown -R ds:ds \
-        /etc/nginx \
-        /var/lib/$COMPANY_NAME/documentserver \
-        /var/www/$COMPANY_NAME/documentserver \
-        /var/www/$COMPANY_NAME/documentserver-example
-VOLUME /var/lib/$COMPANY_NAME
-USER ds
-ENTRYPOINT \
     find \
         /var/www/$COMPANY_NAME/documentserver/fonts \
         -type f ! \
@@ -109,15 +101,29 @@ ENTRYPOINT \
         -type f \
         \( -name *.js -o -name *.json -o -name *.htm -o -name *.html -o -name *.css \) \
         -exec sh -c 'gzip -cf9 $0 > $0.gz' {} \; && \
+    chown -R ds:ds \
+        /etc/nginx \
+        /var/lib/$COMPANY_NAME/documentserver \
+        /var/www/$COMPANY_NAME/documentserver \
+        /var/www/$COMPANY_NAME/documentserver-example
+VOLUME /var/lib/$COMPANY_NAME
+USER ds
+ENTRYPOINT \
+    if ! [ -d /tmp/proxy_nginx ]; then \
+        mkdir /tmp/proxy_nginx; \
+    fi && \
+    cp -r /etc/nginx/* /tmp/proxy_nginx/ && \
     sed 's|\(worker_connections\) [[:digit:]]*;|\1 '$NGINX_WORKER_CONNECTIONS';|g' \
-        -i /etc/nginx/nginx.conf && \
+        -i /tmp/proxy_nginx/nginx.conf && \
     if [ $NGINX_ACCESS_LOG != "off" ]; then \
         sed 's|#*\(\s*access_log\).*;|\1 /var/log/nginx/access.log '$NGINX_ACCESS_LOG';|g' \
-            -i /etc/nginx/nginx.conf; \
+            -i /tmp/proxy_nginx/nginx.conf; \
     fi && \
-    envsubst < /etc/nginx/includes/http-upstream.conf > /tmp/http-upstream.conf && \
-    envsubst < /etc/nginx/includes/ds-common.conf | tee /etc/nginx/includes/ds-common.conf > /dev/null && \
-    exec nginx -g 'daemon off;'
+    sed -i 's/etc\/nginx/tmp\/proxy_nginx/g' /tmp/proxy_nginx/nginx.conf && \
+    envsubst < /tmp/proxy_nginx/includes/http-upstream.conf > /tmp/http-upstream.conf && \
+    envsubst < /etc/nginx/includes/ds-common.conf | tee /tmp/proxy_nginx/includes/ds-common.conf > /dev/null && \
+    sed -i 's/etc\/nginx/tmp\/proxy_nginx/g' /tmp/proxy_nginx/conf.d/ds.conf && \
+    exec nginx -c /tmp/proxy_nginx/nginx.conf -g 'daemon off;'
 
 FROM ds-base AS docservice
 EXPOSE 8000
