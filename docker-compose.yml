@@ -118,8 +118,6 @@ services:
     restart: always
     expose:
       - '3000'
-    volumes:
-     - common_data:/var/lib/${COMPANY_NAME}
 
   redis:
     container_name: redis
