@@ -216,22 +216,6 @@ FROM statsd/statsd AS metrics
 ARG COMPANY_NAME=onlyoffice
 COPY --from=ds-service /var/www/$COMPANY_NAME/documentserver/server/Metrics/config/config.js /usr/src/app/config.js
 
-FROM ds-base AS example
-ENV NODE_CONFIG_DIR=/etc/$COMPANY_NAME/documentserver-example
-EXPOSE 8000
-COPY --from=ds-service \
-    /etc/$COMPANY_NAME/documentserver-example \
-    /etc/$COMPANY_NAME/documentserver-example
-COPY --from=ds-service \
-    /var/www/$COMPANY_NAME/documentserver-example \
-    /var/www/$COMPANY_NAME/documentserver-example
-COPY example-docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
-RUN mkdir -p /var/lib/$COMPANY_NAME/documentserver-example/files && \
-    chown -R ds:ds /var/lib/$COMPANY_NAME/documentserver-example/files
-VOLUME /var/lib/$COMPANY_NAME/documentserver-example/files
-USER ds
-ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver-example/example
-
 FROM postgres:9.5 AS db
 ARG COMPANY_NAME=onlyoffice
 COPY --from=ds-service /var/www/$COMPANY_NAME/documentserver/server/schema/postgresql/createdb.sql /docker-entrypoint-initdb.d/
