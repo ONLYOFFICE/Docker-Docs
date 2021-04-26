@@ -1,4 +1,4 @@
-FROM centos:7 AS ds-base
+FROM centos:8 AS ds-base
 
 LABEL maintainer Ascensio System SIA <support@onlyoffice.com>
 
