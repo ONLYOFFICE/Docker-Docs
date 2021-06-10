@@ -79,7 +79,9 @@ COPY --from=ds-service \
 COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver-example/welcome \
     /var/www/$COMPANY_NAME/documentserver-example/welcome
-RUN sed 's,\(listen.\+:\)\([0-9]\+\)\(.*;\),'"\18888\3"',' \
+RUN sed 's|\(application\/zip.*\)|\1\n    application\/wasm wasm;|' \
+        -i /etc/nginx/mime.types && \
+    sed 's,\(listen.\+:\)\([0-9]\+\)\(.*;\),'"\18888\3"',' \
         -i /etc/nginx/conf.d/ds.conf && \
     sed '/access_log.*/d' -i /etc/nginx/includes/ds-common.conf && \
     sed '/error_log.*/d' -i /etc/nginx/includes/ds-common.conf && \
