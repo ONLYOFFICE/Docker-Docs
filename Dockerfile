@@ -33,7 +33,6 @@ RUN documentserver-generate-allfonts.sh true
 
 FROM ds-base AS proxy
 ENV DOCSERVICE_HOST_PORT=localhost:8000 \
-    SPELLCHECKER_HOST_PORT=localhost:8080 \
     EXAMPLE_HOST_PORT=localhost:3000 \
     NGINX_ACCESS_LOG=off \
     NGINX_GZIP_PROXIED=off \
@@ -52,7 +51,6 @@ COPY --from=ds-service \
     /etc/onlyoffice/documentserver/nginx/includes/ds-common.conf \
     /etc/onlyoffice/documentserver/nginx/includes/ds-docservice.conf \
     /etc/onlyoffice/documentserver-example/nginx/includes/ds-example.conf \
-    /etc/onlyoffice/documentserver/nginx/includes/ds-spellchecker.conf \
     /etc/nginx/includes/
 COPY \
     config/nginx/includes/http-common.conf \
@@ -73,6 +71,9 @@ COPY --from=ds-service \
 COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/web-apps \
     /var/www/$COMPANY_NAME/documentserver/web-apps
+COPY --from=ds-service \
+    /var/www/$COMPANY_NAME/documentserver/server/SpellChecker/dictionaries \
+    /var/www/$COMPANY_NAME/documentserver/server/SpellChecker/dictionaries
 COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver-example/welcome \
     /var/www/$COMPANY_NAME/documentserver-example/welcome
@@ -194,23 +195,6 @@ RUN mkdir -p \
     chown -R ds:ds /var/lib/$COMPANY_NAME/documentserver
 USER ds
 ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/FileConverter/converter
-
-FROM ds-base AS spellchecker
-EXPOSE 8080
-COPY --from=ds-service \
-    /etc/$COMPANY_NAME/documentserver/default.json \
-    /etc/$COMPANY_NAME/documentserver/production-linux.json \
-    /etc/$COMPANY_NAME/documentserver/
-COPY --from=ds-service --chown=ds:ds \
-    /etc/$COMPANY_NAME/documentserver/log4js/production.json \
-    /etc/$COMPANY_NAME/documentserver/log4js/
-COPY --from=ds-service \
-    /var/www/$COMPANY_NAME/documentserver/server/SpellChecker \
-    /var/www/$COMPANY_NAME/documentserver/server/SpellChecker
-COPY docker-entrypoint.sh /usr/local/bin/
-USER ds
-ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/SpellChecker/spellchecker
-HEALTHCHECK --interval=10s --timeout=3s CMD curl -sf http://localhost:8080/index.html
 
 FROM statsd/statsd AS metrics
 ARG COMPANY_NAME=onlyoffice

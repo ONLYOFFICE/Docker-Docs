@@ -8,7 +8,6 @@ services:
     image: ${COMPANY_NAME}/${PRODUCT_NAME}-proxy${PRODUCT_EDITION}:${PRODUCT_VERSION}
     environment:
       - DOCSERVICE_HOST_PORT=docservice:8000
-      - SPELLCHECKER_HOST_PORT=spellchecker:8080
       - EXAMPLE_HOST_PORT=example:3000
     stdin_open: true
     restart: always
@@ -66,33 +65,6 @@ services:
       - metrics
     stdin_open: true
     restart: always
-    volumes:
-     - common_data:/var/lib/${COMPANY_NAME}
-
-  spellchecker:
-    build:
-      context: .
-      target: spellchecker
-    image: ${COMPANY_NAME}/${PRODUCT_NAME}-spellchecker${PRODUCT_EDITION}:${PRODUCT_VERSION}
-    container_name: spellchecker
-    environment:
-      - DB_HOST=postgresql
-      - DB_NAME=mydb
-      - DB_USER=myuser
-      - REDIST_SERVER_HOST=redis
-      - AMQP_HOST=rabbitmq
-      - METRICS_HOST=metrics
-      - METRICS_ENABLED=true
-    depends_on:
-      - proxy
-      - postgresql
-      - redis
-      - rabbitmq
-      - metrics
-    stdin_open: true
-    restart: always
-    expose:
-      - '8080'
     volumes:
      - common_data:/var/lib/${COMPANY_NAME}
 
