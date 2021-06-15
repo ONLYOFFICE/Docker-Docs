@@ -48,20 +48,18 @@ ONLYOFFICE Docs consists of set of images:
 - onlyoffice/docs-proxy
 - onlyoffice/docs-docservice
 - onlyoffice/docs-converter
-- onlyoffice/docs-spellchecker
 - onlyoffice/docs-example
 
 Each of them can be configured by environment variables. Please refer to your docker orchestrating system for details.
 
 Below is the complete list of parameters for `onlyoffice/docs-proxy`.
 - **DOCSERVICE_HOST_PORT**: Defaults to `localhost:8000`.
-- **SPELLCHECKER_HOST_PORT**: Defaults to `localhost:8080`.
 - **EXAMPLE_HOST_PORT**: Defaults to `localhost:3000`.
 - **NGINX_ACCESS_LOG**: Defines the nginx config [access_log](https://nginx.org/ru/docs/http/ngx_http_log_module.html#access_log) directive. Defaults to `off`.
 - **NGINX_GZIP_PROXIED**: Defines the nginx config [gzip_proxied](https://nginx.org/ru/docs/http/ngx_http_gzip_module.html#gzip_proxied) directive. Defaults to `off`.
 - **NGINX_WORKER_CONNECTIONS**: Defines the nginx config [worker_connections](https://nginx.org/en/docs/ngx_core_module.html#worker_connections) directive. Defaults to `4096`.
 
-Below is the complete list of parameters for `onlyoffice/docs-docservice`, `onlyoffice/docs-converter`, `onlyoffice/docs-spellchecker`.
+Below is the complete list of parameters for `onlyoffice/docs-docservice`, `onlyoffice/docs-converter`.
 - **DB_HOST**: The IP address or the name of the host where the PostgreSQL server is running.
 - **DB_PORT**: The PostgreSQL server port number.
 - **DB_NAME**: The name of a PostgreSQL database to be created on the image startup.

@@ -33,7 +33,6 @@ RUN documentserver-generate-allfonts.sh true
 
 FROM ds-base AS proxy
 ENV DOCSERVICE_HOST_PORT=localhost:8000 \
-    SPELLCHECKER_HOST_PORT=localhost:8080 \
     EXAMPLE_HOST_PORT=localhost:3000 \
     NGINX_ACCESS_LOG=off \
     NGINX_GZIP_PROXIED=off \
@@ -52,7 +51,6 @@ COPY --from=ds-service \
     /etc/onlyoffice/documentserver/nginx/includes/ds-common.conf \
     /etc/onlyoffice/documentserver/nginx/includes/ds-docservice.conf \
     /etc/onlyoffice/documentserver-example/nginx/includes/ds-example.conf \
-    /etc/onlyoffice/documentserver/nginx/includes/ds-spellchecker.conf \
     /etc/nginx/includes/
 COPY \
     config/nginx/includes/http-common.conf \
@@ -93,14 +91,6 @@ RUN sed 's|\(application\/zip.*\)|\1\n    application\/wasm wasm;|' \
     mkdir -p \
         /var/lib/$COMPANY_NAME/documentserver/App_Data/cache/files \
         /var/lib/$COMPANY_NAME/documentserver/App_Data/docbuilder && \
-    chown -R ds:ds \
-        /etc/nginx \
-        /var/lib/$COMPANY_NAME/documentserver \
-        /var/www/$COMPANY_NAME/documentserver \
-        /var/www/$COMPANY_NAME/documentserver-example
-VOLUME /var/lib/$COMPANY_NAME
-USER ds
-ENTRYPOINT \
     find \
         /var/www/$COMPANY_NAME/documentserver/fonts \
         -type f ! \
@@ -114,15 +104,29 @@ ENTRYPOINT \
         -type f \
         \( -name *.js -o -name *.json -o -name *.htm -o -name *.html -o -name *.css \) \
         -exec sh -c 'gzip -cf9 $0 > $0.gz' {} \; && \
+    chown -R ds:ds \
+        /etc/nginx \
+        /var/lib/$COMPANY_NAME/documentserver \
+        /var/www/$COMPANY_NAME/documentserver \
+        /var/www/$COMPANY_NAME/documentserver-example
+VOLUME /var/lib/$COMPANY_NAME
+USER ds
+ENTRYPOINT \
+    if ! [ -d /tmp/proxy_nginx ]; then \
+        mkdir /tmp/proxy_nginx; \
+    fi && \
+    cp -r /etc/nginx/* /tmp/proxy_nginx/ && \
     sed 's|\(worker_connections\) [[:digit:]]*;|\1 '$NGINX_WORKER_CONNECTIONS';|g' \
-        -i /etc/nginx/nginx.conf && \
+        -i /tmp/proxy_nginx/nginx.conf && \
     if [ $NGINX_ACCESS_LOG != "off" ]; then \
         sed 's|#*\(\s*access_log\).*;|\1 /var/log/nginx/access.log '$NGINX_ACCESS_LOG';|g' \
-            -i /etc/nginx/nginx.conf; \
+            -i /tmp/proxy_nginx/nginx.conf; \
     fi && \
-    envsubst < /etc/nginx/includes/http-upstream.conf > /tmp/http-upstream.conf && \
-    envsubst < /etc/nginx/includes/ds-common.conf | tee /etc/nginx/includes/ds-common.conf > /dev/null && \
-    exec nginx -g 'daemon off;'
+    sed -i 's/etc\/nginx/tmp\/proxy_nginx/g' /tmp/proxy_nginx/nginx.conf && \
+    envsubst < /tmp/proxy_nginx/includes/http-upstream.conf > /tmp/http-upstream.conf && \
+    envsubst < /etc/nginx/includes/ds-common.conf | tee /tmp/proxy_nginx/includes/ds-common.conf > /dev/null && \
+    sed -i 's/etc\/nginx/tmp\/proxy_nginx/g' /tmp/proxy_nginx/conf.d/ds.conf && \
+    exec nginx -c /tmp/proxy_nginx/nginx.conf -g 'daemon off;'
 
 FROM ds-base AS docservice
 EXPOSE 8000
@@ -194,42 +198,9 @@ RUN mkdir -p \
 USER ds
 ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/FileConverter/converter
 
-FROM ds-base AS spellchecker
-EXPOSE 8080
-COPY --from=ds-service \
-    /etc/$COMPANY_NAME/documentserver/default.json \
-    /etc/$COMPANY_NAME/documentserver/production-linux.json \
-    /etc/$COMPANY_NAME/documentserver/
-COPY --from=ds-service --chown=ds:ds \
-    /etc/$COMPANY_NAME/documentserver/log4js/production.json \
-    /etc/$COMPANY_NAME/documentserver/log4js/
-COPY --from=ds-service \
-    /var/www/$COMPANY_NAME/documentserver/server/SpellChecker \
-    /var/www/$COMPANY_NAME/documentserver/server/SpellChecker
-COPY docker-entrypoint.sh /usr/local/bin/
-USER ds
-ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/SpellChecker/spellchecker
-HEALTHCHECK --interval=10s --timeout=3s CMD curl -sf http://localhost:8080/index.html
-
 FROM statsd/statsd AS metrics
 ARG COMPANY_NAME=onlyoffice
 COPY --from=ds-service /var/www/$COMPANY_NAME/documentserver/server/Metrics/config/config.js /usr/src/app/config.js
-
-FROM ds-base AS example
-ENV NODE_CONFIG_DIR=/etc/$COMPANY_NAME/documentserver-example
-EXPOSE 8000
-COPY --from=ds-service \
-    /etc/$COMPANY_NAME/documentserver-example \
-    /etc/$COMPANY_NAME/documentserver-example
-COPY --from=ds-service \
-    /var/www/$COMPANY_NAME/documentserver-example \
-    /var/www/$COMPANY_NAME/documentserver-example
-COPY example-docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
-RUN mkdir -p /var/lib/$COMPANY_NAME/documentserver-example/files && \
-    chown -R ds:ds /var/lib/$COMPANY_NAME/documentserver-example/files
-VOLUME /var/lib/$COMPANY_NAME/documentserver-example/files
-USER ds
-ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver-example/example
 
 FROM postgres:9.5 AS db
 ARG COMPANY_NAME=onlyoffice
