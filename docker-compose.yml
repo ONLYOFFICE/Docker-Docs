@@ -30,6 +30,7 @@ services:
       - AMQP_HOST=rabbitmq
       - METRICS_HOST=metrics
       - METRICS_ENABLED=true
+      - WOPI_ENABLED=false
     depends_on:
       - proxy
       - postgresql
