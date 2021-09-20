@@ -25,10 +25,6 @@ RUN useradd --no-create-home --shell /sbin/nologin nginx && \
         /usr/share/fonts/msttcore/*.ttf && \
     chmod a+r /etc/$COMPANY_NAME/documentserver*/*.json && \
     chmod a+r /etc/$COMPANY_NAME/documentserver/log4js/*.json
-COPY --chown=ds:ds \
-    fonts/* \
-    /var/www/$COMPANY_NAME/documentserver/core-fonts/custom/
-RUN documentserver-generate-allfonts.sh true
 
 FROM ds-base AS proxy
 ENV DOCSERVICE_HOST_PORT=localhost:8000 \
@@ -59,8 +55,17 @@ COPY --chown=ds:ds --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/core-fonts \
     /var/www/$COMPANY_NAME/documentserver/core-fonts
 COPY --chown=ds:ds --from=ds-service \
+    /var/www/$COMPANY_NAME/documentserver/server/FileConverter/bin/AllFonts.js \
+    /var/www/$COMPANY_NAME/documentserver/server/FileConverter/bin/AllFonts.js
+COPY --chown=ds:ds --from=ds-service \
+    /var/www/$COMPANY_NAME/documentserver/server/tools/ \
+    /var/www/$COMPANY_NAME/documentserver/server/tools/
+COPY --chown=ds:ds --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/fonts \
     /var/www/$COMPANY_NAME/documentserver/fonts
+COPY --chown=ds:ds --from=ds-service \
+    /usr/bin/documentserver-generate-allfonts.sh \
+    /usr/bin/documentserver-generate-allfonts.sh
 COPY --chown=ds:ds --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/sdkjs \
     /var/www/$COMPANY_NAME/documentserver/sdkjs
@@ -76,6 +81,23 @@ COPY --from=ds-service \
 COPY --chown=ds:ds --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver-example/welcome \
     /var/www/$COMPANY_NAME/documentserver-example/welcome
+COPY --chown=ds:ds --from=ds-service \
+    /usr/lib64/libgraphics.so \
+    /usr/lib64/libdoctrenderer.so \
+    /usr/lib64/libkernel.so \
+    /usr/lib64/libicudata.so.58 \
+    /usr/lib64/libicuuc.so.58 \
+    /usr/lib64/libDjVuFile.so \
+    /usr/lib64/libEpubFile.so \
+    /usr/lib64/libFb2File.so \
+    /usr/lib64/libPdfReader.so \
+    /usr/lib64/libPdfWriter.so \
+    /usr/lib64/libHtmlFile2.so \
+    /usr/lib64/libHtmlRenderer.so \
+    /usr/lib64/libUnicodeConverter.so \
+    /usr/lib64/libXpsFile.so \
+    /usr/lib64/
+COPY --chown=ds:ds fonts-generation.sh /usr/local/bin/
 RUN sed 's|\(application\/zip.*\)|\1\n    application\/wasm wasm;|' \
         -i /etc/nginx/mime.types && \
     sed 's,\(listen.\+:\)\([0-9]\+\)\(.*;\),'"\18888\3"',' \
@@ -107,6 +129,7 @@ RUN sed 's|\(application\/zip.*\)|\1\n    application\/wasm wasm;|' \
 VOLUME /var/lib/$COMPANY_NAME
 USER ds
 ENTRYPOINT \
+    fonts-generation.sh && \
     if ! [ -d /tmp/proxy_nginx ]; then \
         mkdir /tmp/proxy_nginx; \
     fi && \
@@ -158,6 +181,9 @@ COPY --from=ds-service --chown=ds:ds \
     /var/www/$COMPANY_NAME/documentserver/fonts \
     /var/www/$COMPANY_NAME/documentserver/fonts
 COPY --from=ds-service --chown=ds:ds \
+    /usr/bin/documentserver-generate-allfonts.sh \
+    /usr/bin/documentserver-generate-allfonts.sh
+COPY --from=ds-service --chown=ds:ds \
     /usr/share/fonts \
     /usr/share/fonts
 COPY --from=ds-service --chown=ds:ds \
@@ -166,6 +192,9 @@ COPY --from=ds-service --chown=ds:ds \
 COPY --from=ds-service --chown=ds:ds \
     /var/www/$COMPANY_NAME/documentserver/server/FileConverter \
     /var/www/$COMPANY_NAME/documentserver/server/FileConverter
+COPY --from=ds-service --chown=ds:ds \
+    /var/www/$COMPANY_NAME/documentserver/server/tools/ \
+    /var/www/$COMPANY_NAME/documentserver/server/tools/
 COPY --from=ds-service --chown=ds:ds \
     /var/www/$COMPANY_NAME/documentserver/web-apps \
     /var/www/$COMPANY_NAME/documentserver/web-apps
@@ -186,12 +215,14 @@ COPY --from=ds-service --chown=ds:ds \
     /usr/lib64/libXpsFile.so \
     /usr/lib64/
 COPY docker-entrypoint.sh /usr/local/bin/
+COPY --chown=ds:ds fonts-generation.sh /usr/local/bin/
 RUN mkdir -p \
         /var/lib/$COMPANY_NAME/documentserver/App_Data/cache/files \
         /var/lib/$COMPANY_NAME/documentserver/App_Data/docbuilder && \
         chown -R ds:ds /var/lib/$COMPANY_NAME/documentserver/
 USER ds
-ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/FileConverter/converter
+ENTRYPOINT fonts-generation.sh && \
+           docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/FileConverter/converter
 
 FROM statsd/statsd AS metrics
 ARG COMPANY_NAME=onlyoffice

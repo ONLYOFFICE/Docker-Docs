@@ -15,6 +15,7 @@ services:
       - '80:8888'
     volumes:
       - common_data:/var/lib/${COMPANY_NAME} 
+      - ./fonts:/var/www/$COMPANY_NAME/documentserver/core-fonts/custom/
        
   docservice:
     build:
@@ -67,6 +68,7 @@ services:
     restart: always
     volumes:
      - common_data:/var/lib/${COMPANY_NAME}
+     - ./fonts:/var/www/$COMPANY_NAME/documentserver/core-fonts/custom/
 
   metrics:
     build:
