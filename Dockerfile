@@ -23,7 +23,6 @@ RUN useradd --no-create-home --shell /sbin/nologin nginx && \
     cp -vt \
         /var/www/$COMPANY_NAME/documentserver/core-fonts/msttcore \
         /usr/share/fonts/msttcore/*.ttf && \
-    chown -R ds:ds /var/www/$COMPANY_NAME/documentserver/core-fonts/msttcore && \
     chmod a+r /etc/$COMPANY_NAME/documentserver*/*.json && \
     chmod a+r /etc/$COMPANY_NAME/documentserver/log4js/*.json
 COPY --chown=ds:ds \
@@ -43,38 +42,38 @@ RUN yum -y install epel-release sudo && \
     yum -y install gettext nginx && \
     yum clean all && \
     rm -f /var/log/*log
-COPY config/nginx/nginx.conf /etc/nginx/nginx.conf
-COPY --from=ds-service \
+COPY --chown=ds:ds config/nginx/nginx.conf /etc/nginx/nginx.conf
+COPY --chown=ds:ds --from=ds-service \
     /etc/onlyoffice/documentserver/nginx/ds.conf \
     /etc/nginx/conf.d/
-COPY --from=ds-service \
+COPY --chown=ds:ds --from=ds-service \
     /etc/onlyoffice/documentserver/nginx/includes/ds-common.conf \
     /etc/onlyoffice/documentserver/nginx/includes/ds-docservice.conf \
     /etc/onlyoffice/documentserver-example/nginx/includes/ds-example.conf \
     /etc/nginx/includes/
-COPY \
+COPY --chown=ds:ds \
     config/nginx/includes/http-common.conf \
     config/nginx/includes/http-upstream.conf \
     /etc/nginx/includes/
-COPY --from=ds-service \
+COPY --chown=ds:ds --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/core-fonts \
     /var/www/$COMPANY_NAME/documentserver/core-fonts
-COPY --from=ds-service \
+COPY --chown=ds:ds --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/fonts \
     /var/www/$COMPANY_NAME/documentserver/fonts
-COPY --from=ds-service \
+COPY --chown=ds:ds --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/sdkjs \
     /var/www/$COMPANY_NAME/documentserver/sdkjs
-COPY --from=ds-service \
+COPY --chown=ds:ds --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/sdkjs-plugins \
     /var/www/$COMPANY_NAME/documentserver/sdkjs-plugins
-COPY --from=ds-service \
+COPY --chown=ds:ds --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/web-apps \
     /var/www/$COMPANY_NAME/documentserver/web-apps
 COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/server/SpellChecker/dictionaries \
     /var/www/$COMPANY_NAME/documentserver/server/SpellChecker/dictionaries
-COPY --from=ds-service \
+COPY --chown=ds:ds --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver-example/welcome \
     /var/www/$COMPANY_NAME/documentserver-example/welcome
 RUN sed 's|\(application\/zip.*\)|\1\n    application\/wasm wasm;|' \
@@ -95,7 +94,7 @@ RUN sed 's|\(application\/zip.*\)|\1\n    application\/wasm wasm;|' \
         /var/www/$COMPANY_NAME/documentserver/fonts \
         -type f ! \
         -name "*.*" \
-        -exec sh -c 'gzip -cf9 $0 > $0.gz' {} \; && \
+        -exec sh -c 'gzip -cf9 $0 > $0.gz && chown ds:ds $0.gz' {} \; && \
     find \
         /var/www/$COMPANY_NAME/documentserver/sdkjs \
         /var/www/$COMPANY_NAME/documentserver/sdkjs-plugins \
@@ -103,12 +102,8 @@ RUN sed 's|\(application\/zip.*\)|\1\n    application\/wasm wasm;|' \
         /var/www/$COMPANY_NAME/documentserver-example/welcome \
         -type f \
         \( -name *.js -o -name *.json -o -name *.htm -o -name *.html -o -name *.css \) \
-        -exec sh -c 'gzip -cf9 $0 > $0.gz' {} \; && \
-    chown -R ds:ds \
-        /etc/nginx \
-        /var/lib/$COMPANY_NAME/documentserver \
-        /var/www/$COMPANY_NAME/documentserver \
-        /var/www/$COMPANY_NAME/documentserver-example
+        -exec sh -c 'gzip -cf9 $0 > $0.gz && chown ds:ds $0.gz' {} \;
+
 VOLUME /var/lib/$COMPANY_NAME
 USER ds
 ENTRYPOINT \
@@ -149,32 +144,32 @@ ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/Doc
 HEALTHCHECK --interval=10s --timeout=3s CMD curl -sf http://localhost:8000/index.html
 
 FROM ds-base AS converter
-COPY --from=ds-service \
+COPY --from=ds-service --chown=ds:ds \
     /etc/$COMPANY_NAME/documentserver/default.json \
     /etc/$COMPANY_NAME/documentserver/production-linux.json \
     /etc/$COMPANY_NAME/documentserver/
 COPY --from=ds-service --chown=ds:ds \
     /etc/$COMPANY_NAME/documentserver/log4js/production.json \
     /etc/$COMPANY_NAME/documentserver/log4js/
-COPY --from=ds-service \
+COPY --from=ds-service --chown=ds:ds \
     /var/www/$COMPANY_NAME/documentserver/core-fonts \
     /var/www/$COMPANY_NAME/documentserver/core-fonts
-COPY --from=ds-service \
+COPY --from=ds-service --chown=ds:ds \
     /var/www/$COMPANY_NAME/documentserver/fonts \
     /var/www/$COMPANY_NAME/documentserver/fonts
-COPY --from=ds-service \
+COPY --from=ds-service --chown=ds:ds \
     /usr/share/fonts \
     /usr/share/fonts
-COPY --from=ds-service \
+COPY --from=ds-service --chown=ds:ds \
     /var/www/$COMPANY_NAME/documentserver/sdkjs \
     /var/www/$COMPANY_NAME/documentserver/sdkjs
-COPY --from=ds-service \
+COPY --from=ds-service --chown=ds:ds \
     /var/www/$COMPANY_NAME/documentserver/server/FileConverter \
     /var/www/$COMPANY_NAME/documentserver/server/FileConverter
-COPY --from=ds-service \
+COPY --from=ds-service --chown=ds:ds \
     /var/www/$COMPANY_NAME/documentserver/web-apps \
     /var/www/$COMPANY_NAME/documentserver/web-apps
-COPY --from=ds-service \
+COPY --from=ds-service --chown=ds:ds \
     /usr/lib64/libgraphics.so \
     /usr/lib64/libdoctrenderer.so \
     /usr/lib64/libkernel.so \
@@ -194,7 +189,7 @@ COPY docker-entrypoint.sh /usr/local/bin/
 RUN mkdir -p \
         /var/lib/$COMPANY_NAME/documentserver/App_Data/cache/files \
         /var/lib/$COMPANY_NAME/documentserver/App_Data/docbuilder && \
-    chown -R ds:ds /var/lib/$COMPANY_NAME/documentserver
+        chown -R ds:ds /var/lib/$COMPANY_NAME/documentserver/
 USER ds
 ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/FileConverter/converter
 
