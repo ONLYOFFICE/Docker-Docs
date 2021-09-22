@@ -1,10 +1,15 @@
 #!/usr/bin/env bash
 set -e
 
+FONTS_DIR="/var/www/$COMPANY_NAME/documentserver/core-fonts"
 FONTS_GENERATION="false"
-find /var/www/$COMPANY_NAME/documentserver/core-fonts/ -type f \( -name "*.ttf" -o -name "*.otf" \) | rev | sed 's!/.*!!' | rev > /var/www/$COMPANY_NAME/documentserver/core-fonts/current_fonts
-if [ ! -f /var/www/$COMPANY_NAME/documentserver/core-fonts/generated_fonts ] || [ -n "$(diff /var/www/$COMPANY_NAME/documentserver/core-fonts/current_fonts /var/www/$COMPANY_NAME/documentserver/core-fonts/generated_fonts)" ]; then 
+
+find $FONTS_DIR -type f \
+\( -name "*.ttf" -o -name "*.otf" -o -name "*.ttc" \) | rev | sed 's!/.*!!' | rev \
+> $FONTS_DIR/current_fonts
+
+if [ ! -f $FONTS_DIR/generated_fonts ] || [ -n "$(diff $FONTS_DIR/current_fonts $FONTS_DIR/generated_fonts)" ]; then 
 	bash /usr/bin/documentserver-generate-allfonts.sh true 
 	FONTS_GENERATION="true"
 fi
-mv -f /var/www/$COMPANY_NAME/documentserver/core-fonts/current_fonts /var/www/$COMPANY_NAME/documentserver/core-fonts/generated_fonts
+mv -f $FONTS_DIR/current_fonts $FONTS_DIR/generated_fonts

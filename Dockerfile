@@ -191,7 +191,7 @@ COPY --chown=ds:ds fonts-generation.sh /usr/local/bin/
 RUN mkdir -p \
         /var/lib/$COMPANY_NAME/documentserver/App_Data/cache/files \
         /var/lib/$COMPANY_NAME/documentserver/App_Data/docbuilder && \
-    chown -R ds:ds /var/lib/$COMPANY_NAME/documentserver/
+    chown -R ds:ds /var/lib/$COMPANY_NAME/documentserver
 USER ds
 ENTRYPOINT fonts-generation.sh && \
            docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/FileConverter/converter
