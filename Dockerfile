@@ -75,9 +75,9 @@ COPY --chown=ds:ds --from=ds-service \
 COPY --chown=ds:ds --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/web-apps \
     /var/www/$COMPANY_NAME/documentserver/web-apps
-COPY --from=ds-service \
-    /var/www/$COMPANY_NAME/documentserver/server/SpellChecker/dictionaries \
-    /var/www/$COMPANY_NAME/documentserver/server/SpellChecker/dictionaries
+COPY --chown=ds:ds --from=ds-service \
+    /var/www/$COMPANY_NAME/documentserver/dictionaries \
+    /var/www/$COMPANY_NAME/documentserver/dictionaries
 COPY --chown=ds:ds --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver-example/welcome \
     /var/www/$COMPANY_NAME/documentserver-example/welcome
