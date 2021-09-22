@@ -55,17 +55,17 @@ COPY --chown=ds:ds --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/core-fonts \
     /var/www/$COMPANY_NAME/documentserver/core-fonts
 COPY --chown=ds:ds --from=ds-service \
-    /var/www/$COMPANY_NAME/documentserver/server/FileConverter/bin/ \
-    /var/www/$COMPANY_NAME/documentserver/server/FileConverter/bin/
+    /var/www/$COMPANY_NAME/documentserver/server/FileConverter/bin \
+    /var/www/$COMPANY_NAME/documentserver/server/FileConverter/bin
 COPY --chown=ds:ds --from=ds-service \
-    /var/www/$COMPANY_NAME/documentserver/server/tools/ \
-    /var/www/$COMPANY_NAME/documentserver/server/tools/
+    /var/www/$COMPANY_NAME/documentserver/server/tools \
+    /var/www/$COMPANY_NAME/documentserver/server/tools
 COPY --chown=ds:ds --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/fonts \
     /var/www/$COMPANY_NAME/documentserver/fonts
 COPY --chown=ds:ds --from=ds-service \
     /usr/bin/documentserver-generate-allfonts.sh \
-    /usr/bin/documentserver-generate-allfonts.sh
+    /usr/bin/
 COPY --chown=ds:ds --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/sdkjs \
     /var/www/$COMPANY_NAME/documentserver/sdkjs
@@ -154,7 +154,7 @@ COPY --from=ds-service --chown=ds:ds \
     /var/www/$COMPANY_NAME/documentserver/fonts
 COPY --from=ds-service --chown=ds:ds \
     /usr/bin/documentserver-generate-allfonts.sh \
-    /usr/bin/documentserver-generate-allfonts.sh
+    /usr/bin/
 COPY --from=ds-service --chown=ds:ds \
     /usr/share/fonts \
     /usr/share/fonts
@@ -165,8 +165,8 @@ COPY --from=ds-service --chown=ds:ds \
     /var/www/$COMPANY_NAME/documentserver/server/FileConverter \
     /var/www/$COMPANY_NAME/documentserver/server/FileConverter
 COPY --from=ds-service --chown=ds:ds \
-    /var/www/$COMPANY_NAME/documentserver/server/tools/ \
-    /var/www/$COMPANY_NAME/documentserver/server/tools/
+    /var/www/$COMPANY_NAME/documentserver/server/tools \
+    /var/www/$COMPANY_NAME/documentserver/server/tools
 COPY --from=ds-service --chown=ds:ds \
     /var/www/$COMPANY_NAME/documentserver/web-apps \
     /var/www/$COMPANY_NAME/documentserver/web-apps
