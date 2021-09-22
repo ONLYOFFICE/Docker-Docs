@@ -91,7 +91,10 @@ Below is the complete list of parameters for `onlyoffice/docs-example`.
 
 ONLYOFFICE Docs always has a certain set of fonts with it. If you would like to use additional fonts you can do the following:
 
-  1. Install the font by copying it to the **fonts** folder (which is located in the Docker-Docs directory).
+  1. Run the **onlyoffice/docs-proxy** and **onlyoffice/doc-converter** containers with the volume.
+  - If you're using **docker-compose** provided in this repository, that install the fonts by copying it to the **fonts** folder (which is located in the Docker-Docs directory).
+  - If you're using **own docker-compose**, then you need to specify `- <fonts_dir>:/var/www/onlyoffice/documentserver/core-fonts/` in the `volume` section.
+  - If you're using **docker image**, you need specify the `-v <fonts_dir>:/var/www/onlyoffice/documentserver/core-fonts/` parameter at startup.
   2. Restart the **ONLYOFFICE Docs** containers.
   3. Clear the browser cache and reopen the page.
 
