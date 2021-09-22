@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
+GZIP_FILES='gzip -cf9 $0 > $0.gz && chown ds:ds $0.gz'
+
 if [ ! -f /var/www/$COMPANY_NAME/documentserver/core-fonts/generated_fonts ]; then
 	find /var/www/$COMPANY_NAME/documentserver/sdkjs \
 	/var/www/$COMPANY_NAME/documentserver/sdkjs-plugins \
@@ -8,14 +10,14 @@ if [ ! -f /var/www/$COMPANY_NAME/documentserver/core-fonts/generated_fonts ]; th
 	/var/www/$COMPANY_NAME/documentserver-example/welcome \
 	-type f \
 	\( -name *.js -o -name *.json -o -name *.htm -o -name *.html -o -name *.css \) \
-	-exec sh -c 'gzip -cf9 $0 > $0.gz && chown ds:ds $0.gz' {} \;
+	-exec sh -c "$GZIP_FILES" {} \;
 fi
 
 source /usr/local/bin/fonts-generation.sh
 
 if [ $FONTS_GENERATION = "true" ]; then
-	find /var/www/$COMPANY_NAME/documentserver/fonts -type f ! -name "*.*" -exec sh -c 'gzip -cf9 $0 > $0.gz && chown ds:ds $0.gz' {} \;
-	find /var/www/$COMPANY_NAME/documentserver -type f  -name "AllFonts.js" -exec sh -c 'gzip -cf9 $0 > $0.gz && chown ds:ds $0.gz' {} \;
+	find /var/www/$COMPANY_NAME/documentserver/fonts -type f ! -name "*.*" -exec sh -c "$GZIP_FILES" {} \;
+	find /var/www/$COMPANY_NAME/documentserver -type f  -name "AllFonts.js" -exec sh -c "$GZIP_FILES" {} \;
 fi
 
 if ! [ -d /tmp/proxy_nginx ]; then 
