@@ -87,6 +87,14 @@ Below is the complete list of parameters for `onlyoffice/docs-example`.
 - **JWT_SECRET**: Defines the secret key to validate the JSON Web Token in the request to the ONLYOFFICE Docs. Defaults to `secret`.
 - **JWT_HEADER**: Defines the http header that will be used to send the JSON Web Token. Defaults to `Authorization`.
 
+#### Adding fonts to ONLYOFFICE Docs
+
+By default **ONLYOFFICE Docs** uses embedded free fonts (true type only in `.ttf` format) from the operating system where **ONLYOFFICE Docs** is installed. If you would like to use additional fonts you can do the following:
+
+  1. Install the font by copying it to the **fonts** folder (which is located in the Docker-Docs directory).
+  2. Restart the **ONLYOFFICE Docs** containers.
+  3. Clear the browser cache and reopen the page.
+
 ## Project Information
 
 Official website: [https://www.onlyoffice.com/](https://www.onlyoffice.com/ "https://www.onlyoffice.com/")
