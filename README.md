@@ -89,7 +89,7 @@ Below is the complete list of parameters for `onlyoffice/docs-example`.
 
 #### Adding fonts to ONLYOFFICE Docs
 
-By default **ONLYOFFICE Docs** uses embedded free fonts (true type only in `.ttf` format) from the operating system where **ONLYOFFICE Docs** is installed. If you would like to use additional fonts you can do the following:
+By default **ONLYOFFICE Docs** uses a set of built-in free fonts (true type only in `.ttf` format). If you would like to use additional fonts you can do the following:
 
   1. Install the font by copying it to the **fonts** folder (which is located in the Docker-Docs directory).
   2. Restart the **ONLYOFFICE Docs** containers.
