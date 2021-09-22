@@ -55,8 +55,8 @@ COPY --chown=ds:ds --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/core-fonts \
     /var/www/$COMPANY_NAME/documentserver/core-fonts
 COPY --chown=ds:ds --from=ds-service \
-    /var/www/$COMPANY_NAME/documentserver/server/FileConverter/bin/AllFonts.js \
-    /var/www/$COMPANY_NAME/documentserver/server/FileConverter/bin/AllFonts.js
+    /var/www/$COMPANY_NAME/documentserver/server/FileConverter/bin/ \
+    /var/www/$COMPANY_NAME/documentserver/server/FileConverter/bin/
 COPY --chown=ds:ds --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/server/tools/ \
     /var/www/$COMPANY_NAME/documentserver/server/tools/
@@ -97,6 +97,7 @@ COPY --chown=ds:ds --from=ds-service \
     /usr/lib64/libUnicodeConverter.so \
     /usr/lib64/libXpsFile.so \
     /usr/lib64/
+COPY --chown=ds:ds proxy-docker-entrypoint.sh /usr/local/bin/
 COPY --chown=ds:ds fonts-generation.sh /usr/local/bin/
 RUN sed 's|\(application\/zip.*\)|\1\n    application\/wasm wasm;|' \
         -i /etc/nginx/mime.types && \
@@ -112,39 +113,11 @@ RUN sed 's|\(application\/zip.*\)|\1\n    application\/wasm wasm;|' \
     mkdir -p \
         /var/lib/$COMPANY_NAME/documentserver/App_Data/cache/files \
         /var/lib/$COMPANY_NAME/documentserver/App_Data/docbuilder && \
-    find \
-        /var/www/$COMPANY_NAME/documentserver/fonts \
-        -type f ! \
-        -name "*.*" \
-        -exec sh -c 'gzip -cf9 $0 > $0.gz && chown ds:ds $0.gz' {} \; && \
-    find \
-        /var/www/$COMPANY_NAME/documentserver/sdkjs \
-        /var/www/$COMPANY_NAME/documentserver/sdkjs-plugins \
-        /var/www/$COMPANY_NAME/documentserver/web-apps \
-        /var/www/$COMPANY_NAME/documentserver-example/welcome \
-        -type f \
-        \( -name *.js -o -name *.json -o -name *.htm -o -name *.html -o -name *.css \) \
-        -exec sh -c 'gzip -cf9 $0 > $0.gz && chown ds:ds $0.gz' {} \;
+    chown -R ds:ds /var/lib/$COMPANY_NAME/documentserver
 
 VOLUME /var/lib/$COMPANY_NAME
 USER ds
-ENTRYPOINT \
-    fonts-generation.sh && \
-    if ! [ -d /tmp/proxy_nginx ]; then \
-        mkdir /tmp/proxy_nginx; \
-    fi && \
-    cp -r /etc/nginx/* /tmp/proxy_nginx/ && \
-    sed 's|\(worker_connections\) [[:digit:]]*;|\1 '$NGINX_WORKER_CONNECTIONS';|g' \
-        -i /tmp/proxy_nginx/nginx.conf && \
-    if [ $NGINX_ACCESS_LOG != "off" ]; then \
-        sed 's|#*\(\s*access_log\).*;|\1 /var/log/nginx/access.log '$NGINX_ACCESS_LOG';|g' \
-            -i /tmp/proxy_nginx/nginx.conf; \
-    fi && \
-    sed -i 's/etc\/nginx/tmp\/proxy_nginx/g' /tmp/proxy_nginx/nginx.conf && \
-    envsubst < /tmp/proxy_nginx/includes/http-upstream.conf > /tmp/http-upstream.conf && \
-    envsubst < /etc/nginx/includes/ds-common.conf | tee /tmp/proxy_nginx/includes/ds-common.conf > /dev/null && \
-    sed -i 's/etc\/nginx/tmp\/proxy_nginx/g' /tmp/proxy_nginx/conf.d/ds.conf && \
-    exec nginx -c /tmp/proxy_nginx/nginx.conf -g 'daemon off;'
+ENTRYPOINT proxy-docker-entrypoint.sh
 
 FROM ds-base AS docservice
 EXPOSE 8000
