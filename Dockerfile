@@ -141,32 +141,32 @@ ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/Doc
 HEALTHCHECK --interval=10s --timeout=3s CMD curl -sf http://localhost:8000/index.html
 
 FROM ds-base AS converter
-COPY --from=ds-service --chown=ds:ds \
+COPY --from=ds-service \
     /etc/$COMPANY_NAME/documentserver/default.json \
     /etc/$COMPANY_NAME/documentserver/production-linux.json \
     /etc/$COMPANY_NAME/documentserver/
 COPY --from=ds-service --chown=ds:ds \
     /etc/$COMPANY_NAME/documentserver/log4js/production.json \
     /etc/$COMPANY_NAME/documentserver/log4js/
-COPY --from=ds-service --chown=ds:ds \
+COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/core-fonts \
     /var/www/$COMPANY_NAME/documentserver/core-fonts
-COPY --from=ds-service --chown=ds:ds \
+COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/fonts \
     /var/www/$COMPANY_NAME/documentserver/fonts
-COPY --from=ds-service --chown=ds:ds \
+COPY --from=ds-service \
     /usr/share/fonts \
     /usr/share/fonts
-COPY --from=ds-service --chown=ds:ds \
+COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/sdkjs \
     /var/www/$COMPANY_NAME/documentserver/sdkjs
-COPY --from=ds-service --chown=ds:ds \
+COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/server/FileConverter \
     /var/www/$COMPANY_NAME/documentserver/server/FileConverter
-COPY --from=ds-service --chown=ds:ds \
+COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/web-apps \
     /var/www/$COMPANY_NAME/documentserver/web-apps
-COPY --from=ds-service --chown=ds:ds \
+COPY --from=ds-service \
     /usr/lib64/libgraphics.so \
     /usr/lib64/libdoctrenderer.so \
     /usr/lib64/libkernel.so \
