@@ -58,6 +58,9 @@ export NODE_CONFIG='{
   "rabbitmq": {
     "url": "'${AMQP_URI:-${AMQP_PROTO:-amqp}://${AMQP_USER:-guest}:${AMQP_PWD:-guest}@${AMQP_HOST:-localhost}}'"
   },
+  "wopi": {
+    "enable": "'${WOPI_ENABLED:-false}'"
+  },
   "FileConverter": {
     "converter": {
         "maxprocesscount": 0.001
