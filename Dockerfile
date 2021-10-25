@@ -26,6 +26,10 @@ RUN useradd --no-create-home --shell /sbin/nologin nginx && \
     chmod a+r /etc/$COMPANY_NAME/documentserver*/*.json && \
     chmod a+r /etc/$COMPANY_NAME/documentserver/log4js/*.json
 COPY --chown=ds:ds \
+    config/nginx/includes/http-common.conf \
+    config/nginx/includes/http-upstream.conf \
+    /etc/$COMPANY_NAME/documentserver/nginx/includes/
+COPY --chown=ds:ds \
     fonts/* \
     /var/www/$COMPANY_NAME/documentserver/core-fonts/custom/
 RUN documentserver-generate-allfonts.sh true
@@ -44,16 +48,10 @@ RUN yum -y install epel-release sudo && \
     rm -f /var/log/*log
 COPY --chown=ds:ds config/nginx/nginx.conf /etc/nginx/nginx.conf
 COPY --chown=ds:ds --from=ds-service \
-    /etc/onlyoffice/documentserver/nginx/ds.conf \
+    /etc/$COMPANY_NAME/documentserver/nginx/ds.conf \
     /etc/nginx/conf.d/
 COPY --chown=ds:ds --from=ds-service \
-    /etc/onlyoffice/documentserver/nginx/includes/ds-common.conf \
-    /etc/onlyoffice/documentserver/nginx/includes/ds-docservice.conf \
-    /etc/onlyoffice/documentserver-example/nginx/includes/ds-example.conf \
-    /etc/nginx/includes/
-COPY --chown=ds:ds \
-    config/nginx/includes/http-common.conf \
-    config/nginx/includes/http-upstream.conf \
+    /etc/$COMPANY_NAME/documentserver*/nginx/includes/*.conf \
     /etc/nginx/includes/
 COPY --chown=ds:ds --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/fonts \
