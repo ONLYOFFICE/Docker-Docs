@@ -68,6 +68,9 @@ COPY --chown=ds:ds --from=ds-service \
 COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/dictionaries \
     /var/www/$COMPANY_NAME/documentserver/dictionaries
+COPY --from=ds-service \
+    /var/www/$COMPANY_NAME/documentserver/server/info \
+    /var/www/$COMPANY_NAME/documentserver/server/info
 COPY --chown=ds:ds --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver-example/welcome \
     /var/www/$COMPANY_NAME/documentserver-example/welcome
