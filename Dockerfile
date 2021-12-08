@@ -32,6 +32,9 @@ COPY --chown=ds:ds \
 COPY --chown=ds:ds \
     fonts/* \
     /var/www/$COMPANY_NAME/documentserver/core-fonts/custom/
+COPY --chown=ds:ds \
+    plugins/* \
+    /var/www/$COMPANY_NAME/documentserver/sdkjs-plugins/
 RUN documentserver-generate-allfonts.sh true
 
 FROM ds-base AS proxy
