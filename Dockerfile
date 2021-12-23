@@ -116,7 +116,7 @@ ENTRYPOINT \
     envsubst < /tmp/proxy_nginx/includes/http-upstream.conf > /tmp/http-upstream.conf && \
     envsubst < /etc/nginx/includes/ds-common.conf | tee /tmp/proxy_nginx/includes/ds-common.conf > /dev/null && \
     sed -i 's/etc\/nginx/tmp\/proxy_nginx/g' /tmp/proxy_nginx/conf.d/ds.conf && \
-    sed -i 's/X-Forwarded-For.*/X-Forwarded-For example.com;/' /tmp/proxy_nginx/includes/ds-example.conf && \
+    sed 's/\(X-Forwarded-For\).*/\1 example.com;/' -i /tmp/proxy_nginx/includes/ds-example.conf && \
     exec nginx -c /tmp/proxy_nginx/nginx.conf -g 'daemon off;'
 
 FROM ds-base AS docservice
