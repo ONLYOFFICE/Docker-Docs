@@ -175,6 +175,7 @@ COPY --from=ds-service \
     /usr/lib64/libgraphics.so \
     /usr/lib64/libdoctrenderer.so \
     /usr/lib64/libkernel.so \
+    /usr/lib64/libkernel_network.so \
     /usr/lib64/libicudata.so.58 \
     /usr/lib64/libicuuc.so.58 \
     /usr/lib64/libDjVuFile.so \
