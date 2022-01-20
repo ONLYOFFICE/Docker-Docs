@@ -135,6 +135,9 @@ COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/sdkjs-plugins \
     /var/www/$COMPANY_NAME/documentserver/sdkjs-plugins
 COPY --from=ds-service \
+    /var/www/$COMPANY_NAME/documentserver/web-apps/apps/common/main/resources/themes \
+    /var/www/$COMPANY_NAME/documentserver/web-apps/apps/common/main/resources/themes
+COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/server/DocService \
     /var/www/$COMPANY_NAME/documentserver/server/DocService
 COPY --from=ds-service \
