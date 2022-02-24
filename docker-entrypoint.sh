@@ -66,6 +66,11 @@ export NODE_CONFIG='{
         "maxprocesscount": 0.001
     }  
   }
+  "storage": {
+    "fs": {
+      "secretString": "'${SECRET_STRING_MD5:-$(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 20)}'"
+    }
+  }
 }'
 
 exec "$@"

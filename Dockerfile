@@ -117,12 +117,12 @@ ENTRYPOINT \
     envsubst < /etc/nginx/includes/ds-common.conf | tee /tmp/proxy_nginx/includes/ds-common.conf > /dev/null && \
     sed -i 's/etc\/nginx/tmp\/proxy_nginx/g' /tmp/proxy_nginx/conf.d/ds.conf && \
     sed 's/\(X-Forwarded-For\).*/\1 example.com;/' -i /tmp/proxy_nginx/includes/ds-example.conf && \
-    sed "s/verysecretstring/${SECRET_STRING_MD5:-$(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 12)}/" -i /etc/nginx/includes/ds-docservice.conf && \
+    sed "s/verysecretstring/${SECRET_STRING_MD5:-$(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 20)}/" -i /etc/nginx/includes/ds-docservice.conf && \
     exec nginx -c /tmp/proxy_nginx/nginx.conf -g 'daemon off;'
 
 FROM ds-base AS docservice
 EXPOSE 8000
-COPY --from=ds-service --chown=ds:ds \
+COPY --from=ds-service \
     /etc/$COMPANY_NAME/documentserver/default.json \
     /etc/$COMPANY_NAME/documentserver/production-linux.json \
     /etc/$COMPANY_NAME/documentserver/
@@ -137,9 +137,7 @@ COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/server/DocService
 COPY docker-entrypoint.sh /usr/local/bin/
 USER ds
-ENTRYPOINT \
-    sed "s/verysecretstring/${SECRET_STRING_MD5:-$(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 12)}/" -i /etc/$COMPANY_NAME/documentserver/default.json && \
-    docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/DocService/docservice
+ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/DocService/docservice
 HEALTHCHECK --interval=10s --timeout=3s CMD curl -sf http://localhost:8000/index.html
 
 FROM ds-base AS converter
