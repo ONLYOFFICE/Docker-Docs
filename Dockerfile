@@ -50,10 +50,10 @@ RUN yum -y install epel-release sudo && \
     yum clean all && \
     rm -f /var/log/*log
 COPY --chown=ds:ds config/nginx/nginx.conf /etc/nginx/nginx.conf
-COPY --chown=ds:ds --from=ds-service \
+COPY --chown=ds:ds --chmod=644 --from=ds-service \
     /etc/$COMPANY_NAME/documentserver/nginx/ds.conf \
     /etc/nginx/conf.d/
-COPY --chown=ds:ds --from=ds-service \
+COPY --chown=ds:ds --chmod=644 --from=ds-service \
     /etc/$COMPANY_NAME/documentserver*/nginx/includes/*.conf \
     /etc/nginx/includes/
 COPY --chown=ds:ds --from=ds-service \
