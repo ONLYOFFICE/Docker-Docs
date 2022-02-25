@@ -1,4 +1,5 @@
 #!/bin/bash
 
 export PRODUCT_VERSION=$DOCKER_TAG
+export DOCKER_BUILDKIT=1
 docker-compose build --build-arg PRODUCT_EDITION=$PRODUCT_EDITION
