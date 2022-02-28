@@ -58,7 +58,7 @@ Below is the complete list of parameters for `onlyoffice/docs-proxy`.
 - **NGINX_ACCESS_LOG**: Defines the nginx config [access_log](https://nginx.org/ru/docs/http/ngx_http_log_module.html#access_log) directive. Defaults to `off`.
 - **NGINX_GZIP_PROXIED**: Defines the nginx config [gzip_proxied](https://nginx.org/ru/docs/http/ngx_http_gzip_module.html#gzip_proxied) directive. Defaults to `off`.
 - **NGINX_WORKER_CONNECTIONS**: Defines the nginx config [worker_connections](https://nginx.org/en/docs/ngx_core_module.html#worker_connections) directive. Defaults to `4096`.
-- **SECRET_STRING_MD5**: Defines the nginx config [secure_link_md5](http://nginx.org/ru/docs/http/ngx_http_secure_link_module.html#secure_link_md5) directive. Defaults to `verysecretstring`.
+- **SECURE_LINK_SECRET**: Defines the nginx config [secure_link_md5](http://nginx.org/ru/docs/http/ngx_http_secure_link_module.html#secure_link_md5) directive. Defaults to `verysecretstring`.
 
 Below is the complete list of parameters for `onlyoffice/docs-docservice`, `onlyoffice/docs-converter`.
 - **DB_HOST**: The IP address or the name of the host where the PostgreSQL server is running.

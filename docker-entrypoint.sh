@@ -68,7 +68,7 @@ export NODE_CONFIG='{
   }
   "storage": {
     "fs": {
-      "secretString": "'${SECRET_STRING_MD5:-verysecretstring}'"
+      "secretString": "'${SECURE_LINK_SECRET:-verysecretstring}'"
     }
   }
 }'
