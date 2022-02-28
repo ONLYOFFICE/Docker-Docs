@@ -68,7 +68,7 @@ export NODE_CONFIG='{
   }
   "storage": {
     "fs": {
-      "secretString": "'${SECRET_STRING_MD5:-$(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 20)}'"
+      "secretString": "'${SECRET_STRING_MD5:-verysecretstring}'"
     }
   }
 }'
