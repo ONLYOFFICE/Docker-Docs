@@ -6,7 +6,11 @@ if [[ -n ${LOG_LEVEL} ]]; then
 fi
 
 if [[ -n ${LOG_FORMAT} ]]; then
-  sed 's/"type"\: "pattern"/"type"\: "'$LOG_FORMAT'"/' -i /etc/$COMPANY_NAME/documentserver/log4js/production.json
+  sed 's/\("type"\:\) "pattern"/\1 "'$LOG_FORMAT'"/' -i /etc/$COMPANY_NAME/documentserver/log4js/production.json
+fi
+
+if [[ -n ${PATTERN_FORMAT} ]]; then
+  sed "s/\(\"pattern\"\:\).*/\1 \"$PATTERN_FORMAT\"/" -i /etc/$COMPANY_NAME/documentserver/log4js/production.json
 fi
 
 export NODE_CONFIG='{
