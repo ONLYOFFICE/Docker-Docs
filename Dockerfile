@@ -30,10 +30,10 @@ COPY --chown=ds:ds \
     config/nginx/includes/http-upstream.conf \
     /etc/$COMPANY_NAME/documentserver/nginx/includes/
 COPY --chown=ds:ds \
-    fonts/* \
+    fonts/ \
     /var/www/$COMPANY_NAME/documentserver/core-fonts/custom/
 COPY --chown=ds:ds \
-    plugins/* \
+    plugins/ \
     /var/www/$COMPANY_NAME/documentserver/sdkjs-plugins/
 RUN documentserver-generate-allfonts.sh true
 
