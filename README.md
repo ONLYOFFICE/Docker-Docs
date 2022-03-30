@@ -71,27 +71,27 @@ docker-compose build --build-arg PRODUCT_EDITION=$PRODUCT_EDITION
 
 2. Publish the images to the image repository, for example `hub.docker.com`
 
-2.1 Log in to the local host
+  - Log in to the local host
 
-```bash
-docker login
-```
+    ```bash
+    docker login
+    ```
 
-2.2 Set a tag for all the collected images indicating your repository
+  - Set a tag for all the collected images indicating your repository
 
-```bash
-docker tag onlyoffice/[PRODUCT_NAME]-docservice[PRODUCT_EDITION]:[PRODUCT_VERSION] [user_name]/[repo_name]:[tag1]
-docker tag onlyoffice/[PRODUCT_NAME]-proxy[PRODUCT_EDITION]:[PRODUCT_VERSION] [user_name]/[repo_name]:[tag2]
-docker tag onlyoffice/[PRODUCT_NAME]-converter[PRODUCT_EDITION]:[PRODUCT_VERSION] [user_name]/[repo_name]:[tag3]
-```
+    ```bash
+    docker tag onlyoffice/[PRODUCT_NAME]-docservice[PRODUCT_EDITION]:[PRODUCT_VERSION] [user_name]/[repo_name]:[tag1]
+    docker tag onlyoffice/[PRODUCT_NAME]-proxy[PRODUCT_EDITION]:[PRODUCT_VERSION] [user_name]/[repo_name]:[tag2]
+    docker tag onlyoffice/[PRODUCT_NAME]-converter[PRODUCT_EDITION]:[PRODUCT_VERSION] [user_name]/[repo_name]:[tag3]
+    ```
 
-2.3 Publish the images
+  - Publish the images
 
-```bash
-docker push [user_name]/[repo_name]:[tag1]
-docker push [user_name]/[repo_name]:[tag2]
-docker push [user_name]/[repo_name]:[tag3]
-```
+    ```bash
+    docker push [user_name]/[repo_name]:[tag1]
+    docker push [user_name]/[repo_name]:[tag2]
+    docker push [user_name]/[repo_name]:[tag3]
+    ```
 
 ## Running ONLYOFFICE Docs
 
