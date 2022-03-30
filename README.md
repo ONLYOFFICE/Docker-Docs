@@ -25,6 +25,7 @@ ONLYOFFICE Docs has three editions - [Community, Enterprise, and Developer](http
 * **HDD**: at least 2 GB of free space
 * **Distribution**: 64-bit Red Hat, CentOS or other compatible distributive with kernel version 3.8 or later, 64-bit Debian, Ubuntu or other compatible distributive with kernel version 3.8 or later
 * **Docker**: version 1.9.0 or later
+* **Docker-compose**: version 1.28.0 or later
 
 ## Adding custom Fonts (optional)
 
@@ -96,7 +97,7 @@ docker-compose build --build-arg PRODUCT_EDITION=$PRODUCT_EDITION
 ## Running ONLYOFFICE Docs
 
 
-Install [docker-compose](https://docs.docker.com/compose/install "docker-compose"). If you have docker-compose installed, execute the following command:
+Execute the following command:
 
 ```bash
 docker-compose up -d
