@@ -26,6 +26,73 @@ ONLYOFFICE Docs has three editions - [Community, Enterprise, and Developer](http
 * **Distribution**: 64-bit Red Hat, CentOS or other compatible distributive with kernel version 3.8 or later, 64-bit Debian, Ubuntu or other compatible distributive with kernel version 3.8 or later
 * **Docker**: version 1.9.0 or later
 
+## Adding custom Fonts (optional)
+
+To add your custom fonts to the images, please follow these steps
+
+1. Clone this repository
+git clone https://github.com/ONLYOFFICE/Docker-Docs.git
+
+2. Go to Docker-Docs directory
+
+3. Add your custom fonts to the `fonts` directory
+
+## Adding Plugins (optional)
+
+To add plugins to the images, please follow these steps
+
+1. Clone this repository
+git clone https://github.com/ONLYOFFICE/Docker-Docs.git
+
+2. Go to Docker-Docs directory
+
+3. Add the folder with plugin code to `plugins` directory
+
+## Building images (optional)
+
+To build images, please follow these steps
+
+1. Build the images by changing, if necessary, the values of the `PRODUCT_VERSION` and `PRODUCT_NAME` variables in the `.env` file, like this
+(in case you are using ONLYOFFICE Docs Developer Edition)
+
+```bash
+export DOCKER_BUILDKIT=1
+export PRODUCT_EDITION=-de
+docker-compose build --build-arg PRODUCT_EDITION=$PRODUCT_EDITION
+```
+
+or like this (in case you are using ONLYOFFICE Docs Enterprise Edition)
+
+```bash
+export DOCKER_BUILDKIT=1
+export PRODUCT_EDITION=-ee
+docker-compose build --build-arg PRODUCT_EDITION=$PRODUCT_EDITION
+```
+
+2. Publish the images to the image repository, for example `hub.docker.com`
+
+2.1 Log in to the local host
+
+```bash
+docker login
+```
+
+2.2 Set a tag for all the collected images indicating your repository
+
+```bash
+docker tag onlyoffice/[PRODUCT_NAME]-docservice[PRODUCT_EDITION]:[PRODUCT_VERSION] [user_name]/[repo_name]:[tag1]
+docker tag onlyoffice/[PRODUCT_NAME]-proxy[PRODUCT_EDITION]:[PRODUCT_VERSION] [user_name]/[repo_name]:[tag2]
+docker tag onlyoffice/[PRODUCT_NAME]-converter[PRODUCT_EDITION]:[PRODUCT_VERSION] [user_name]/[repo_name]:[tag3]
+```
+
+2.3 Publish the images
+
+```bash
+docker push [user_name]/[repo_name]:[tag1]
+docker push [user_name]/[repo_name]:[tag2]
+docker push [user_name]/[repo_name]:[tag3]
+```
+
 ## Running ONLYOFFICE Docs
 
 
