@@ -33,7 +33,7 @@ To add your custom fonts to the images, please follow these steps
 1. Clone this repository
 git clone https://github.com/ONLYOFFICE/Docker-Docs.git
 
-2. Go to Docker-Docs directory
+2. Go to the Docker-Docs directory
 
 3. Add your custom fonts to the `fonts` directory
 
@@ -44,9 +44,9 @@ To add plugins to the images, please follow these steps
 1. Clone this repository
 git clone https://github.com/ONLYOFFICE/Docker-Docs.git
 
-2. Go to Docker-Docs directory
+2. Go to the Docker-Docs directory
 
-3. Add the folder with plugin code to `plugins` directory
+3. Add the folder with the plugin code to the `plugins` directory
 
 ## Building images (optional)
 
