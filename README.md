@@ -57,17 +57,13 @@ To build images, please follow these steps
 (in case you are using ONLYOFFICE Docs Developer Edition)
 
 ```bash
-export DOCKER_BUILDKIT=1
-export PRODUCT_EDITION=-de
-docker-compose build --build-arg PRODUCT_EDITION=$PRODUCT_EDITION
+DOCKER_BUILDKIT=1 PRODUCT_EDITION=-de docker-compose build --build-arg PRODUCT_EDITION=$PRODUCT_EDITION
 ```
 
 or like this (in case you are using ONLYOFFICE Docs Enterprise Edition)
 
 ```bash
-export DOCKER_BUILDKIT=1
-export PRODUCT_EDITION=-ee
-docker-compose build --build-arg PRODUCT_EDITION=$PRODUCT_EDITION
+DOCKER_BUILDKIT=1 PRODUCT_EDITION=-ee docker-compose build --build-arg PRODUCT_EDITION=$PRODUCT_EDITION
 ```
 
 2. Publish the images to the image repository, for example `hub.docker.com`
