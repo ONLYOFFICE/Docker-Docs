@@ -49,24 +49,34 @@ git clone https://github.com/ONLYOFFICE/Docker-Docs.git
 
 3. Add the folder with the plugin code to the `plugins` directory
 
-## Building images (optional)
+## Building images
 
 To build images, please follow these steps
 
-1. Build the images by changing, if necessary, the values of the `PRODUCT_VERSION` and `PRODUCT_NAME` variables in the `.env` file, like this
-(in case you are using ONLYOFFICE Docs Developer Edition)
+1. Change the value of the `USER_NAME` variable in the `.env` file. It must contain the account name in Docker Hub. If necessary, change the values of the variables `PRODUCT_NAME` and `PRODUCT_VERSION` in the `.env` file.
 
-```bash
-DOCKER_BUILDKIT=1 PRODUCT_EDITION=-de docker-compose build --build-arg PRODUCT_EDITION=$PRODUCT_EDITION
-```
+2. Build the images taking into consideration ONLYOFFICE Docs solution type (either commercial or open-source/community editions)
 
-or like this (in case you are using ONLYOFFICE Docs Enterprise Edition)
+  - To build open-source community version, run the following command:
 
-```bash
-DOCKER_BUILDKIT=1 PRODUCT_EDITION=-ee docker-compose build --build-arg PRODUCT_EDITION=$PRODUCT_EDITION
-```
+  ```bash
+  DOCKER_BUILDKIT=1 docker-compose build
+  ```
 
-2. Publish the images to the image repository, for example `hub.docker.com`
+  - To build commercial Developer Edition, run the following command:
+
+  ```bash
+  DOCKER_BUILDKIT=1 PRODUCT_EDITION=-de docker-compose build --build-arg PRODUCT_EDITION=$PRODUCT_EDITION
+  ```
+
+  - To build commercial Enterprise Edition run the following command:
+
+  ```bash
+  DOCKER_BUILDKIT=1 PRODUCT_EDITION=-ee docker-compose build --build-arg PRODUCT_EDITION=$PRODUCT_EDITION
+  ```
+
+
+3. Publish the images to the image repository
 
   - Log in to the local host
 
@@ -74,21 +84,23 @@ DOCKER_BUILDKIT=1 PRODUCT_EDITION=-ee docker-compose build --build-arg PRODUCT_E
     docker login
     ```
 
-  - Set a tag for all the collected images indicating your repository
+  - To publish open-source community version, run the following command:
 
     ```bash
-    docker tag onlyoffice/[PRODUCT_NAME]-docservice[PRODUCT_EDITION]:[PRODUCT_VERSION] [user_name]/[repo_name]:[tag1]
-    docker tag onlyoffice/[PRODUCT_NAME]-proxy[PRODUCT_EDITION]:[PRODUCT_VERSION] [user_name]/[repo_name]:[tag2]
-    docker tag onlyoffice/[PRODUCT_NAME]-converter[PRODUCT_EDITION]:[PRODUCT_VERSION] [user_name]/[repo_name]:[tag3]
+    docker-compose push
     ```
 
-  - Publish the images
+  - To publish commercial Developer Edition, run the following command:
 
-    ```bash
-    docker push [user_name]/[repo_name]:[tag1]
-    docker push [user_name]/[repo_name]:[tag2]
-    docker push [user_name]/[repo_name]:[tag3]
-    ```
+  ```bash
+  PRODUCT_EDITION=-de docker-compose push
+  ```
+
+  - To publish commercial Enterprise Edition run the following command:
+
+  ```bash
+  PRODUCT_EDITION=-ee docker-compose push
+  ```
 
 ## Running ONLYOFFICE Docs
 
