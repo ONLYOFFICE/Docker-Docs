@@ -27,29 +27,27 @@ ONLYOFFICE Docs has three editions - [Community, Enterprise, and Developer](http
 * **Docker**: version 1.9.0 or later
 * **Docker-compose**: version 1.28.0 or later
 
-## Adding custom Fonts (optional)
+## Building ONLYOFFICE Docs
 
-To add your custom fonts to the images, please follow these steps
+### Cloning this repository
 
-1. Clone this repository
+To clone this repository, run the following command:
+
+```bash
 git clone https://github.com/ONLYOFFICE/Docker-Docs.git
+```
 
-2. Go to the Docker-Docs directory
+Go to the Docker-Docs directory.
 
-3. Add your custom fonts to the `fonts` directory
+### Adding custom Fonts (optional)
 
-## Adding Plugins (optional)
+To add your custom fonts to the images, add your custom fonts to the `fonts` directory.
 
-To add plugins to the images, please follow these steps
+### Adding Plugins (optional)
 
-1. Clone this repository
-git clone https://github.com/ONLYOFFICE/Docker-Docs.git
+To add plugins to the images, add the folder with the plugin code to the `plugins` directory.
 
-2. Go to the Docker-Docs directory
-
-3. Add the folder with the plugin code to the `plugins` directory
-
-## Building images
+### Building images
 
 To build images, please follow these steps
 
@@ -95,14 +93,13 @@ To build images, please follow these steps
     PRODUCT_EDITION=-de docker-compose push
     ```
 
-    - To publish images build from the commercial Enterprise Edition run the following command:
+    - To publish images build from the commercial Enterprise Edition, run the following command:
 
     ```bash
     PRODUCT_EDITION=-ee docker-compose push
     ```
 
 ## Running ONLYOFFICE Docs
-
 
 Execute the following command:
 
