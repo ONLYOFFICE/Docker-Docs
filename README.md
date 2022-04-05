@@ -53,54 +53,53 @@ git clone https://github.com/ONLYOFFICE/Docker-Docs.git
 
 To build images, please follow these steps
 
-1. Change the value of the `USER_NAME` variable in the `.env` file. It must contain the account name in Docker Hub. If necessary, change the values of the variables `PRODUCT_NAME` and `PRODUCT_VERSION` in the `.env` file.
+1. Change the value of the `ACCOUNT_NAME` variable in the `.env` file. It must contain the account name in Docker Hub. If necessary, change the values of the variables `PRODUCT_NAME` and `PRODUCT_VERSION` in the `.env` file.
 
 2. Build the images taking into consideration ONLYOFFICE Docs solution type (either commercial or open-source/community editions)
 
-  - To build open-source community version, run the following command:
+    - To build open-source community version, run the following command:
 
-  ```bash
-  DOCKER_BUILDKIT=1 docker-compose build
-  ```
+    ```bash
+    DOCKER_BUILDKIT=1 docker-compose build
+    ```
 
-  - To build commercial Developer Edition, run the following command:
+    - To build commercial Developer Edition, run the following command:
 
-  ```bash
-  DOCKER_BUILDKIT=1 PRODUCT_EDITION=-de docker-compose build --build-arg PRODUCT_EDITION=$PRODUCT_EDITION
-  ```
+    ```bash
+    DOCKER_BUILDKIT=1 PRODUCT_EDITION=-de docker-compose build --build-arg PRODUCT_EDITION=$PRODUCT_EDITION
+    ```
 
-  - To build commercial Enterprise Edition run the following command:
+    - To build commercial Enterprise Edition run the following command:
 
-  ```bash
-  DOCKER_BUILDKIT=1 PRODUCT_EDITION=-ee docker-compose build --build-arg PRODUCT_EDITION=$PRODUCT_EDITION
-  ```
-
+    ```bash
+    DOCKER_BUILDKIT=1 PRODUCT_EDITION=-ee docker-compose build --build-arg PRODUCT_EDITION=$PRODUCT_EDITION
+    ```
 
 3. Publish the images to the image repository
 
-  - Log in to the local host
+    - Log in to the local host
 
     ```bash
     docker login
     ```
 
-  - To publish open-source community version, run the following command:
+    - To publish images build from the open-source community version, run the following command:
 
     ```bash
     docker-compose push
     ```
 
-  - To publish commercial Developer Edition, run the following command:
+    - To publish images build from the commercial Developer Edition, run the following command:
 
-  ```bash
-  PRODUCT_EDITION=-de docker-compose push
-  ```
+    ```bash
+    PRODUCT_EDITION=-de docker-compose push
+    ```
 
-  - To publish commercial Enterprise Edition run the following command:
+    - To publish images build from the commercial Enterprise Edition run the following command:
 
-  ```bash
-  PRODUCT_EDITION=-ee docker-compose push
-  ```
+    ```bash
+    PRODUCT_EDITION=-ee docker-compose push
+    ```
 
 ## Running ONLYOFFICE Docs
 

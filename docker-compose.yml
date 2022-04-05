@@ -5,7 +5,7 @@ services:
     build:
       context: .
       target: proxy
-    image: ${USER_NAME}/${PRODUCT_NAME}-proxy${PRODUCT_EDITION}:${PRODUCT_VERSION}
+    image: ${ACCOUNT_NAME}/${PRODUCT_NAME}-proxy${PRODUCT_EDITION}:${PRODUCT_VERSION}
     environment:
       - DOCSERVICE_HOST_PORT=docservice:8000
       - EXAMPLE_HOST_PORT=example:3000
@@ -20,7 +20,7 @@ services:
     build:
       context: .
       target: docservice
-    image: ${USER_NAME}/${PRODUCT_NAME}-docservice${PRODUCT_EDITION}:${PRODUCT_VERSION}
+    image: ${ACCOUNT_NAME}/${PRODUCT_NAME}-docservice${PRODUCT_EDITION}:${PRODUCT_VERSION}
     container_name: docservice
     environment:
       - DB_HOST=postgresql
@@ -48,7 +48,7 @@ services:
     build:
       context: .
       target: converter
-    image: ${USER_NAME}/${PRODUCT_NAME}-converter${PRODUCT_EDITION}:${PRODUCT_VERSION}
+    image: ${ACCOUNT_NAME}/${PRODUCT_NAME}-converter${PRODUCT_EDITION}:${PRODUCT_VERSION}
     container_name: converter
     environment:
       - DB_HOST=postgresql
