@@ -53,51 +53,32 @@ To build images, please follow these steps
 
 1. Change the value of the `ACCOUNT_NAME` variable in the `.env` file. It must contain the account name in Docker Hub. If necessary, change the values of the variables `PRODUCT_NAME` and `PRODUCT_VERSION` in the `.env` file.
 
-2. Build the images taking into consideration ONLYOFFICE Docs solution type (either commercial or open-source/community editions)
+Also, depending on the solution type, specify the required value for the variable `PRODUCT_EDITION`.
 
-    - To build open-source community version, run the following command:
+Possible values:
+  - Nothing is specified. For the open-source community version. Default,
+  - `-de`. For commercial Developer Edition,
+  - `-ee`. For commercial Enterprise Edition.
 
-    ```bash
-    DOCKER_BUILDKIT=1 docker-compose build
-    ```
+2. Run the build by running the following command:
 
-    - To build commercial Developer Edition, run the following command:
-
-    ```bash
-    DOCKER_BUILDKIT=1 PRODUCT_EDITION=-de docker-compose build --build-arg PRODUCT_EDITION=$PRODUCT_EDITION
-    ```
-
-    - To build commercial Enterprise Edition run the following command:
-
-    ```bash
-    DOCKER_BUILDKIT=1 PRODUCT_EDITION=-ee docker-compose build --build-arg PRODUCT_EDITION=$PRODUCT_EDITION
-    ```
+```bash
+./build.sh
+```
 
 3. Publish the images to the image repository
 
-    - Log in to the local host
+  - Log in to the local host
 
-    ```bash
-    docker login
-    ```
+  ```bash
+  docker login
+  ```
 
-    - To publish images build from the open-source community version, run the following command:
+  - Publish the images
 
-    ```bash
-    docker-compose push
-    ```
-
-    - To publish images build from the commercial Developer Edition, run the following command:
-
-    ```bash
-    PRODUCT_EDITION=-de docker-compose push
-    ```
-
-    - To publish images build from the commercial Enterprise Edition, run the following command:
-
-    ```bash
-    PRODUCT_EDITION=-ee docker-compose push
-    ```
+  ```bash
+  docker-compose push
+  ```
 
 ## Running ONLYOFFICE Docs
 
