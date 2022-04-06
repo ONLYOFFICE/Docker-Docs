@@ -51,7 +51,9 @@ To add plugins to the images, add the folder with the plugin code to the `plugin
 
 To build images, please follow these steps
 
-1. Change the value of the `ACCOUNT_NAME` variable in the `.env` file. It must contain the account name in Docker Hub. If necessary, change the values of the variables `PRODUCT_NAME` and `PRODUCT_VERSION` in the `.env` file.
+#### 1. Change the variables
+
+Change the value of the `ACCOUNT_NAME` variable in the `.env` file. It must contain the account name in Docker Hub. If necessary, change the values of the variables `PRODUCT_NAME` and `PRODUCT_VERSION` in the `.env` file.
 
 Also, depending on the solution type, specify the required value for the variable `PRODUCT_EDITION`.
 
@@ -60,25 +62,27 @@ Possible values:
   - `-de`. For commercial Developer Edition,
   - `-ee`. For commercial Enterprise Edition.
 
-2. Run the build by running the following command:
+#### 2. Run the build
+
+To start the build, run the following command:
 
 ```bash
 ./build.sh
 ```
 
-3. Publish the images to the image repository
+#### 3. Publish the images to the image repository
 
-  - Log in to the local host
+Log in to the local host:
 
-  ```bash
-  docker login
-  ```
+```bash
+docker login
+```
 
-  - Publish the images
+To publish the images, run the following command:
 
-  ```bash
-  docker-compose push
-  ```
+```bash
+docker-compose push
+```
 
 ## Running ONLYOFFICE Docs
 
