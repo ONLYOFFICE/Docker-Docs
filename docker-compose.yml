@@ -5,7 +5,7 @@ services:
     build:
       context: .
       target: proxy
-    image: ${ACCOUNT_NAME}/${PREFIX_NAME}-proxy${PRODUCT_EDITION}:${TAG}
+    image: ${ACCOUNT_NAME}/${PREFIX_NAME}-proxy${PRODUCT_EDITION}:${DOCKER_TAG}
     environment:
       - DOCSERVICE_HOST_PORT=docservice:8000
       - EXAMPLE_HOST_PORT=example:3000
@@ -20,7 +20,7 @@ services:
     build:
       context: .
       target: docservice
-    image: ${ACCOUNT_NAME}/${PREFIX_NAME}-docservice${PRODUCT_EDITION}:${TAG}
+    image: ${ACCOUNT_NAME}/${PREFIX_NAME}-docservice${PRODUCT_EDITION}:${DOCKER_TAG}
     container_name: docservice
     environment:
       - DB_HOST=postgresql
@@ -48,7 +48,7 @@ services:
     build:
       context: .
       target: converter
-    image: ${ACCOUNT_NAME}/${PREFIX_NAME}-converter${PRODUCT_EDITION}:${TAG}
+    image: ${ACCOUNT_NAME}/${PREFIX_NAME}-converter${PRODUCT_EDITION}:${DOCKER_TAG}
     container_name: converter
     environment:
       - DB_HOST=postgresql
@@ -79,7 +79,7 @@ services:
       - '8126'
 
   example:
-    image: ${COMPANY_NAME}/${PREFIX_NAME}-example:${TAG}
+    image: ${COMPANY_NAME}/${PREFIX_NAME}-example:${DOCKER_TAG}
     container_name: example
     environment:
       - JWT_ENABLED=false

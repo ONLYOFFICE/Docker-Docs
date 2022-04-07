@@ -1,4 +1,3 @@
 #!/bin/bash
 
-export TAG=$DOCKER_TAG
 docker-compose push

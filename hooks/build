@@ -1,5 +1,4 @@
 #!/bin/bash
 
-export TAG=$DOCKER_TAG
 export DOCKER_BUILDKIT=1
 docker-compose build --build-arg PRODUCT_EDITION=$PRODUCT_EDITION
