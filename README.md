@@ -53,7 +53,7 @@ To build images, please follow these steps
 
 #### 1. Change the variables
 
-Change the value of the `ACCOUNT_NAME` variable in the `.env` file. It must contain the account name in Docker Hub. If necessary, change the values of the variables `PRODUCT_NAME` and `PRODUCT_VERSION` in the `.env` file.
+Change the value of the `ACCOUNT_NAME` variable in the `.env` file. It must contain the account name in Docker Hub. If necessary, change the values of the variables `PREFIX_NAME` and `TAG` in the `.env` file.
 
 Also, depending on the solution type, specify the required value for the `PRODUCT_EDITION` variable in the `.env` file.
 

@@ -1,4 +1,4 @@
 #!/bin/bash
 
-export PRODUCT_VERSION=$DOCKER_TAG
+export TAG=$DOCKER_TAG
 docker-compose push
