@@ -25,11 +25,68 @@ ONLYOFFICE Docs has three editions - [Community, Enterprise, and Developer](http
 * **HDD**: at least 2 GB of free space
 * **Distribution**: 64-bit Red Hat, CentOS or other compatible distributive with kernel version 3.8 or later, 64-bit Debian, Ubuntu or other compatible distributive with kernel version 3.8 or later
 * **Docker**: version 1.9.0 or later
+* **Docker-compose**: version 1.28.0 or later
+
+## Building ONLYOFFICE Docs
+
+### Cloning this repository
+
+To clone this repository, run the following command:
+
+```bash
+git clone https://github.com/ONLYOFFICE/Docker-Docs.git
+```
+
+Go to the Docker-Docs directory.
+
+### Adding custom Fonts (optional)
+
+To add your custom fonts to the images, add your custom fonts to the `fonts` directory.
+
+### Adding Plugins (optional)
+
+To add plugins to the images, add the folder with the plugin code to the `plugins` directory.
+
+### Building images
+
+To build images, please follow these steps
+
+#### 1. Change the variables
+
+Change the value of the `ACCOUNT_NAME` variable in the `.env` file. It must contain the account name in Docker Hub. If necessary, change the values of the variables `PREFIX_NAME` and `DOCKER_TAG` in the `.env` file.
+
+Also, depending on the solution type, specify the required value for the `PRODUCT_EDITION` variable in the `.env` file.
+
+Possible values:
+  - Nothing is specified. For the open-source community version. Default,
+  - `-de`. For commercial Developer Edition,
+  - `-ee`. For commercial Enterprise Edition.
+
+#### 2. Run the build
+
+To start the build, run the following command:
+
+```bash
+./build.sh
+```
+
+#### 3. Publish the images to the image repository
+
+Log in to the local host:
+
+```bash
+docker login
+```
+
+To publish the images, run the following command:
+
+```bash
+docker-compose push
+```
 
 ## Running ONLYOFFICE Docs
 
-
-Install [docker-compose](https://docs.docker.com/compose/install "docker-compose"). If you have docker-compose installed, execute the following command:
+Execute the following command:
 
 ```bash
 docker-compose up -d
