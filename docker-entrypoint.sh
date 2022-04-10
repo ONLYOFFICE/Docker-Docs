@@ -37,25 +37,25 @@ export NODE_CONFIG='{
         "enable": {
           "browser": '${JWT_ENABLED:=false}',
           "request": {
-            "inbox": '${JWT_ENABLED}',
-            "outbox": '${JWT_ENABLED}' 
+            "inbox": '${JWT_ENABLED_INBOX:-${JWT_ENABLED}}',
+            "outbox": '${JWT_ENABLED_OUTBOX:-${JWT_ENABLED}}'
           }
         },
         "inbox": {
-          "header": "'${JWT_HEADER:=Authorization}'",
+          "header": "'${JWT_HEADER_INBOX:-${JWT_HEADER:=Authorization}}'",
           "inBody": '${JWT_IN_BODY:=false}'
         },
         "outbox": {
-          "header": "'${JWT_HEADER}'",
+          "header": "'${JWT_HEADER_OUTBOX:-${JWT_HEADER}}'",
           "inBody": '${JWT_IN_BODY}'
-        }        
+        }
       },
       "secret": {
         "inbox": {
-          "string": "'${JWT_SECRET:=secret}'"
+          "string": "'${JWT_SECRET_INBOX:-${JWT_SECRET:=secret}}'"
         },
         "outbox": {
-          "string": "'${JWT_SECRET}'"
+          "string": "'${JWT_SECRET_OUTBOX:-${JWT_SECRET}}'"
         },
         "session": {
           "string": "'${JWT_SECRET}'"
