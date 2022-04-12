@@ -128,9 +128,15 @@ Below is the complete list of parameters for `onlyoffice/docs-docservice`, `only
 - **AMQP_HOST**: The IP address or the name of the host where the AMQP server is running.
 - **REDIS_SERVER_HOST**: The IP address or the name of the host where the Redis server is running.
 - **REDIS_SERVER_PORT**:  The Redis server port number. Default to `6379`.
-- **JWT_ENABLED**: Specifies the enabling the JSON Web Token validation by the ONLYOFFICE Docs. Defaults to `false`.
-- **JWT_SECRET**: Defines the secret key to validate the JSON Web Token in the request to the ONLYOFFICE Docs. Defaults to `secret`.
-- **JWT_HEADER**: Defines the http header that will be used to send the JSON Web Token. Defaults to `Authorization`.
+- **JWT_ENABLED**: Specifies the enabling the JSON Web Token validation by the ONLYOFFICE Docs. Common for inbox and outbox requests. Defaults to `false`.
+- **JWT_ENABLED_INBOX**: Specifies the enabling the JSON Web Token validation by the ONLYOFFICE Docs only for inbox requests. Default, it is equal to `JWT_ENABLED`.
+- **JWT_ENABLED_OUTBOX**: Specifies the enabling the JSON Web Token validation by the ONLYOFFICE Docs only for outbox requests. Default, it is equal to `JWT_ENABLED`.
+- **JWT_SECRET**: Defines the secret key to validate the JSON Web Token in the request to the ONLYOFFICE Docs. Common for inbox and outbox requests. Defaults to `secret`.
+- **JWT_SECRET_INBOX**: Defines the secret key to validate the JSON Web Token in the request to the ONLYOFFICE Docs only for inbox requests. Default, it is equal to `JWT_SECRET`.
+- **JWT_SECRET_OUTBOX**: Defines the secret key to validate the JSON Web Token in the request to the ONLYOFFICE Docs only for outbox requests. Default, it is equal to `JWT_SECRET`.
+- **JWT_HEADER**: Defines the http header that will be used to send the JSON Web Token. Common for inbox and outbox requests. Defaults to `Authorization`.
+- **JWT_HEADER_INBOX**: Defines the http header that will be used to send the JSON Web Token only for inbox requests. Default, it is equal to `JWT_HEADER`.
+- **JWT_HEADER_OUTBOX**: Defines the http header that will be used to send the JSON Web Token only for outbox requests. Default, it is equal to `JWT_HEADER`.
 - **JWT_IN_BODY**: Specifies the enabling the token validation in the request body to the ONLYOFFICE Docs. Defaults to `false`.
 - **LOG_LEVEL**: Defines the type and severity of a logged event. Default to `WARN`. Possible values are `ALL`, `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, `FATAL`, `MARK`, `OFF`.
 - **LOG_TYPE**: Defines the format of a logged event. Default to `pattern`. Possible values are `pattern`, `json`, `basic`, `coloured`, `messagePassThrough`, `dummy`.
