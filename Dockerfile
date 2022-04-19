@@ -16,7 +16,7 @@ RUN yum install sudo -y && \
 
 FROM ds-base AS ds-service
 ARG PRODUCT_EDITION=
-ARG PRODUCT_URL=
+ARG PRODUCT_URL=http://download.onlyoffice.com/install/documentserver/linux/onlyoffice-documentserver$PRODUCT_EDITION.x86_64.rpm
 RUN useradd --no-create-home --shell /sbin/nologin nginx && \
     yum -y updateinfo && \
     yum -y install cabextract fontconfig xorg-x11-font-utils xorg-x11-server-utils && \
@@ -209,4 +209,3 @@ COPY --from=ds-service /var/www/$COMPANY_NAME/documentserver/server/Metrics/conf
 FROM postgres:9.5 AS db
 ARG COMPANY_NAME=onlyoffice
 COPY --from=ds-service /var/www/$COMPANY_NAME/documentserver/server/schema/postgresql/createdb.sql /docker-entrypoint-initdb.d/
-
