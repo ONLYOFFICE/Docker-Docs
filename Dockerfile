@@ -8,7 +8,6 @@ ENV COMPANY_NAME=$COMPANY_NAME \
     NODE_CONFIG_DIR=/etc/$COMPANY_NAME/documentserver
 
 RUN yum install sudo -y && \
-    yum install openssl -y && \
     yum install shadow-utils -y && \
     amazon-linux-extras install epel -y && \
     groupadd --system --gid 101 ds && \
