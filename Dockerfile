@@ -47,8 +47,7 @@ ENV DOCSERVICE_HOST_PORT=localhost:8000 \
     NGINX_GZIP_PROXIED=off \
     NGINX_WORKER_CONNECTIONS=4096
 EXPOSE 8888
-RUN yum install sudo && \
-    yum -y updateinfo && \
+RUN yum -y updateinfo && \
     yum -y install gettext nginx && \
     yum clean all && \
     rm -f /var/log/*log
