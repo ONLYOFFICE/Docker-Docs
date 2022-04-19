@@ -1,4 +1,4 @@
-FROM centos:7 AS ds-base
+FROM amazonlinux:2 AS ds-base
 
 LABEL maintainer Ascensio System SIA <support@onlyoffice.com>
 
@@ -6,15 +6,19 @@ ARG COMPANY_NAME=onlyoffice
 ENV COMPANY_NAME=$COMPANY_NAME \
     NODE_ENV=production-linux \
     NODE_CONFIG_DIR=/etc/$COMPANY_NAME/documentserver
-RUN groupadd --system --gid 101 ds && \
+
+RUN yum install sudo -y && \
+    yum install openssl -y && \
+    yum install shadow-utils -y && \
+    amazon-linux-extras install epel -y && \
+    groupadd --system --gid 101 ds && \
     useradd --system -g ds --no-create-home --shell /sbin/nologin --uid 101 ds && \
     rm -f /var/log/*log
 
 FROM ds-base AS ds-service
 ARG PRODUCT_EDITION=
-ARG PRODUCT_URL=http://download.onlyoffice.com/install/documentserver/linux/onlyoffice-documentserver$PRODUCT_EDITION.x86_64.rpm
+ARG PRODUCT_URL=
 RUN useradd --no-create-home --shell /sbin/nologin nginx && \
-    yum -y install epel-release && \
     yum -y updateinfo && \
     yum -y install cabextract fontconfig xorg-x11-font-utils xorg-x11-server-utils && \
     rpm -i https://downloads.sourceforge.net/project/mscorefonts2/rpms/msttcore-fonts-installer-2.6-1.noarch.rpm && \
@@ -44,7 +48,7 @@ ENV DOCSERVICE_HOST_PORT=localhost:8000 \
     NGINX_GZIP_PROXIED=off \
     NGINX_WORKER_CONNECTIONS=4096
 EXPOSE 8888
-RUN yum -y install epel-release sudo && \
+RUN yum install sudo && \
     yum -y updateinfo && \
     yum -y install gettext nginx && \
     yum clean all && \
