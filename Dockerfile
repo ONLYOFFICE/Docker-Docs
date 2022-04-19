@@ -210,3 +210,4 @@ COPY --from=ds-service /var/www/$COMPANY_NAME/documentserver/server/Metrics/conf
 FROM postgres:9.5 AS db
 ARG COMPANY_NAME=onlyoffice
 COPY --from=ds-service /var/www/$COMPANY_NAME/documentserver/server/schema/postgresql/createdb.sql /docker-entrypoint-initdb.d/
+
