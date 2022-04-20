@@ -128,7 +128,7 @@ Below is the complete list of parameters for `onlyoffice/docs-docservice`, `only
 - **AMQP_PWD**: The password set for the AMQP server account.
 - **AMQP_HOST**: The IP address or the name of the host where the AMQP server is running.
 - **AMQP_PORT**: The port for the connection to AMQP server. Default to `5672`.
-- **AMQP_TRANSPORT**: Defines the connect options if `QUEUE_TYPE=activemq`. Defaults to `tcp`. Possible values are `undefined`, `tcp` or `tls`.
+- **AMQP_TRANSPORT**: Defines the connection options if `QUEUE_TYPE=activemq`. Defaults to `tcp`. Possible values are `undefined`, `tcp` or `tls`.
 - **REDIS_SERVER_HOST**: The IP address or the name of the host where the Redis server is running.
 - **REDIS_SERVER_PORT**:  The Redis server port number. Default to `6379`.
 - **JWT_ENABLED**: Specifies the enabling the JSON Web Token validation by the ONLYOFFICE Docs. Common for inbox and outbox requests. Defaults to `false`.
