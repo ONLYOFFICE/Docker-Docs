@@ -64,7 +64,7 @@ export NODE_CONFIG='{
     }
   },
   "queue": {
-  "type": "'${QUEUE_TYPE:-rabbitmq}'"
+    "type": "'${QUEUE_TYPE:-rabbitmq}'"
   },
   "activemq": {
     "connectOptions": {
