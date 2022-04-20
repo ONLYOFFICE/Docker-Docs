@@ -122,10 +122,13 @@ Below is the complete list of parameters for `onlyoffice/docs-docservice`, `only
 - **DB_NAME**: The name of a PostgreSQL database to be created on the image startup.
 - **DB_USER**: The new user name with superuser permissions for the PostgreSQL account.
 - **DB_PWD**: The password set for the PostgreSQL account.
-- **AMQP_PROTO**: The protocol for the connection to AMQP server. Default to `amqp`. Possible values are `amqp`, `amqps`.
+- **QUEUE_TYPE**: Defines the message broker type. Defaults to `rabbitmq`. Possible values are `rabbitmq` or `activemq`.
+- **AMQP_PROTO**: The protocol for the connection to AMQP server if `QUEUE_TYPE=rabbitmq`. Default to `amqp`. Possible values are `amqp`, `amqps`.
 - **AMQP_USER**: The username for the AMQP server account.
 - **AMQP_PWD**: The password set for the AMQP server account.
 - **AMQP_HOST**: The IP address or the name of the host where the AMQP server is running.
+- **AMQP_PORT**: The port for the connection to AMQP server. Default to `5672`.
+- **AMQP_TRANSPORT**: Defines the connect options if `QUEUE_TYPE=activemq`. Defaults to `tcp`. Possible values are `undefined`, `tcp` or `tls`.
 - **REDIS_SERVER_HOST**: The IP address or the name of the host where the Redis server is running.
 - **REDIS_SERVER_PORT**:  The Redis server port number. Default to `6379`.
 - **JWT_ENABLED**: Specifies the enabling the JSON Web Token validation by the ONLYOFFICE Docs. Common for inbox and outbox requests. Defaults to `false`.
