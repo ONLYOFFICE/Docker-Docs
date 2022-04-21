@@ -64,7 +64,7 @@ export NODE_CONFIG='{
     }
   },
   "queue": {
-    "type": "'${QUEUE_TYPE:-rabbitmq}'"
+    "type": "'${AMQP_TYPE:-rabbitmq}'"
   },
   "activemq": {
     "connectOptions": {
@@ -72,11 +72,11 @@ export NODE_CONFIG='{
       "host": "'${AMQP_HOST:-localhost}'",
       "username": "'${AMQP_USER:-guest}'",
       "password": "'${AMQP_PWD:-guest}'",
-      "transport": "'${AMQP_TRANSPORT:-tcp}'"
+      "transport": "'${AMQP_PROTO:-tcp}'"
     }
   },
   "rabbitmq": {
-    "url": "'${AMQP_URI:-${AMQP_PROTO:-amqp}://${AMQP_USER:-guest}:${AMQP_PWD:-guest}@${AMQP_HOST:-localhost}:${AMQP_PORT:-5672}}'"
+    "url": "'${AMQP_URI:-${AMQP_PROTO:-amqp}://${AMQP_USER:-guest}:${AMQP_PWD:-guest}@${AMQP_HOST:-localhost}:${AMQP_PORT:-5672}${AMQP_VHOST:-/}}'"
   },
   "wopi": {
     "enable": "'${WOPI_ENABLED:-false}'"
