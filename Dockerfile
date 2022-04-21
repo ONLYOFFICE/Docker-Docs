@@ -15,8 +15,9 @@ RUN yum install sudo -y && \
     rm -f /var/log/*log
 
 FROM ds-base AS ds-service
+ARG TARGETARCH
 ARG PRODUCT_EDITION=
-ARG PRODUCT_URL=http://download.onlyoffice.com/install/documentserver/linux/onlyoffice-documentserver$PRODUCT_EDITION.x86_64.rpm
+ARG PRODUCT_URL=http://download.onlyoffice.com/install/documentserver/linux/onlyoffice-documentserver$PRODUCT_EDITION.$TARGETARCH.rpm
 RUN useradd --no-create-home --shell /sbin/nologin nginx && \
     yum -y updateinfo && \
     yum -y install cabextract fontconfig xorg-x11-font-utils xorg-x11-server-utils && \
