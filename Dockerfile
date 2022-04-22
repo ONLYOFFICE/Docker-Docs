@@ -16,13 +16,19 @@ RUN yum install sudo -y && \
 
 FROM ds-base AS ds-service
 ARG PRODUCT_EDITION=
-ARG PRODUCT_URL=http://download.onlyoffice.com/install/documentserver/linux/onlyoffice-documentserver$PRODUCT_EDITION
+ARG PRODUCT_URL=http://download.onlyoffice.com/install/documentserver/linux/onlyoffice-documentserver$PRODUCT_EDITION.x86_64.rpm
 RUN useradd --no-create-home --shell /sbin/nologin nginx && \
-    ARCH=$(uname -m) && export $ARCH  && \
+    echo $PRODUCT_URL >> ./url-product && \
+    sed -i "s/arm64/$(uname -m)/" ./url-product && \
+    sed -i "s/amd64/$(uname -m)/" ./url-product && \
+    sed -i "s/aarch64/$(uname -m)/" ./url-product && \
+    sed -i "s/x86_64/$(uname -m)/" ./url-product && \
+    URL=$(cat ./url-product) && \
     yum -y updateinfo && \
     yum -y install cabextract fontconfig xorg-x11-font-utils xorg-x11-server-utils && \
     rpm -i https://downloads.sourceforge.net/project/mscorefonts2/rpms/msttcore-fonts-installer-2.6-1.noarch.rpm && \
-    rpm -ivh $PRODUCT_URL.$ARCH.rpm --noscripts --nodeps && \
+    rpm -ivh $URL --noscripts --nodeps && \
+    rm ./url-product && \
     mkdir -p /var/www/$COMPANY_NAME/documentserver/core-fonts/msttcore && \
     cp -vt \
         /var/www/$COMPANY_NAME/documentserver/core-fonts/msttcore \
