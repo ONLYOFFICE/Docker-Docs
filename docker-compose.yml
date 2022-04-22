@@ -1,6 +1,8 @@
 version: '3.8'
 services:
   proxy:
+    env_file: 
+      - '.env'
     container_name: proxy
     build:
       context: .
@@ -17,6 +19,8 @@ services:
       - common_data:/var/lib/${COMPANY_NAME} 
        
   docservice:
+    env_file:
+      - '.env'       
     build:
       context: .
       target: docservice
@@ -45,6 +49,8 @@ services:
      - common_data:/var/lib/${COMPANY_NAME}
 
   converter:
+    env_file:
+      - '.env'
     build:
       context: .
       target: converter
