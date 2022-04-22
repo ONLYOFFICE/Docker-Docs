@@ -13,6 +13,14 @@ if [[ -n ${LOG_PATTERN} ]]; then
   sed "s/\(\"pattern\"\:\).*/\1 \"$LOG_PATTERN\"/" -i /etc/$COMPANY_NAME/documentserver/log4js/production.json
 fi
 
+if [[ $AMQP_TYPE == "activemq" ]]; then
+  if [[ $AMQP_PROTO == "amqp" ]]; then
+    AMQP_PROTO="tcp"
+  elif [[ $AMQP_PROTO == "amqps" || $AMQP_PROTO == "amqp+ssl" ]]; then
+  AMQP_PROTO="tls"
+  fi
+fi
+
 export NODE_CONFIG='{
   "statsd": {
     "useMetrics": '${METRICS_ENABLED:-false}',
