@@ -2,9 +2,9 @@
 
 export DOCKER_BUILDKIT=1
 export COMPOSE_DOCKER_CLI_BUILD=1
-apt install wget
+apt install -y wget
 apt-get update 
-apt-get install libpipeline-dev 
+apt-get install -y libpipeline-dev 
 wget http://archive.ubuntu.com/ubuntu/pool/main/b/binfmt-support/binfmt-support_2.1.8-2_amd64.deb
 dpkg -i *.deb
 apt-get install -y qemu-user-static
