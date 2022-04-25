@@ -2,9 +2,9 @@
 
 export DOCKER_BUILDKIT=1
 export COMPOSE_DOCKER_CLI_BUILD=1
+export DEBIAN_FRONTEND=noninteractive
 cat /etc/os-release
 uname -r
-apt get update
 apt install -y wget
 apt-get install live-boot-initramfs-tools -y 
 apt-get install -y kmod
