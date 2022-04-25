@@ -2,20 +2,11 @@
 
 export DOCKER_BUILDKIT=1
 export COMPOSE_DOCKER_CLI_BUILD=1
-mkdir kernel
-wget http://kernel.ubuntu.com/~kernel-ppa/mainline/v4.9/linux-headers-4.9.0-040900_4.9.0-040900.201612111631_all.deb
-wget http://kernel.ubuntu.com/~kernel-ppa/mainline/v4.9/linux-headers-4.9.0-040900-generic_4.9.0-040900.201612111631_amd64.deb
-wget http://kernel.ubuntu.com/~kernel-ppa/mainline/v4.9/linux-image-4.9.0-040900-generic_4.9.0-040900.201612111631_amd64.deb
-mv linux* kernel/
-dpkg -i kernel/*.deb
-update-grub
-rm -rf kernel
-reboot
+apt install wget
 wget http://archive.ubuntu.com/ubuntu/pool/main/b/binfmt-support/binfmt-support_2.1.8-2_amd64.deb
-apt-get install -y qemu-user-static
-apt-get install -y binfmt-support
 dpkg -i *.deb
-sudo uname -r 
+apt-get install -y qemu-user-static
+apt-get install -y binfmt-support 
 docker buildx create --name mybuilder
 docker buildx use mybuilder
 docker buildx inspect --bootstrap
