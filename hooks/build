@@ -2,6 +2,7 @@
 
 export DOCKER_BUILDKIT=1
 export COMPOSE_DOCKER_CLI_BUILD=1
+cat  cat /etc/os-release 
 apt-get install -y qemu-user-static
 docker buildx create --name mybuilder
 docker buildx use mybuilder
