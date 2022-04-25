@@ -13,13 +13,11 @@ if [[ -n ${LOG_PATTERN} ]]; then
   sed "s/\(\"pattern\"\:\).*/\1 \"$LOG_PATTERN\"/" -i /etc/$COMPANY_NAME/documentserver/log4js/production.json
 fi
 
-if [[ $AMQP_TYPE == "activemq" ]]; then
+if [[ ${AMQP_TYPE:=rabbitmq} == "activemq" ]]; then
   case $AMQP_PROTO in
-
     amqp)
       AMQP_PROTO="tcp"
       ;;
-
     amqps | amqp+ssl)
       AMQP_PROTO="tls"
       ;;
@@ -77,19 +75,19 @@ export NODE_CONFIG='{
     }
   },
   "queue": {
-    "type": "'${AMQP_TYPE:-rabbitmq}'"
+    "type": "'${AMQP_TYPE}'"
   },
   "activemq": {
     "connectOptions": {
-      "port": "'${AMQP_PORT:-5672}'",
-      "host": "'${AMQP_HOST:-localhost}'",
-      "username": "'${AMQP_USER:-guest}'",
-      "password": "'${AMQP_PWD:-guest}'",
+      "port": "'${AMQP_PORT:=5672}'",
+      "host": "'${AMQP_HOST:=localhost}'",
+      "username": "'${AMQP_USER:=guest}'",
+      "password": "'${AMQP_PWD:=guest}'",
       "transport": "'${AMQP_PROTO:-tcp}'"
     }
   },
   "rabbitmq": {
-    "url": "'${AMQP_URI:-${AMQP_PROTO:-amqp}://${AMQP_USER:-guest}:${AMQP_PWD:-guest}@${AMQP_HOST:-localhost}:${AMQP_PORT:-5672}${AMQP_VHOST:-/}}'"
+    "url": "'${AMQP_URI:-${AMQP_PROTO:-amqp}://${AMQP_USER}:${AMQP_PWD}@${AMQP_HOST}:${AMQP_PORT}${AMQP_VHOST:-/}}'"
   },
   "wopi": {
     "enable": "'${WOPI_ENABLED:-false}'"
