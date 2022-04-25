@@ -5,7 +5,7 @@ export COMPOSE_DOCKER_CLI_BUILD=1
 cat /etc/os-release
 uname -r
 apt-get update 
-apt-get install linux-image-4.8.0-56
+apt-get install linux-image-4.8.0-56 -y 
 apt-get install -y qemu-user-static
 apt-get install -y binfmt-support 
 docker buildx create --name mybuilder
