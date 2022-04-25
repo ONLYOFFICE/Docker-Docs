@@ -7,15 +7,12 @@ uname -r
 apt install -y wget
 apt-get update -y 
 apt-get install linux-image-4.8.0-56 -y 
+apt install libpipeline1 -y
 update-grub -y 
 uname -r 
-dpkg --list | grep linux-image
-systemctl reboot 
-wget http://archive.ubuntu.com/ubuntu/pool/main/b/binfmt-support/binfmt-support_2.1.8-2_amd64.deb
-dpkg -i *.deb
-rm *.deb
-apt-get install -y qemu-user-static
-apt-get install -y binfmt-support 
+#apt-get install -y qemu-user-static
+#apt-get install -y binfmt-support 
+docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
 docker buildx create --name mybuilder
 docker buildx use mybuilder
 docker buildx inspect --bootstrap
