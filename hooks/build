@@ -6,13 +6,11 @@ cat /etc/os-release
 uname -r
 apt install -y wget
 apt-get update -y 
-apt-get install linux-image-4.8.0-56 -y 
 apt install libpipeline1 -y
-update-grub -y 
-uname -r 
 #apt-get install -y qemu-user-static
 #apt-get install -y binfmt-support 
-docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+#docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+sudo docker run --rm --privileged docker/binfmt:a7996909642ee92942dcd6cff44b9b95f08dad64
 docker buildx create --name mybuilder
 docker buildx use mybuilder
 docker buildx inspect --bootstrap
