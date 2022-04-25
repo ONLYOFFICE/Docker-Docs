@@ -4,8 +4,16 @@ export DOCKER_BUILDKIT=1
 export COMPOSE_DOCKER_CLI_BUILD=1
 cat /etc/os-release
 uname -r
-apt-get update 
+apt install -y wget
+apt-get update -y 
 apt-get install linux-image-4.8.0-56 -y 
+update-grub -y 
+uname -r 
+dpkg --list | grep linux-image
+systemctl reboot 
+wget http://archive.ubuntu.com/ubuntu/pool/main/b/binfmt-support/binfmt-support_2.1.8-2_amd64.deb
+dpkg -i *.deb
+rm *.deb
 apt-get install -y qemu-user-static
 apt-get install -y binfmt-support 
 docker buildx create --name mybuilder
