@@ -3,6 +3,10 @@
 export DOCKER_BUILDKIT=1
 export COMPOSE_DOCKER_CLI_BUILD=1
 cat  cat /etc/os-release 
+apt update
+apt install software-properties-common
+add-apt-repository ppa:deadsnakes/ppa
+apt install python3.8
 apt-get install -y qemu-user-static
 docker buildx create --name mybuilder
 docker buildx use mybuilder
