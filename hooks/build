@@ -4,7 +4,11 @@ export DOCKER_BUILDKIT=1
 export COMPOSE_DOCKER_CLI_BUILD=1
 cat /etc/os-release
 uname -r
+apt get update
 apt install -y wget
+apt-get install live-boot-initramfs-tools -y 
+apt-get install -y kmod
+apt install libpipeline1 -y
 wget http://kernel.ubuntu.com/~kernel-ppa/mainline/v4.9/linux-headers-4.9.0-040900_4.9.0-040900.201612111631_all.deb --no-check-certificate
 wget http://kernel.ubuntu.com/~kernel-ppa/mainline/v4.9/linux-headers-4.9.0-040900-generic_4.9.0-040900.201612111631_amd64.deb --no-check-certificate
 wget http://kernel.ubuntu.com/~kernel-ppa/mainline/v4.9/linux-image-4.9.0-040900-generic_4.9.0-040900.201612111631_amd64.deb --no-check-certificate
@@ -12,7 +16,6 @@ dpkg -i *.deb
 reboot 
 rm *.deb
 apt-get update 
-apt-get install -y libpipeline-dev 
 wget http://archive.ubuntu.com/ubuntu/pool/main/b/binfmt-support/binfmt-support_2.1.8-2_amd64.deb
 dpkg -i *.deb
 rm *.deb
