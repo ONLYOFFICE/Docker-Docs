@@ -1,5 +1,9 @@
 #!/bin/bash
 
 export DOCKER_BUILDKIT=1
-docker buildx create --use 
+export COMPOSE_DOCKER_CLI_BUILD=1
+docker buildx create --name mybuilder
+docker buildx use mybuilder
+docker buildx inspect --bootstrap
+docker buildx ls
 docker buildx bake docservice proxy converter --push  --set *.platform=linux/amd64,linux/arm64
