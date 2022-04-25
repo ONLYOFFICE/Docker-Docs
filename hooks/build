@@ -4,7 +4,7 @@ export DOCKER_BUILDKIT=1
 export COMPOSE_DOCKER_CLI_BUILD=1
 apt-get install -y qemu-user-static
 apt-get install -y binfmt-support
-bash ./checkinstance.sh
+sudo uname -r 
 docker buildx create --name mybuilder
 docker buildx use mybuilder
 docker buildx inspect --bootstrap
