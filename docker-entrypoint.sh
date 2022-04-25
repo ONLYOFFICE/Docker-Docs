@@ -14,11 +14,16 @@ if [[ -n ${LOG_PATTERN} ]]; then
 fi
 
 if [[ $AMQP_TYPE == "activemq" ]]; then
-  if [[ $AMQP_PROTO == "amqp" ]]; then
-    AMQP_PROTO="tcp"
-  elif [[ $AMQP_PROTO == "amqps" || $AMQP_PROTO == "amqp+ssl" ]]; then
-  AMQP_PROTO="tls"
-  fi
+  case $AMQP_PROTO in
+
+    amqp)
+      AMQP_PROTO="tcp"
+      ;;
+
+    amqps | amqp+ssl)
+      AMQP_PROTO="tls"
+      ;;
+  esac
 fi
 
 export NODE_CONFIG='{
