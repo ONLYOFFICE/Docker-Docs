@@ -20,9 +20,10 @@ ARG PRODUCT_EDITION=
 ARG PRODUCT_URL=http://download.onlyoffice.com/install/documentserver/linux/onlyoffice-documentserver$PRODUCT_EDITION.$TARGETARCH.rpm
 RUN useradd --no-create-home --shell /sbin/nologin nginx && \
     yum -y updateinfo && \
-    PRODUCT_URL="${PRODUCT_URL//amd64/x86_64}"; PRODUCT_URL=${PRODUCT_URL//arm64/aarch64} && \
     yum -y install cabextract fontconfig xorg-x11-font-utils xorg-x11-server-utils && \
     rpm -i https://downloads.sourceforge.net/project/mscorefonts2/rpms/msttcore-fonts-installer-2.6-1.noarch.rpm && \
+    PRODUCT_URL="${PRODUCT_URL//amd64.rpm/x86_64.rpm}" && \
+    PRODUCT_URL=${PRODUCT_URL//arm64.rpm/aarch64.rpm} && \
     rpm -ivh $PRODUCT_URL --noscripts --nodeps && \
     mkdir -p /var/www/$COMPANY_NAME/documentserver/core-fonts/msttcore && \
     cp -vt \
