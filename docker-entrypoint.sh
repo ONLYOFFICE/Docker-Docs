@@ -13,15 +13,9 @@ if [[ -n ${LOG_PATTERN} ]]; then
   sed "s/\(\"pattern\"\:\).*/\1 \"$LOG_PATTERN\"/" -i /etc/$COMPANY_NAME/documentserver/log4js/production.json
 fi
 
-if [[ ${AMQP_TYPE:=rabbitmq} == "activemq" ]]; then
-  case $AMQP_PROTO in
-    amqp)
-      AMQP_PROTO="tcp"
-      ;;
-    amqps | amqp+ssl)
-      AMQP_PROTO="tls"
-      ;;
-  esac
+ACTIVEMQ_TRANSPORT="tcp"
+if [[ $AMQP_PROTO == "amqps" || $AMQP_PROTO == "amqp+ssl" ]]; then
+  ACTIVEMQ_TRANSPORT="tls"
 fi
 
 export NODE_CONFIG='{
@@ -75,7 +69,7 @@ export NODE_CONFIG='{
     }
   },
   "queue": {
-    "type": "'${AMQP_TYPE}'"
+    "type": "'${AMQP_TYPE:=rabbitmq}'"
   },
   "activemq": {
     "connectOptions": {
@@ -83,7 +77,7 @@ export NODE_CONFIG='{
       "host": "'${AMQP_HOST:=localhost}'",
       "username": "'${AMQP_USER:=guest}'",
       "password": "'${AMQP_PWD:=guest}'",
-      "transport": "'${AMQP_PROTO:-tcp}'"
+      "transport": "'${ACTIVEMQ_TRANSPORT}'"
     }
   },
   "rabbitmq": {
