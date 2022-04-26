@@ -20,6 +20,7 @@ case $AMQP_PROTO in
     ;;
   *)
     ACTIVEMQ_TRANSPORT="tcp"
+    ;;
 esac
 
 export NODE_CONFIG='{
