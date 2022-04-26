@@ -11,3 +11,8 @@ jobs:
     name: Build 
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v1
+      - name: Login to DockerHub Registry
+        run: echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+      - name: build the image
+        run: docker buildx bake docservice proxy converter --push  --set *.platform=linux/amd64,linux/arm64
