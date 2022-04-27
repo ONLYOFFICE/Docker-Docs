@@ -22,8 +22,7 @@ RUN useradd --no-create-home --shell /sbin/nologin nginx && \
     yum -y updateinfo && \
     yum -y install cabextract fontconfig xorg-x11-font-utils xorg-x11-server-utils && \
     rpm -i https://downloads.sourceforge.net/project/mscorefonts2/rpms/msttcore-fonts-installer-2.6-1.noarch.rpm && \
-    PRODUCT_URL="${PRODUCT_URL//amd64.rpm/x86_64.rpm}" && \
-    PRODUCT_URL=${PRODUCT_URL//arm64.rpm/aarch64.rpm} && \
+    PRODUCT_URL=$(echo $PRODUCT_URL | sed "s/arm64.rpm/"$(uname -m)".rpm/g;s/amd64.rpm/"$(uname -m)".rpm/g")
     rpm -ivh $PRODUCT_URL --noscripts --nodeps && \
     mkdir -p /var/www/$COMPANY_NAME/documentserver/core-fonts/msttcore && \
     cp -vt \
