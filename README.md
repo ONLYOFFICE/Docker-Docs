@@ -1,4 +1,5 @@
 ## Overview
+[![Multi-arch build](https://github.com/ONLYOFFICE/Docker-Docs/actions/workflows/build.yaml/badge.svg)](https://github.com/ONLYOFFICE/Docker-Docs/actions/workflows/build.yaml)
 
 ONLYOFFICE Docs is an online office suite comprising viewers and editors for texts, spreadsheets and presentations and enabling collaborative editing in real time. The suite provides maximum compatibility with Office Open XML formats: .docx, .xlsx, .pptx. 
 
