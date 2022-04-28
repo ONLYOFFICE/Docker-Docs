@@ -1,10 +1,10 @@
-### This workflow setup instance then build and push image ###
+### This workflow setup instance then build and push images ###
 name: Multi-arch build 
 
-on:    
+on:
   push:
-    branches:
-      - feature/amazonlinux-arm64
+    tags:
+      - "v*"
       
 jobs:
   build:
@@ -26,5 +26,11 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-      - name: build multiarch image
-        run: docker buildx bake docservice proxy converter --push  --set *.platform=linux/amd64,linux/arm64
+      - name: build Community-Edition
+        run: PRODUCT_EDITION= TAG= docker buildx bake -f docker-bake.hcl docservice proxy converter --push  --set *.platform=linux/amd64,linux/arm64
+
+      - name: build Enterprise-Edition 
+        run: PRODUCT_EDITION=-ee TAG= docker buildx bake -f docker-bake.hcl docservice --push  --set *.platform=linux/amd64,linux/arm64
+
+      - name: build Developer-Edition 
+        run: PRODUCT_EDITION=-de TAG= docker buildx bake -f docker-bake.hcl docservice --push  --set *.platform=linux/amd64,linux/arm64
