@@ -1,4 +1,4 @@
-
+## variables for buildx bake ##
 variable "DOCKER_TAG" {
     default = "latest" 
 }
