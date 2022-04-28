@@ -1,13 +1,11 @@
 version: '3.8'
 services:
   proxy:
-    env_file: 
-      - '.env'
     container_name: proxy
     build:
       context: .
       target: proxy
-    image: onlyoffice/docs-test:proxy
+    image: ${ACCOUNT_NAME}/${PREFIX_NAME}-proxy${PRODUCT_EDITION}:${DOCKER_TAG}
     environment:
       - DOCSERVICE_HOST_PORT=docservice:8000
       - EXAMPLE_HOST_PORT=example:3000
@@ -18,13 +16,11 @@ services:
     volumes:
       - common_data:/var/lib/${COMPANY_NAME} 
        
-  docservice:
-    env_file:
-      - '.env'       
+  docservice:       
     build:
       context: .
       target: docservice
-    image: onlyoffice/docs-test:docservice
+    image: ${ACCOUNT_NAME}/${PREFIX_NAME}-docservice${PRODUCT_EDITION}:${DOCKER_TAG}
     container_name: docservice
     environment:
       - DB_HOST=postgresql
@@ -49,12 +45,10 @@ services:
      - common_data:/var/lib/${COMPANY_NAME}
 
   converter:
-    env_file:
-      - '.env'
     build:
       context: .
       target: converter
-    image: onlyoffice/docs-test:converter
+    image: ${ACCOUNT_NAME}/${PREFIX_NAME}-converter${PRODUCT_EDITION}:${DOCKER_TAG}
     container_name: converter
     environment:
       - DB_HOST=postgresql
