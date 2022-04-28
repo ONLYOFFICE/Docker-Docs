@@ -1,17 +1,4 @@
 #!/bin/bash
 
 export DOCKER_BUILDKIT=1
-export COMPOSE_DOCKER_CLI_BUILD=1
-#apt install -y wget
-#apt-get update -y 
-#apt install libpipeline1 -y
-#apt-get install -y qemu-user-static
-#apt-get install -y binfmt-support 
-bash ./check.sh
-#docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-#docker run --rm --privileged docker/binfmt:a7996909642ee92942dcd6cff44b9b95f08dad64
-docker buildx create --name mybuilder
-docker buildx use mybuilder
-docker buildx inspect --bootstrap
-docker buildx ls
-docker buildx bake docservice proxy converter --push  --set *.platform=linux/amd64
+docker-compose build --build-arg PRODUCT_EDITION=$PRODUCT_EDITION
