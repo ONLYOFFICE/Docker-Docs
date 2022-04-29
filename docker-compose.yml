@@ -16,7 +16,7 @@ services:
     volumes:
       - common_data:/var/lib/${COMPANY_NAME} 
        
-  docservice:       
+  docservice:
     build:
       context: .
       target: docservice
