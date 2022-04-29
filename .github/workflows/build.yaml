@@ -35,7 +35,7 @@ jobs:
         run: PRODUCT_EDITION= TAG=${{ steps.tag_name.outputs.SOURCE_TAG }} docker buildx bake -f docker-bake.hcl docservice proxy converter --push  --set *.platform=linux/amd64,linux/arm64
 
       - name: build Enterprise-Edition 
-        run: PRODUCT_EDITION=-ee TAG=${{ steps.tag_name.outputs.SOURCE_TAG }} docker buildx bake -f docker-bake.hcl docservice --push  --set *.platform=linux/amd64,linux/arm64
+        run: PRODUCT_EDITION=-ee TAG=${{ steps.tag_name.outputs.SOURCE_TAG }} docker buildx bake -f docker-bake.hcl docservice proxy converter --push  --set *.platform=linux/amd64,linux/arm64
 
       - name: build Developer-Edition 
-        run: PRODUCT_EDITION=-de TAG=${{ steps.tag_name.outputs.SOURCE_TAG }} docker buildx bake -f docker-bake.hcl docservice --push  --set *.platform=linux/amd64,linux/arm64
+        run: PRODUCT_EDITION=-de TAG=${{ steps.tag_name.outputs.SOURCE_TAG }} docker buildx bake -f docker-bake.hcl docservice proxy converter --push  --set *.platform=linux/amd64,linux/arm64
