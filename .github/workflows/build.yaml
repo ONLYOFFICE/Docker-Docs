@@ -31,11 +31,14 @@ jobs:
         run: |
           echo ::set-output name=SOURCE_TAG::${GITHUB_REF#refs/tags/}
 
-      - name: build Community-Edition
-        run: PRODUCT_EDITION= TAG=${{ steps.tag_name.outputs.SOURCE_TAG }} docker buildx bake -f docker-bake.hcl docservice proxy converter --push  --set *.platform=linux/amd64,linux/arm64
+      - name: Tag revision
+        run:  DOCKER_TAG=$(echo ${{ steps.tag_name.outputs.SOURCE_TAG }} | sed 's/^.//')
 
-      - name: build Enterprise-Edition 
-        run: PRODUCT_EDITION=-ee TAG=${{ steps.tag_name.outputs.SOURCE_TAG }} docker buildx bake -f docker-bake.hcl docservice proxy converter --push  --set *.platform=linux/amd64,linux/arm64
+      - name: Build Community-Edition
+        run: PRODUCT_EDITION= TAG=$DOCKER_TAG docker buildx bake -f docker-bake.hcl docservice proxy converter --push  --set *.platform=linux/amd64,linux/arm64
 
-      - name: build Developer-Edition 
-        run: PRODUCT_EDITION=-de TAG=${{ steps.tag_name.outputs.SOURCE_TAG }} docker buildx bake -f docker-bake.hcl docservice proxy converter --push  --set *.platform=linux/amd64,linux/arm64
+      - name: Build Enterprise-Edition 
+        run: PRODUCT_EDITION=-ee TAG=$DOCKER_TAG docker buildx bake -f docker-bake.hcl docservice proxy converter --push  --set *.platform=linux/amd64,linux/arm64
+
+      - name: Build Developer-Edition 
+        run: PRODUCT_EDITION=-de TAG=$DOCKER_TAG docker buildx bake -f docker-bake.hcl docservice proxy converter --push  --set *.platform=linux/amd64,linux/arm64
