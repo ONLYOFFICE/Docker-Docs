@@ -15,12 +15,15 @@ RUN yum install sudo -y && \
     rm -f /var/log/*log
 
 FROM ds-base AS ds-service
+ARG TARGETARCH
 ARG PRODUCT_EDITION=
-ARG PRODUCT_URL=http://download.onlyoffice.com/install/documentserver/linux/onlyoffice-documentserver$PRODUCT_EDITION.x86_64.rpm
+ARG PRODUCT_URL=http://download.onlyoffice.com/install/documentserver/linux/onlyoffice-documentserver$PRODUCT_EDITION.$TARGETARCH.rpm
+ENV TARGETARCH=$TARGETARCH
 RUN useradd --no-create-home --shell /sbin/nologin nginx && \
     yum -y updateinfo && \
     yum -y install cabextract fontconfig xorg-x11-font-utils xorg-x11-server-utils && \
     rpm -i https://downloads.sourceforge.net/project/mscorefonts2/rpms/msttcore-fonts-installer-2.6-1.noarch.rpm && \
+    PRODUCT_URL=$(echo $PRODUCT_URL | sed "s/"$TARGETARCH"/"$(uname -m)"/g") && \
     rpm -ivh $PRODUCT_URL --noscripts --nodeps && \
     mkdir -p /var/www/$COMPANY_NAME/documentserver/core-fonts/msttcore && \
     cp -vt \
@@ -208,4 +211,3 @@ COPY --from=ds-service /var/www/$COMPANY_NAME/documentserver/server/Metrics/conf
 FROM postgres:9.5 AS db
 ARG COMPANY_NAME=onlyoffice
 COPY --from=ds-service /var/www/$COMPANY_NAME/documentserver/server/schema/postgresql/createdb.sql /docker-entrypoint-initdb.d/
-
