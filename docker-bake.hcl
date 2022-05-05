@@ -20,6 +20,7 @@ group "apps" {
 }
 
 target "proxy" {
+    dockerfile = "Dockerfile.multiarch"
     target = "proxy"
     tags = ["docker.io/${COMPANY_NAME}/${PREFIX_NAME}-proxy${PRODUCT_EDIDION}:${TAG}"]
     args = {
@@ -28,6 +29,7 @@ target "proxy" {
 }
 
 target "converter" {
+    dockerfile = "Dockerfile.multiarch"
     target = "converter"  
     tags = ["docker.io/${COMPANY_NAME}/${PREFIX_NAME}-converter${PRODUCT_EDITION}:${TAG}"] 
     args = {
@@ -36,6 +38,7 @@ target "converter" {
 }
 
 target "docservice" {
+    dockerfile = "Dockerfile.multiarch"
     tags = ["docker.io/${COMPANY_NAME}/${PREFIX_NAME}-docservice${PRODUCT_EDITION}:${TAG}"]
     target = "docservice"
     args = {
