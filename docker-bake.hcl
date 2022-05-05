@@ -36,8 +36,8 @@ target "converter" {
 }
 
 target "docservice" {
+    target = "docservice" 
     tags = ["docker.io/${COMPANY_NAME}/${PREFIX_NAME}-docservice${PRODUCT_EDITION}:${TAG}"]
-    target = "docservice"
     args = {
         PRODUCT_EDITION = PRODUCT_EDITION
     }
