@@ -10,7 +10,7 @@ ENV COMPANY_NAME=$COMPANY_NAME \
 RUN yum install sudo -y && \
     yum install shadow-utils -y && \
     amazon-linux-extras install epel -y && \
-    yum install procps-ng && \
+    yum install procps-ng -y && \
     groupadd --system --gid 101 ds && \
     useradd --system -g ds --no-create-home --shell /sbin/nologin --uid 101 ds && \
     rm -f /var/log/*log
