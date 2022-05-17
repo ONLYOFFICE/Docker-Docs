@@ -196,6 +196,7 @@ COPY --from=ds-service \
     /usr/lib64/libHtmlRenderer.so \
     /usr/lib64/libUnicodeConverter.so \
     /usr/lib64/libXpsFile.so \
+    /usr/lib64/libDocxRenderer.so \
     /usr/lib64/
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN mkdir -p \
