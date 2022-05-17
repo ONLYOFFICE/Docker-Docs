@@ -21,7 +21,7 @@ group "apps" {
 
 target "proxy" {
     target = "proxy"
-    tags = ["docker.io/${COMPANY_NAME}/${PREFIX_NAME}-proxy${PRODUCT_EDIDION}:${TAG}"]
+    tags = ["docker.io/${COMPANY_NAME}/${PREFIX_NAME}-proxy${PRODUCT_EDITION}:${TAG}"]
     args = {
         PRODUCT_EDITION = PRODUCT_EDITION
     }
