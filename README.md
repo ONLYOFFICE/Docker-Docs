@@ -1,9 +1,11 @@
-## Overview
+﻿## Overview
 [![Multi-arch build](https://github.com/ONLYOFFICE/Docker-Docs/actions/workflows/build.yaml/badge.svg)](https://github.com/ONLYOFFICE/Docker-Docs/actions/workflows/build.yaml)
 
 ONLYOFFICE Docs is an online office suite comprising viewers and editors for texts, spreadsheets and presentations and enabling collaborative editing in real time. The suite provides maximum compatibility with Office Open XML formats: .docx, .xlsx, .pptx. 
 
 This set of images contain the same functionality as [Document Server](https://github.com/ONLYOFFICE/DocumentServer) but internal services are decoupled into multiple containers.
+
+This repository is intended for images used in the Document Server [Helm package for Kubernetes](https://github.com/ONLYOFFICE/Kubernetes-Docs), which allows deploying it into a cluster.
 
 ## Functionality
 
