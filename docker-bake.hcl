@@ -15,8 +15,20 @@ variable "PRODUCT_EDITION" {
     default = ""
 }
 
+variable "EXAMPLE_PATH" {
+    default = "document-server-integration/web/documentserver-example/"
+}
+
 group "apps" {
-    targets = ["proxy", "converter", "docservice"]
+    targets = ["proxy", "converter", "docservice", "example"]
+}
+
+target "example" {
+    target = "proxy"
+    tags = ["docker.io/${COMPANY_NAME}/${PREFIX_NAME}-example${PRODUCT_EDITION}:${TAG}"]
+    args = {
+        PRODUCT_EDITION = PRODUCT_EDITION
+    }
 }
 
 target "proxy" {
