@@ -217,9 +217,8 @@ ENV LANG=en_US.UTF-8 \
 
 WORKDIR /var/www/onlyoffice/documentserver-example/
 
-RUN mkdir -p /var/www/onlyoffice/documentserver-example && \
-    git clone https://github.com/ONLYOFFICE/document-server-integration.git && \
-    git -C ./document-server-integration submodule update --init  && \
+RUN git clone --depth 1 --recurse-submodules https://github.com/ONLYOFFICE/document-server-integration.git && \
+    mkdir -p /var/www/onlyoffice/documentserver-example && \
     cp -r ./document-server-integration/web/documentserver-example/nodejs/. /var/www/onlyoffice/documentserver-example/ && \
     rm -rf ./document-server-integration && \
     groupadd --system --gid 1001 ds && \
