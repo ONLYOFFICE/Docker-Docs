@@ -14,12 +14,6 @@ jobs:
       - name: Checkout code 
         uses: actions/checkout@v3
 
-      - name: Checkout ds-example repo
-        uses: actions/checkout@v3
-        with:
-          repository: ONLYOFFICE/document-server-integration
-          path: document-server-integration
-
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
 
@@ -40,14 +34,14 @@ jobs:
       - name: Build Community-Edition
         run: |
           DOCKER_TAG=$(echo ${{ steps.tag_name.outputs.SOURCE_TAG }} | sed 's/^.//')
-          PRODUCT_EDITION= TAG=$DOCKER_TAG docker buildx bake -f docker-bake.hcl docservice proxy converter example --push  --set *.platform=linux/amd64,linux/arm64
+          PRODUCT_EDITION= TAG=$DOCKER_TAG docker buildx bake -f docker-bake.hcl docservice proxy converter example --push
 
       - name: Build Enterprise-Edition 
         run: |
           DOCKER_TAG=$(echo ${{ steps.tag_name.outputs.SOURCE_TAG }} | sed 's/^.//')
-          PRODUCT_EDITION=-ee TAG=$DOCKER_TAG docker buildx bake -f docker-bake.hcl docservice proxy converter --push  --set *.platform=linux/amd64,linux/arm64
+          PRODUCT_EDITION=-ee TAG=$DOCKER_TAG docker buildx bake -f docker-bake.hcl docservice proxy converter --push
 
       - name: Build Developer-Edition 
         run: |
           DOCKER_TAG=$(echo ${{ steps.tag_name.outputs.SOURCE_TAG }} | sed 's/^.//')
-          PRODUCT_EDITION=-de TAG=$DOCKER_TAG docker buildx bake -f docker-bake.hcl docservice proxy converter --push  --set *.platform=linux/amd64,linux/arm64
+          PRODUCT_EDITION=-de TAG=$DOCKER_TAG docker buildx bake -f docker-bake.hcl docservice proxy converter --push
