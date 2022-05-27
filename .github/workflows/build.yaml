@@ -10,6 +10,13 @@ jobs:
   build:
     name: Build 
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        edition: [ "", "-ee", "-de"]
+        images: [ "proxy docservice converter" ]
+        include:
+          - edition: ""
+            images: "example"
     steps:
       - name: Checkout code 
         uses: actions/checkout@v3
@@ -34,14 +41,4 @@ jobs:
       - name: Build Community-Edition
         run: |
           DOCKER_TAG=$(echo ${{ steps.tag_name.outputs.SOURCE_TAG }} | sed 's/^.//')
-          PRODUCT_EDITION= TAG=$DOCKER_TAG docker buildx bake -f docker-bake.hcl docservice proxy converter example --push
-
-      - name: Build Enterprise-Edition 
-        run: |
-          DOCKER_TAG=$(echo ${{ steps.tag_name.outputs.SOURCE_TAG }} | sed 's/^.//')
-          PRODUCT_EDITION=-ee TAG=$DOCKER_TAG docker buildx bake -f docker-bake.hcl docservice proxy converter --push
-
-      - name: Build Developer-Edition 
-        run: |
-          DOCKER_TAG=$(echo ${{ steps.tag_name.outputs.SOURCE_TAG }} | sed 's/^.//')
-          PRODUCT_EDITION=-de TAG=$DOCKER_TAG docker buildx bake -f docker-bake.hcl docservice proxy converter --push
+          PRODUCT_EDITION=${{ matrix.edition }} TAG=$DOCKER_TAG docker buildx bake -f docker-bake.hcl ${{ matrix.images }} --push
