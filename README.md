@@ -1,8 +1,11 @@
-## Overview
+﻿## Overview
+[![Multi-arch build](https://github.com/ONLYOFFICE/Docker-Docs/actions/workflows/build.yaml/badge.svg)](https://github.com/ONLYOFFICE/Docker-Docs/actions/workflows/build.yaml)
 
 ONLYOFFICE Docs is an online office suite comprising viewers and editors for texts, spreadsheets and presentations and enabling collaborative editing in real time. The suite provides maximum compatibility with Office Open XML formats: .docx, .xlsx, .pptx. 
 
 This set of images contain the same functionality as [Document Server](https://github.com/ONLYOFFICE/DocumentServer) but internal services are decoupled into multiple containers.
+
+This repository is intended for images used in the Document Server [Helm package for Kubernetes](https://github.com/ONLYOFFICE/Kubernetes-Docs), which allows deploying it into a cluster.
 
 ## Functionality
 
@@ -25,11 +28,68 @@ ONLYOFFICE Docs has three editions - [Community, Enterprise, and Developer](http
 * **HDD**: at least 2 GB of free space
 * **Distribution**: 64-bit Red Hat, CentOS or other compatible distributive with kernel version 3.8 or later, 64-bit Debian, Ubuntu or other compatible distributive with kernel version 3.8 or later
 * **Docker**: version 1.9.0 or later
+* **Docker-compose**: version 1.28.0 or later
+
+## Building ONLYOFFICE Docs
+
+### Cloning this repository
+
+To clone this repository, run the following command:
+
+```bash
+git clone https://github.com/ONLYOFFICE/Docker-Docs.git
+```
+
+Go to the Docker-Docs directory.
+
+### Adding custom Fonts (optional)
+
+To add your custom fonts to the images, add your custom fonts to the `fonts` directory.
+
+### Adding Plugins (optional)
+
+To add plugins to the images, add the folder with the plugin code to the `plugins` directory.
+
+### Building images
+
+To build images, please follow these steps
+
+#### 1. Change the variables
+
+Change the value of the `ACCOUNT_NAME` variable in the `.env` file. It must contain the account name in Docker Hub. If necessary, change the values of the variables `PREFIX_NAME` and `DOCKER_TAG` in the `.env` file.
+
+Also, depending on the solution type, specify the required value for the `PRODUCT_EDITION` variable in the `.env` file.
+
+Possible values:
+  - Nothing is specified. For the open-source community version. Default,
+  - `-de`. For commercial Developer Edition,
+  - `-ee`. For commercial Enterprise Edition.
+
+#### 2. Run the build
+
+To start the build, run the following command:
+
+```bash
+./build.sh
+```
+
+#### 3. Publish the images to the image repository
+
+Log in to the local host:
+
+```bash
+docker login
+```
+
+To publish the images, run the following command:
+
+```bash
+docker-compose push
+```
 
 ## Running ONLYOFFICE Docs
 
-
-Install [docker-compose](https://docs.docker.com/compose/install "docker-compose"). If you have docker-compose installed, execute the following command:
+Execute the following command:
 
 ```bash
 docker-compose up -d
@@ -66,17 +126,28 @@ Below is the complete list of parameters for `onlyoffice/docs-docservice`, `only
 - **DB_NAME**: The name of a PostgreSQL database to be created on the image startup.
 - **DB_USER**: The new user name with superuser permissions for the PostgreSQL account.
 - **DB_PWD**: The password set for the PostgreSQL account.
+- **AMQP_TYPE**: Defines the message broker type. Defaults to `rabbitmq`. Possible values are `rabbitmq` or `activemq`.
 - **AMQP_PROTO**: The protocol for the connection to AMQP server. Default to `amqp`. Possible values are `amqp`, `amqps`.
 - **AMQP_USER**: The username for the AMQP server account.
 - **AMQP_PWD**: The password set for the AMQP server account.
 - **AMQP_HOST**: The IP address or the name of the host where the AMQP server is running.
+- **AMQP_PORT**: The port for the connection to AMQP server. Default to `5672`.
+- **AMQP_VHOST**: The virtual host for the connection to AMQP server. Default to `/`.
 - **REDIS_SERVER_HOST**: The IP address or the name of the host where the Redis server is running.
 - **REDIS_SERVER_PORT**:  The Redis server port number. Default to `6379`.
-- **JWT_ENABLED**: Specifies the enabling the JSON Web Token validation by the ONLYOFFICE Docs. Defaults to `false`.
-- **JWT_SECRET**: Defines the secret key to validate the JSON Web Token in the request to the ONLYOFFICE Docs. Defaults to `secret`.
-- **JWT_HEADER**: Defines the http header that will be used to send the JSON Web Token. Defaults to `Authorization`.
+- **JWT_ENABLED**: Specifies the enabling the JSON Web Token validation by the ONLYOFFICE Docs. Common for inbox and outbox requests. Defaults to `false`.
+- **JWT_ENABLED_INBOX**: Specifies the enabling the JSON Web Token validation by the ONLYOFFICE Docs only for inbox requests. Default, the value of the variable `JWT_ENABLED` is used.
+- **JWT_ENABLED_OUTBOX**: Specifies the enabling the JSON Web Token validation by the ONLYOFFICE Docs only for outbox requests. Default, the value of the variable `JWT_ENABLED` is used.
+- **JWT_SECRET**: Defines the secret key to validate the JSON Web Token in the request to the ONLYOFFICE Docs. Common for inbox and outbox requests. Defaults to `secret`.
+- **JWT_SECRET_INBOX**: Defines the secret key to validate the JSON Web Token in the request to the ONLYOFFICE Docs only for inbox requests. Default, the value of the variable `JWT_SECRET` is used.
+- **JWT_SECRET_OUTBOX**: Defines the secret key to validate the JSON Web Token in the request to the ONLYOFFICE Docs only for outbox requests. Default, the value of the variable `JWT_SECRET` is used.
+- **JWT_HEADER**: Defines the http header that will be used to send the JSON Web Token. Common for inbox and outbox requests. Defaults to `Authorization`.
+- **JWT_HEADER_INBOX**: Defines the http header that will be used to send the JSON Web Token only for inbox requests. Default, the value of the variable `JWT_HEADER` is used.
+- **JWT_HEADER_OUTBOX**: Defines the http header that will be used to send the JSON Web Token only for outbox requests. Default, the value of the variable `JWT_HEADER` is used.
 - **JWT_IN_BODY**: Specifies the enabling the token validation in the request body to the ONLYOFFICE Docs. Defaults to `false`.
 - **LOG_LEVEL**: Defines the type and severity of a logged event. Default to `WARN`. Possible values are `ALL`, `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, `FATAL`, `MARK`, `OFF`.
+- **LOG_TYPE**: Defines the format of a logged event. Default to `pattern`. Possible values are `pattern`, `json`, `basic`, `coloured`, `messagePassThrough`, `dummy`.
+- **LOG_PATTERN**: Defines the log [pattern](https://github.com/log4js-node/log4js-node/blob/master/docs/layouts.md#pattern-format) if `LOG_TYPE=pattern`. Default to `[%d] [%p] %c - %.10000m`.
 - **METRICS_ENABLED**: Specifies the enabling StatsD for ONLYOFFICE Docs. Defaults to `false`.
 - **METRICS_HOST**: Defines StatsD listening host. Defaults to `localhost`.
 - **METRICS_PORT**: Defines StatsD listening port. Defaults to `8125`.

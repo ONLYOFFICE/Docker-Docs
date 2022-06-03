@@ -1,4 +1,4 @@
-FROM centos:7 AS ds-base
+FROM amazonlinux:2 AS ds-base
 
 LABEL maintainer Ascensio System SIA <support@onlyoffice.com>
 
@@ -6,18 +6,25 @@ ARG COMPANY_NAME=onlyoffice
 ENV COMPANY_NAME=$COMPANY_NAME \
     NODE_ENV=production-linux \
     NODE_CONFIG_DIR=/etc/$COMPANY_NAME/documentserver
-RUN groupadd --system --gid 101 ds && \
+
+RUN yum install sudo -y && \
+    yum install shadow-utils -y && \
+    amazon-linux-extras install epel -y && \
+    yum install procps-ng -y && \
+    groupadd --system --gid 101 ds && \
     useradd --system -g ds --no-create-home --shell /sbin/nologin --uid 101 ds && \
     rm -f /var/log/*log
 
 FROM ds-base AS ds-service
+ARG TARGETARCH
 ARG PRODUCT_EDITION=
-ARG PRODUCT_URL=http://download.onlyoffice.com/install/documentserver/linux/onlyoffice-documentserver$PRODUCT_EDITION.x86_64.rpm
+ARG PRODUCT_URL=http://download.onlyoffice.com/install/documentserver/linux/onlyoffice-documentserver$PRODUCT_EDITION.$TARGETARCH.rpm
+ENV TARGETARCH=$TARGETARCH
 RUN useradd --no-create-home --shell /sbin/nologin nginx && \
-    yum -y install epel-release && \
     yum -y updateinfo && \
     yum -y install cabextract fontconfig xorg-x11-font-utils xorg-x11-server-utils && \
     rpm -i https://downloads.sourceforge.net/project/mscorefonts2/rpms/msttcore-fonts-installer-2.6-1.noarch.rpm && \
+    PRODUCT_URL=$(echo $PRODUCT_URL | sed "s/"$TARGETARCH"/"$(uname -m)"/g") && \
     rpm -ivh $PRODUCT_URL --noscripts --nodeps && \
     mkdir -p /var/www/$COMPANY_NAME/documentserver/core-fonts/msttcore && \
     cp -vt \
@@ -30,8 +37,11 @@ COPY --chown=ds:ds \
     config/nginx/includes/http-upstream.conf \
     /etc/$COMPANY_NAME/documentserver/nginx/includes/
 COPY --chown=ds:ds \
-    fonts/* \
+    fonts/ \
     /var/www/$COMPANY_NAME/documentserver/core-fonts/custom/
+COPY --chown=ds:ds \
+    plugins/ \
+    /var/www/$COMPANY_NAME/documentserver/sdkjs-plugins/
 RUN documentserver-generate-allfonts.sh true
 
 FROM ds-base AS proxy
@@ -41,16 +51,15 @@ ENV DOCSERVICE_HOST_PORT=localhost:8000 \
     NGINX_GZIP_PROXIED=off \
     NGINX_WORKER_CONNECTIONS=4096
 EXPOSE 8888
-RUN yum -y install epel-release sudo && \
-    yum -y updateinfo && \
+RUN yum -y updateinfo && \
     yum -y install gettext nginx && \
     yum clean all && \
     rm -f /var/log/*log
 COPY --chown=ds:ds config/nginx/nginx.conf /etc/nginx/nginx.conf
-COPY --chown=ds:ds --from=ds-service \
+COPY --chown=ds:ds --chmod=644 --from=ds-service \
     /etc/$COMPANY_NAME/documentserver/nginx/ds.conf \
     /etc/nginx/conf.d/
-COPY --chown=ds:ds --from=ds-service \
+COPY --chown=ds:ds --chmod=644 --from=ds-service \
     /etc/$COMPANY_NAME/documentserver*/nginx/includes/*.conf \
     /etc/nginx/includes/
 COPY --chown=ds:ds --from=ds-service \
@@ -79,6 +88,9 @@ RUN sed 's|\(application\/zip.*\)|\1\n    application\/wasm wasm;|' \
     sed '/error_log.*/d' -i /etc/nginx/includes/ds-common.conf && \
     echo -e "\ngzip_proxied \$NGINX_GZIP_PROXIED;\n" >> /etc/nginx/includes/ds-common.conf && \
     sed 's/#*\s*\(gzip_static\).*/\1 on;/g' -i /etc/nginx/includes/ds-docservice.conf && \
+    sed -i 's/etc\/nginx/tmp\/proxy_nginx/g' /etc/nginx/nginx.conf && \
+    sed -i 's/etc\/nginx/tmp\/proxy_nginx/g' /etc/nginx/conf.d/ds.conf && \
+    sed 's/\(X-Forwarded-For\).*/\1 example.com;/' -i /etc/nginx/includes/ds-example.conf && \
     chmod 755 /var/log/nginx && \
     ln -sf /dev/stdout /var/log/nginx/access.log && \
     ln -sf /dev/stderr /var/log/nginx/error.log && \
@@ -112,11 +124,8 @@ ENTRYPOINT \
         sed 's|#*\(\s*access_log\).*;|\1 /var/log/nginx/access.log '$NGINX_ACCESS_LOG';|g' \
             -i /tmp/proxy_nginx/nginx.conf; \
     fi && \
-    sed -i 's/etc\/nginx/tmp\/proxy_nginx/g' /tmp/proxy_nginx/nginx.conf && \
     envsubst < /tmp/proxy_nginx/includes/http-upstream.conf > /tmp/http-upstream.conf && \
     envsubst < /etc/nginx/includes/ds-common.conf | tee /tmp/proxy_nginx/includes/ds-common.conf > /dev/null && \
-    sed -i 's/etc\/nginx/tmp\/proxy_nginx/g' /tmp/proxy_nginx/conf.d/ds.conf && \
-    sed 's/\(X-Forwarded-For\).*/\1 example.com;/' -i /tmp/proxy_nginx/includes/ds-example.conf && \
     sed "s,\(set \+\$secret_string\).*,\1 "${SECURE_LINK_SECRET:-verysecretstring}";," -i /tmp/proxy_nginx/conf.d/ds.conf && \
     exec nginx -c /tmp/proxy_nginx/nginx.conf -g 'daemon off;'
 
@@ -133,8 +142,14 @@ COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/sdkjs-plugins \
     /var/www/$COMPANY_NAME/documentserver/sdkjs-plugins
 COPY --from=ds-service \
+    /var/www/$COMPANY_NAME/documentserver/web-apps/apps/common/main/resources/themes \
+    /var/www/$COMPANY_NAME/documentserver/web-apps/apps/common/main/resources/themes
+COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/server/DocService \
     /var/www/$COMPANY_NAME/documentserver/server/DocService
+COPY --from=ds-service \
+    /var/www/$COMPANY_NAME/documentserver/server/info \
+    /var/www/$COMPANY_NAME/documentserver/server/info
 COPY docker-entrypoint.sh /usr/local/bin/
 USER ds
 ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/DocService/docservice
@@ -170,6 +185,7 @@ COPY --from=ds-service \
     /usr/lib64/libgraphics.so \
     /usr/lib64/libdoctrenderer.so \
     /usr/lib64/libkernel.so \
+    /usr/lib64/libkernel_network.so \
     /usr/lib64/libicudata.so.58 \
     /usr/lib64/libicuuc.so.58 \
     /usr/lib64/libDjVuFile.so \
@@ -181,6 +197,7 @@ COPY --from=ds-service \
     /usr/lib64/libHtmlRenderer.so \
     /usr/lib64/libUnicodeConverter.so \
     /usr/lib64/libXpsFile.so \
+    /usr/lib64/libDocxRenderer.so \
     /usr/lib64/
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN mkdir -p \
@@ -189,6 +206,48 @@ RUN mkdir -p \
     chown -R ds:ds /var/lib/$COMPANY_NAME/documentserver
 USER ds
 ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/FileConverter/converter
+
+FROM node:buster AS example
+LABEL maintainer Ascensio System SIA <support@onlyoffice.com>
+
+ENV LANG=en_US.UTF-8 \
+    LANGUAGE=en_US:en \
+    LC_ALL=en_US.UTF-8 \
+    NODE_ENV=production-linux \
+    NODE_CONFIG_DIR=/etc/onlyoffice/documentserver-example/
+
+WORKDIR /var/www/onlyoffice/documentserver-example/
+
+RUN git clone \
+      --depth 1 \
+      --recurse-submodules \
+      https://github.com/ONLYOFFICE/document-server-integration.git && \
+    mkdir -p /var/www/onlyoffice/documentserver-example && \
+    cp -r ./document-server-integration/web/documentserver-example/nodejs/. \
+      /var/www/onlyoffice/documentserver-example/ && \
+    rm -rf ./document-server-integration && \
+    groupadd --system --gid 1001 ds && \
+    useradd \
+      --system \
+      -g ds \
+      --home-dir /var/www/onlyoffice/documentserver-example \
+      --create-home \
+      --shell /sbin/nologin \
+      --uid 1001 ds && \
+    chown -R ds:ds /var/www/onlyoffice/documentserver-example/ && \
+    mkdir -p /var/lib/onlyoffice/documentserver-example/ && \
+    chown -R ds:ds /var/lib/onlyoffice/ && \
+    mv files /var/lib/onlyoffice/documentserver-example/ && \
+    mkdir -p /etc/onlyoffice/documentserver-example/ && \
+    chown -R ds:ds /etc/onlyoffice/ && \
+    mv config/* /etc/onlyoffice/documentserver-example/ && \
+    npm install
+
+EXPOSE 3000
+
+USER ds
+
+ENTRYPOINT /var/www/onlyoffice/documentserver-example/docker-entrypoint.sh npm start
 
 FROM statsd/statsd AS metrics
 ARG COMPANY_NAME=onlyoffice
