@@ -36,6 +36,9 @@ COPY --chown=ds:ds \
     config/nginx/includes/http-common.conf \
     config/nginx/includes/http-upstream.conf \
     /etc/$COMPANY_NAME/documentserver/nginx/includes/
+COPY --chown=ds:ds --chmod=440 \
+    config/nginx/welcome-page.html \
+    /var/www/$COMPANY_NAME/documentserver-example/welcome/linux-rpm.html
 COPY --chown=ds:ds \
     fonts/ \
     /var/www/$COMPANY_NAME/documentserver/core-fonts/custom/
