@@ -127,6 +127,7 @@ ENTRYPOINT \
     fi && \
     envsubst < /tmp/proxy_nginx/includes/http-upstream.conf > /tmp/http-upstream.conf && \
     envsubst < /etc/nginx/includes/ds-common.conf | tee /tmp/proxy_nginx/includes/ds-common.conf > /dev/null && \
+    sed "s,\(set \+\$secure_link_secret\).*,\1 "${SECURE_LINK_SECRET:-verysecretstring}";," -i /tmp/proxy_nginx/conf.d/ds.conf && \
     exec nginx -c /tmp/proxy_nginx/nginx.conf -g 'daemon off;'
 
 FROM ds-base AS docservice
