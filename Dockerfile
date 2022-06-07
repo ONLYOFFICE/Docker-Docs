@@ -36,9 +36,6 @@ COPY --chown=ds:ds \
     config/nginx/includes/http-common.conf \
     config/nginx/includes/http-upstream.conf \
     /etc/$COMPANY_NAME/documentserver/nginx/includes/
-COPY --chown=ds:ds --chmod=440 \
-    config/nginx/welcome-page.html \
-    /var/www/$COMPANY_NAME/documentserver-example/welcome/linux-rpm.html
 COPY --chown=ds:ds \
     fonts/ \
     /var/www/$COMPANY_NAME/documentserver/core-fonts/custom/
@@ -94,6 +91,7 @@ RUN sed 's|\(application\/zip.*\)|\1\n    application\/wasm wasm;|' \
     sed -i 's/etc\/nginx/tmp\/proxy_nginx/g' /etc/nginx/nginx.conf && \
     sed -i 's/etc\/nginx/tmp\/proxy_nginx/g' /etc/nginx/conf.d/ds.conf && \
     sed 's/\(X-Forwarded-For\).*/\1 example.com;/' -i /etc/nginx/includes/ds-example.conf && \
+    sed 's/\(index\).*/\1 k8s.html;/' -i /etc/nginx/includes/ds-example.conf && \
     chmod 755 /var/log/nginx && \
     ln -sf /dev/stdout /var/log/nginx/access.log && \
     ln -sf /dev/stderr /var/log/nginx/error.log && \
