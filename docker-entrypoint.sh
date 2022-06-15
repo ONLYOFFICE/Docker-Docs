@@ -40,8 +40,8 @@ export NODE_CONFIG='{
         "dbPass": "'${DB_PWD:-onlyoffice}'"
       },
       "redis": {
-        "host": "'${REDIST_SERVER_HOST:-localhost}'",
-        "port": '${REDIST_SERVER_PORT:-6379}'
+        "host": "'${REDIS_SERVER_HOST:-${REDIST_SERVER_HOST:-localhost}}'",
+        "port": '${REDIS_SERVER_PORT:-${REDIST_SERVER_PORT:-6379}}'
       },
       "token": {
         "enable": {
