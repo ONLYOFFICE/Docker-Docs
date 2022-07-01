@@ -16,7 +16,7 @@ jobs:
         images: [ "proxy docservice converter" ]
         include:
           - edition: ""
-            images: "example"
+            images: "example utils" 
     steps:
       - name: Checkout code 
         uses: actions/checkout@v3
