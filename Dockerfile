@@ -248,6 +248,13 @@ USER ds
 
 ENTRYPOINT /var/www/onlyoffice/documentserver-example/docker-entrypoint.sh npm start
 
+FROM alpine:latest AS utils
+LABEL maintainer Ascensio System SIA <support@onlyoffice.com>
+RUN apk add bash postgresql-client curl wget && \
+    addgroup --system --gid 101 ds && \
+    adduser --system -G ds -h /home/ds --shell /bin/bash --uid 101 ds
+USER ds
+
 FROM statsd/statsd AS metrics
 ARG COMPANY_NAME=onlyoffice
 COPY --from=ds-service /var/www/$COMPANY_NAME/documentserver/server/Metrics/config/config.js /usr/src/app/config.js
