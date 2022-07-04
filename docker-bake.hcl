@@ -54,3 +54,10 @@ target "docservice" {
         "PRODUCT_EDITION": "${PRODUCT_EDITION}"
     }
 }
+
+target "utils" {
+    target = "utils"
+    tags = ["docker.io/${COMPANY_NAME}/${PREFIX_NAME}-utils:${TAG}"]
+    platforms = ["linux/amd64", "linux/arm64"]
+}
+
