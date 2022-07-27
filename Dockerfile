@@ -10,7 +10,7 @@ ENV COMPANY_NAME=$COMPANY_NAME \
 RUN yum install sudo -y && \
     yum install shadow-utils -y && \
     amazon-linux-extras install epel -y && \
-    yum install procps-ng -y && \
+    yum install procps-ng tar -y && \
     groupadd --system --gid 101 ds && \
     useradd --system -g ds --no-create-home --shell /sbin/nologin --uid 101 ds && \
     rm -f /var/log/*log
@@ -77,6 +77,9 @@ COPY --chown=ds:ds --from=ds-service \
 COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/dictionaries \
     /var/www/$COMPANY_NAME/documentserver/dictionaries
+COPY --from=ds-service \
+    /var/www/$COMPANY_NAME/documentserver/document-templates/new \
+    /var/www/$COMPANY_NAME/documentserver/document-templates/new
 COPY --chown=ds:ds --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver-example/welcome \
     /var/www/$COMPANY_NAME/documentserver-example/welcome
@@ -149,6 +152,12 @@ COPY --from=ds-service \
 COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/server/info \
     /var/www/$COMPANY_NAME/documentserver/server/info
+COPY --chown=ds:ds --from=ds-service \
+    /var/www/$COMPANY_NAME/documentserver/web-apps/apps/api/wopi \
+    /var/www/$COMPANY_NAME/documentserver/web-apps/apps/api/wopi
+COPY --from=ds-service \
+    /var/www/$COMPANY_NAME/documentserver/document-templates/new \
+    /var/www/$COMPANY_NAME/documentserver/document-templates/new
 COPY docker-entrypoint.sh /usr/local/bin/
 USER ds
 ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/DocService/docservice
@@ -180,6 +189,9 @@ COPY --from=ds-service \
 COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/web-apps \
     /var/www/$COMPANY_NAME/documentserver/web-apps
+COPY --from=ds-service \
+    /var/www/$COMPANY_NAME/documentserver/document-templates/new \
+    /var/www/$COMPANY_NAME/documentserver/document-templates/new
 COPY --from=ds-service \
     /usr/lib64/libgraphics.so \
     /usr/lib64/libdoctrenderer.so \
