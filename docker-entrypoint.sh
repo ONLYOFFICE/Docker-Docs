@@ -89,7 +89,7 @@ export NODE_CONFIG='{
     "url": "'${AMQP_URI:-${AMQP_PROTO:-amqp}://${AMQP_USER}:${AMQP_PWD}@${AMQP_HOST}:${AMQP_PORT}${AMQP_VHOST:-/}}'"
   },
   "wopi": {
-    "enable": "'${WOPI_ENABLED:-false}'"
+    "enable": '${WOPI_ENABLED:-false}'
   },
   "FileConverter": {
     "converter": {
