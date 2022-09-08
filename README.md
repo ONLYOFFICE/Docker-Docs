@@ -105,10 +105,16 @@ docker-compose down
 
 Converter and docservice can be scaled by changing the [replicas](https://github.com/ONLYOFFICE/Docker-Docs/blob/feature/scale-capability/docker-compose.yml#L25) parameter in the compose file. 
 
-Also you can scale services on runtime, for example: 
+Also you can set amount of replicas manualy when docker compose up, for example:
 
 ```
-docker compose scale docservice=3
+docker compose up -d --scale docservice=3
+```
+
+NOTE: If you wanna scale your container on runtime is necessary to deploy services through swarm. After that you can scale in runtime for example:
+
+```
+docker service scale documentserver_docservice=2
 ```
 
 #### Available сonfiguration parameters
