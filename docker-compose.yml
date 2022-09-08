@@ -51,7 +51,7 @@ services:
       target: converter
     image: ${ACCOUNT_NAME}/${PREFIX_NAME}-converter${PRODUCT_EDITION}:${DOCKER_TAG}
     deploy:
-      replicas: 1
+      replicas: 2
     environment:
       - DB_HOST=postgresql
       - DB_NAME=mydb
