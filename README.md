@@ -103,9 +103,12 @@ docker-compose down
 
 #### Services scaling
 
-Converter and docservice can be scaled by changing the [replicas](https://github.com/ONLYOFFICE/Docker-Docs/blob/feature/scale-capability/docker-compose.yml#L25) parameter in the compose file.
+Converter and docservice can be scaled by changing the [replicas](https://github.com/ONLYOFFICE/Docker-Docs/blob/feature/scale-capability/docker-compose.yml#L25) parameter in the compose file. 
+Also you can scale services on runtime, for example: 
 
-NOTE: Scaling work on WebSocket protocol and can be not avalivable on XHR api or anothers protocols.
+```
+docker compose scale docservice=3
+```
 
 #### Available сonfiguration parameters
 
