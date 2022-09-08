@@ -104,6 +104,7 @@ docker-compose down
 #### Services scaling
 
 Converter and docservice can be scaled by changing the [replicas](https://github.com/ONLYOFFICE/Docker-Docs/blob/feature/scale-capability/docker-compose.yml#L25) parameter in the compose file.
+
 NOTE: Scaling work on WebSocket protocol and not avalivable on anothers protocols.
 
 #### Available сonfiguration parameters
