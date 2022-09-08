@@ -114,7 +114,7 @@ docker compose up -d --scale docservice=3
 NOTE: If you wanna scale your container on runtime is necessary to deploy services through swarm. After that you can scale in runtime for example:
 
 ```
-docker service scale documentserver_docservice=2
+docker service scale <deploy_name>_docservice=2
 ```
 
 #### Available сonfiguration parameters
