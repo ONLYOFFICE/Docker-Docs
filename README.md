@@ -120,6 +120,7 @@ Below is the complete list of parameters for `onlyoffice/docs-proxy`.
 - **NGINX_WORKER_CONNECTIONS**: Defines the nginx config [worker_connections](https://nginx.org/en/docs/ngx_core_module.html#worker_connections) directive. Defaults to `4096`.
 
 Below is the complete list of parameters for `onlyoffice/docs-docservice`, `onlyoffice/docs-converter`.
+- **DB_TYPE**: The database type. Supported values are `postgres`, `mariadb` or `mysql`. Defaults to `postgres`.
 - **DB_HOST**: The IP address or the name of the host where the PostgreSQL server is running.
 - **DB_PORT**: The PostgreSQL server port number. Default to `5432`.
 - **DB_NAME**: The name of a PostgreSQL database to be created on the image startup.

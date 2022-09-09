@@ -33,6 +33,7 @@ export NODE_CONFIG='{
   "services": {
     "CoAuthoring": {
       "sql": {
+        "type": "'${DB_TYPE:-postgres}'",
         "dbHost": "'${DB_HOST:-localhost}'",
         "dbPort": '${DB_PORT:-5432}',
         "dbUser": "'${DB_USER:=onlyoffice}'",
