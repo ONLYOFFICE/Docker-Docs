@@ -262,7 +262,7 @@ ENTRYPOINT /var/www/onlyoffice/documentserver-example/docker-entrypoint.sh npm s
 
 FROM alpine:latest AS utils
 LABEL maintainer Ascensio System SIA <support@onlyoffice.com>
-RUN apk add bash postgresql-client curl wget && \
+RUN apk add bash postgresql-client mysql-client curl wget && \
     addgroup --system --gid 101 ds && \
     adduser --system -G ds -h /home/ds --shell /bin/bash --uid 101 ds && \
     mkdir /sql && \
