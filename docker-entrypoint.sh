@@ -97,6 +97,11 @@ export NODE_CONFIG='{
         "maxprocesscount": 0.001
     }  
   }
+  "storage": {
+    "fs": {
+      "secretString": "'${SECURE_LINK_SECRET:-verysecretstring}'"
+    }
+  }
 }'
 
 exec "$@"
