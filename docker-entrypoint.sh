@@ -96,7 +96,7 @@ export NODE_CONFIG='{
     "converter": {
         "maxprocesscount": 0.001
     }  
-  }
+  },
   "storage": {
     "fs": {
       "secretString": "'${SECURE_LINK_SECRET:-verysecretstring}'"
