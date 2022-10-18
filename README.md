@@ -136,7 +136,7 @@ Below is the complete list of parameters for `onlyoffice/docs-docservice`, `only
 - **AMQP_VHOST**: The virtual host for the connection to AMQP server. Default to `/`.
 - **REDIS_SERVER_HOST**: The IP address or the name of the host where the Redis server is running.
 - **REDIS_SERVER_PORT**:  The Redis server port number. Default to `6379`.
-- **JWT_ENABLED**: Specifies the enabling the JSON Web Token validation by the ONLYOFFICE Docs. Common for inbox and outbox requests. Defaults to `false`.
+- **JWT_ENABLED**: Specifies the enabling the JSON Web Token validation by the ONLYOFFICE Docs. Common for inbox and outbox requests. Defaults to `true`.
 - **JWT_ENABLED_INBOX**: Specifies the enabling the JSON Web Token validation by the ONLYOFFICE Docs only for inbox requests. Default, the value of the variable `JWT_ENABLED` is used.
 - **JWT_ENABLED_OUTBOX**: Specifies the enabling the JSON Web Token validation by the ONLYOFFICE Docs only for outbox requests. Default, the value of the variable `JWT_ENABLED` is used.
 - **JWT_SECRET**: Defines the secret key to validate the JSON Web Token in the request to the ONLYOFFICE Docs. Common for inbox and outbox requests. Defaults to `secret`.
