@@ -21,7 +21,8 @@ services:
       context: .
       target: docservice
     image: ${ACCOUNT_NAME}/${PREFIX_NAME}-docservice${PRODUCT_EDITION}:${DOCKER_TAG}
-    container_name: docservice
+    deploy:
+      replicas: 1
     environment:
       - DB_HOST=postgresql
       - DB_NAME=mydb
@@ -49,7 +50,8 @@ services:
       context: .
       target: converter
     image: ${ACCOUNT_NAME}/${PREFIX_NAME}-converter${PRODUCT_EDITION}:${DOCKER_TAG}
-    container_name: converter
+    deploy:
+      replicas: 2
     environment:
       - DB_HOST=postgresql
       - DB_NAME=mydb

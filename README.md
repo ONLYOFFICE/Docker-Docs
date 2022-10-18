@@ -101,6 +101,22 @@ To stop ONLYOFFICE Docs, type:
 docker-compose down
 ```
 
+#### Services scaling
+
+Converter and docservice can be scaled by changing the [replicas](https://github.com/ONLYOFFICE/Docker-Docs/blob/feature/scale-capability/docker-compose.yml#L25) parameter in the compose file. 
+
+You can also set the number of replicas manualy when you deploy services with compose, for example:
+
+```
+docker compose up -d --scale docservice=3
+```
+
+NOTE: If you wanna scale your container on runtime it is necessary to deploy services through docker swarm. After that you can scale in runtime, for example:
+
+```
+docker service scale <deploy_name>_docservice=2
+```
+
 #### Available сonfiguration parameters
 
 ONLYOFFICE Docs consists of set of images:
