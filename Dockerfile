@@ -56,7 +56,7 @@ RUN yum -y updateinfo && \
     yum clean all && \
     rm -f /var/log/*log
 COPY --chown=ds:ds config/nginx/nginx.conf /etc/nginx/nginx.conf
-COPY --chown=ds:ds proxy-docker-entrypoint.sh /usr/local/bin/
+COPY --chown=ds:ds proxy-docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 COPY --chown=ds:ds --chmod=644 --from=ds-service \
     /etc/$COMPANY_NAME/documentserver/nginx/ds.conf \
     /etc/nginx/conf.d/
@@ -118,7 +118,7 @@ RUN sed 's|\(application\/zip.*\)|\1\n    application\/wasm wasm;|' \
         -exec sh -c 'gzip -cf9 $0 > $0.gz && chown ds:ds $0.gz' {} \;
 VOLUME /var/lib/$COMPANY_NAME
 USER ds
-ENTRYPOINT proxy-docker-entrypoint.sh
+ENTRYPOINT docker-entrypoint.sh
 
 FROM ds-base AS docservice
 EXPOSE 8000
