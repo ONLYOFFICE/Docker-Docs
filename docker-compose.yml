@@ -32,6 +32,9 @@ services:
       - METRICS_HOST=metrics
       - METRICS_ENABLED=true
       - WOPI_ENABLED=false
+      - JWT_ENABLED=true
+      - JWT_HEADER=Authorization
+      - JWT_SECRET=secret
     depends_on:
       - proxy
       - postgresql
@@ -60,6 +63,9 @@ services:
       - AMQP_HOST=rabbitmq
       - METRICS_HOST=metrics
       - METRICS_ENABLED=true
+      - JWT_ENABLED=true
+      - JWT_HEADER=Authorization
+      - JWT_SECRET=secret
     depends_on:
       - proxy
       - postgresql
@@ -84,7 +90,9 @@ services:
     image: ${COMPANY_NAME}/${PREFIX_NAME}-example:${DOCKER_TAG}
     container_name: example
     environment:
-      - JWT_ENABLED=false
+      - JWT_ENABLED=true
+      - JWT_HEADER=Authorization
+      - JWT_SECRET=secret
       # Uncomment the line below and enter your ONLYOFFICE Docs address
       # - DS_URL=http://onlyoffice-docs-address/
     depends_on:

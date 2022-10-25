@@ -46,7 +46,7 @@ export NODE_CONFIG='{
       },
       "token": {
         "enable": {
-          "browser": '${JWT_ENABLED:=false}',
+          "browser": '${JWT_ENABLED:=true}',
           "request": {
             "inbox": '${JWT_ENABLED_INBOX:-${JWT_ENABLED}}',
             "outbox": '${JWT_ENABLED_OUTBOX:-${JWT_ENABLED}}'
