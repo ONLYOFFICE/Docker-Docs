@@ -56,6 +56,7 @@ RUN yum -y updateinfo && \
     yum clean all && \
     rm -f /var/log/*log
 COPY --chown=ds:ds config/nginx/nginx.conf /etc/nginx/nginx.conf
+COPY --chown=ds:ds proxy-docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 COPY --chown=ds:ds --chmod=644 --from=ds-service \
     /etc/$COMPANY_NAME/documentserver/nginx/ds.conf \
     /etc/nginx/conf.d/
@@ -117,21 +118,7 @@ RUN sed 's|\(application\/zip.*\)|\1\n    application\/wasm wasm;|' \
         -exec sh -c 'gzip -cf9 $0 > $0.gz && chown ds:ds $0.gz' {} \;
 VOLUME /var/lib/$COMPANY_NAME
 USER ds
-ENTRYPOINT \
-    if ! [ -d /tmp/proxy_nginx ]; then \
-        mkdir /tmp/proxy_nginx; \
-    fi && \
-    cp -r /etc/nginx/* /tmp/proxy_nginx/ && \
-    sed 's|\(worker_connections\) [[:digit:]]*;|\1 '$NGINX_WORKER_CONNECTIONS';|g' \
-        -i /tmp/proxy_nginx/nginx.conf && \
-    if [ $NGINX_ACCESS_LOG != "off" ]; then \
-        sed 's|#*\(\s*access_log\).*;|\1 /var/log/nginx/access.log '$NGINX_ACCESS_LOG';|g' \
-            -i /tmp/proxy_nginx/nginx.conf; \
-    fi && \
-    envsubst < /tmp/proxy_nginx/includes/http-upstream.conf > /tmp/http-upstream.conf && \
-    envsubst < /etc/nginx/includes/ds-common.conf | tee /tmp/proxy_nginx/includes/ds-common.conf > /dev/null && \
-    sed "s,\(set \+\$secure_link_secret\).*,\1 "${SECURE_LINK_SECRET:-verysecretstring}";," -i /tmp/proxy_nginx/conf.d/ds.conf && \
-    exec nginx -c /tmp/proxy_nginx/nginx.conf -g 'daemon off;'
+ENTRYPOINT docker-entrypoint.sh
 
 FROM ds-base AS docservice
 EXPOSE 8000
