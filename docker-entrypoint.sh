@@ -42,7 +42,12 @@ export NODE_CONFIG='{
       },
       "redis": {
         "host": "'${REDIS_SERVER_HOST:-${REDIST_SERVER_HOST:-localhost}}'",
-        "port": '${REDIS_SERVER_PORT:-${REDIST_SERVER_PORT:-6379}}'
+        "port": '${REDIS_SERVER_PORT:-${REDIST_SERVER_PORT:-6379}}',
+        "options": {
+          "user": "'${REDIS_SERVER_USER:=onlyoffice}'",
+          "password": "'${REDIS_SERVER_PWD:=onlyoffice}'",
+          "db": "'${REDIS_SERVER_DB_NUM:=0}'"
+        }
       },
       "token": {
         "enable": {
