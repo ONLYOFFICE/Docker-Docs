@@ -1,6 +1,23 @@
 #!/usr/bin/env bash
 set -e
 
+PLUGINS_DIR=/var/www/$COMPANY_NAME/documentserver/sdkjs-plugins/
+DEFAULT_PLUGINS=(marketplace photoeditor speech macros highlightcode ocr mendeley thesaurus translator zotero youtube)
+if [[ -n "$DEFAULT_PLUGINS_REMOVE" ]]; then
+  if [ -d "$PLUGINS_DIR" ]; then
+    declare -a PLUGINS_REMOVE=($DEFAULT_PLUGINS_REMOVE)
+    if [[ "${PLUGINS_REMOVE[@]}" =~ "allPlugins" ]]; then
+      for defaultplugin in "${DEFAULT_PLUGINS[@]}"; do
+        rm -rf $PLUGINS_DIR$defaultplugin
+      done
+    else
+      for plugin in "${PLUGINS_REMOVE[@]}"; do
+        rm -rf $PLUGINS_DIR$plugin
+      done
+    fi
+  fi
+fi
+
 if ! [ -d /tmp/proxy_nginx ]; then
   mkdir /tmp/proxy_nginx
 fi

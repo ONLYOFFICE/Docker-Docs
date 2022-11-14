@@ -137,6 +137,9 @@ Below is the complete list of parameters for `onlyoffice/docs-proxy`.
 - **SECURE_LINK_SECRET**: Defines secret for the nginx config directive [secure_link_md5](http://nginx.org/ru/docs/http/ngx_http_secure_link_module.html#secure_link_md5). Defaults to `verysecretstring`.
 - **INFO_ALLOWED_IP**: Defines ip addresses for accessing the info page. You can specify multiple values separated by a space.
 
+Below is the complete list of parameters for `onlyoffice/docs-proxy`, `onlyoffice/docs-docservice`.
+- **DEFAULT_PLUGINS_REMOVE**: Defines the default [plugins](https://helpcenter.onlyoffice.com/onlyoffice-editors/onlyoffice-document-editor/ProgramInterface/PluginsTab.aspx) that need to be removed. You can specify multiple values separated by a space, or if you need to remove all default plugins, you can pass `allPlugins` as the value.
+
 Below is the complete list of parameters for `onlyoffice/docs-docservice`, `onlyoffice/docs-converter`.
 - **DB_TYPE**: The database type. Supported values are `postgres`, `mariadb` or `mysql`. Defaults to `postgres`.
 - **DB_HOST**: The IP address or the name of the host where the PostgreSQL server is running.
