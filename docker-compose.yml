@@ -4,6 +4,7 @@ services:
     container_name: proxy
     build:
       context: .
+      dockerfile: "${DOCKERFILE}"
       target: proxy
     image: ${ACCOUNT_NAME}/${PREFIX_NAME}-proxy${PRODUCT_EDITION}:${DOCKER_TAG}
     environment:
@@ -19,6 +20,7 @@ services:
   docservice:
     build:
       context: .
+      dockerfile: "${DOCKERFILE}"
       target: docservice
     image: ${ACCOUNT_NAME}/${PREFIX_NAME}-docservice${PRODUCT_EDITION}:${DOCKER_TAG}
     deploy:
@@ -51,6 +53,7 @@ services:
   converter:
     build:
       context: .
+      dockerfile: "${DOCKERFILE}"
       target: converter
     image: ${ACCOUNT_NAME}/${PREFIX_NAME}-converter${PRODUCT_EDITION}:${DOCKER_TAG}
     deploy:
@@ -80,6 +83,7 @@ services:
   metrics:
     build:
       context: .
+      dockerfile: "${DOCKERFILE}"
       target: metrics
     container_name: metrics
     expose:
@@ -120,6 +124,7 @@ services:
     container_name: postgresql
     build:
       context: .
+      dockerfile: "${DOCKERFILE}"
       target: db
     environment:
       - POSTGRES_DB=mydb
