@@ -65,6 +65,8 @@ Possible values:
   - `-de`. For commercial Developer Edition,
   - `-ee`. For commercial Enterprise Edition.
 
+If you want to build images that do not have default plugins, then change the value of the `DOCKERFILE` variable to `Dockerfile.noplugins` in the `.env` file.
+
 #### 2. Run the build
 
 To start the build, run the following command:
