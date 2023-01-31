@@ -252,6 +252,11 @@ ENTRYPOINT /var/www/onlyoffice/documentserver-example/docker-entrypoint.sh npm s
 FROM alpine:latest AS utils
 LABEL maintainer Ascensio System SIA <support@onlyoffice.com>
 RUN apk add bash postgresql-client mysql-client curl wget && \
+    curl -LO \
+      https://storage.googleapis.com/kubernetes-release/release/`curl \
+      -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl && \
+    chmod +x ./kubectl && \
+    mv ./kubectl /usr/local/bin/kubectl && \
     addgroup --system --gid 101 ds && \
     adduser --system -G ds -h /home/ds --shell /bin/bash --uid 101 ds && \
     mkdir /sql && \
