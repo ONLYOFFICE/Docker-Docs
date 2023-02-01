@@ -259,8 +259,8 @@ RUN apk add bash postgresql-client mysql-client curl wget && \
     mv ./kubectl /usr/local/bin/kubectl && \
     addgroup --system --gid 101 ds && \
     adduser --system -G ds -h /home/ds --shell /bin/bash --uid 101 ds && \
-    mkdir /sql && \
-    chown -R ds:ds /sql
+    mkdir /scripts && \
+    chown -R ds:ds /scripts
 USER ds
 
 FROM statsd/statsd AS metrics
