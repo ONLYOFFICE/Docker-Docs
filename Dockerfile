@@ -18,7 +18,8 @@ RUN yum install sudo -y && \
 FROM ds-base AS ds-service
 ARG TARGETARCH
 ARG PRODUCT_EDITION=
-ARG PRODUCT_URL=https://download.onlyoffice.com/install/documentserver/linux/onlyoffice-documentserver$PRODUCT_EDITION.$TARGETARCH.rpm
+ARG RELEASE_VERSION
+ARG PRODUCT_URL=https://download.onlyoffice.com/install/documentserver/linux/onlyoffice-documentserver$PRODUCT_EDITION$RELEASE_VERSION.$TARGETARCH.rpm
 ENV TARGETARCH=$TARGETARCH
 RUN useradd --no-create-home --shell /sbin/nologin nginx && \
     yum -y updateinfo && \
