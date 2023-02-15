@@ -65,6 +65,8 @@ Possible values:
   - `-de`. For commercial Developer Edition,
   - `-ee`. For commercial Enterprise Edition.
 
+If you want to use a ONLYOFFICE Docs version other than the latest one, specify the version you need in the `RELEASE_VERSION` variable. If no value is defined, the latest up-to-date version will be used.
+
 #### 2. Run the build
 
 To start the build, run the following command:
