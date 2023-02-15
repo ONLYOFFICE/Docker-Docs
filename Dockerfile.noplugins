@@ -18,7 +18,8 @@ RUN yum install sudo -y && \
 FROM ds-base AS ds-service
 ARG TARGETARCH
 ARG PRODUCT_EDITION=
-ARG PRODUCT_URL=http://download.onlyoffice.com/install/documentserver/linux/onlyoffice-documentserver$PRODUCT_EDITION.$TARGETARCH.rpm
+ARG RELEASE_VERSION
+ARG PRODUCT_URL=https://download.onlyoffice.com/install/documentserver/linux/onlyoffice-documentserver$PRODUCT_EDITION$RELEASE_VERSION.$TARGETARCH.rpm
 ENV TARGETARCH=$TARGETARCH
 RUN useradd --no-create-home --shell /sbin/nologin nginx && \
     yum -y updateinfo && \
@@ -186,8 +187,7 @@ COPY --from=ds-service \
     /usr/lib64/libDjVuFile.so \
     /usr/lib64/libEpubFile.so \
     /usr/lib64/libFb2File.so \
-    /usr/lib64/libPdfReader.so \
-    /usr/lib64/libPdfWriter.so \
+    /usr/lib64/libPdfFile.so \
     /usr/lib64/libHtmlFile2.so \
     /usr/lib64/libHtmlRenderer.so \
     /usr/lib64/libUnicodeConverter.so \
@@ -247,10 +247,15 @@ ENTRYPOINT /var/www/onlyoffice/documentserver-example/docker-entrypoint.sh npm s
 FROM alpine:latest AS utils
 LABEL maintainer Ascensio System SIA <support@onlyoffice.com>
 RUN apk add bash postgresql-client mysql-client curl wget && \
+    curl -LO \
+      https://storage.googleapis.com/kubernetes-release/release/`curl \
+      -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl && \
+    chmod +x ./kubectl && \
+    mv ./kubectl /usr/local/bin/kubectl && \
     addgroup --system --gid 101 ds && \
     adduser --system -G ds -h /home/ds --shell /bin/bash --uid 101 ds && \
-    mkdir /sql && \
-    chown -R ds:ds /sql
+    mkdir /scripts && \
+    chown -R ds:ds /scripts
 USER ds
 
 FROM statsd/statsd AS metrics
