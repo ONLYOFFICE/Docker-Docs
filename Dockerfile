@@ -21,12 +21,16 @@ ARG PRODUCT_EDITION=
 ARG RELEASE_VERSION
 ARG PRODUCT_URL=https://download.onlyoffice.com/install/documentserver/linux/onlyoffice-documentserver$PRODUCT_EDITION$RELEASE_VERSION.$TARGETARCH.rpm
 ENV TARGETARCH=$TARGETARCH
+WORKDIR /ds
 RUN useradd --no-create-home --shell /sbin/nologin nginx && \
     yum -y updateinfo && \
-    yum -y install cabextract fontconfig xorg-x11-font-utils xorg-x11-server-utils && \
+    yum -y install cabextract fontconfig xorg-x11-font-utils xorg-x11-server-utils wget rpm2cpio && \
     rpm -i https://downloads.sourceforge.net/project/mscorefonts2/rpms/msttcore-fonts-installer-2.6-1.noarch.rpm && \
     PRODUCT_URL=$(echo $PRODUCT_URL | sed "s/"$TARGETARCH"/"$(uname -m)"/g") && \
-    rpm -ivh $PRODUCT_URL --noscripts --nodeps && \
+    PACKAGE_NAME=$(echo $PRODUCT_URL | sed 's|.*/||') && \
+    wget $PRODUCT_URL && \
+    rpm -ivh $PACKAGE_NAME --noscripts --nodeps && \
+    rpm2cpio $PACKAGE_NAME | cpio -idmv ./usr/lib64/* && \
     mkdir -p /var/www/$COMPANY_NAME/documentserver/core-fonts/msttcore && \
     cp -vt \
         /var/www/$COMPANY_NAME/documentserver/core-fonts/msttcore \
@@ -183,21 +187,7 @@ COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/document-templates/new \
     /var/www/$COMPANY_NAME/documentserver/document-templates/new
 COPY --from=ds-service \
-    /usr/lib64/libgraphics.so \
-    /usr/lib64/libdoctrenderer.so \
-    /usr/lib64/libkernel.so \
-    /usr/lib64/libkernel_network.so \
-    /usr/lib64/libicudata.so.58 \
-    /usr/lib64/libicuuc.so.58 \
-    /usr/lib64/libDjVuFile.so \
-    /usr/lib64/libEpubFile.so \
-    /usr/lib64/libFb2File.so \
-    /usr/lib64/libPdfFile.so \
-    /usr/lib64/libHtmlFile2.so \
-    /usr/lib64/libHtmlRenderer.so \
-    /usr/lib64/libUnicodeConverter.so \
-    /usr/lib64/libXpsFile.so \
-    /usr/lib64/libDocxRenderer.so \
+    /ds/usr/lib64/* \
     /usr/lib64/
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN mkdir -p \
