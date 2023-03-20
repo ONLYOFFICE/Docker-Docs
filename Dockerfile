@@ -27,7 +27,7 @@ RUN useradd --no-create-home --shell /sbin/nologin nginx && \
     yum -y install cabextract fontconfig xorg-x11-font-utils xorg-x11-server-utils wget rpm2cpio && \
     rpm -i https://downloads.sourceforge.net/project/mscorefonts2/rpms/msttcore-fonts-installer-2.6-1.noarch.rpm && \
     PRODUCT_URL=$(echo $PRODUCT_URL | sed "s/"$TARGETARCH"/"$(uname -m)"/g") && \
-    PACKAGE_NAME=$(echo $PRODUCT_URL | sed 's|.*/||') && \
+    PACKAGE_NAME=$(basename "$PRODUCT_URL") && \
     wget $PRODUCT_URL && \
     rpm -ivh $PACKAGE_NAME --noscripts --nodeps && \
     rpm2cpio $PACKAGE_NAME | cpio -idmv ./usr/lib64/* && \
