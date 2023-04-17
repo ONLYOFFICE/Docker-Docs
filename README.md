@@ -172,7 +172,7 @@ Below is the complete list of parameters for `onlyoffice/docs-docservice`, `only
 - **JWT_IN_BODY**: Specifies the enabling the token validation in the request body to the ONLYOFFICE Docs. Defaults to `false`.
 - **LOG_LEVEL**: Defines the type and severity of a logged event. Default to `WARN`. Possible values are `ALL`, `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, `FATAL`, `MARK`, `OFF`.
 - **LOG_TYPE**: Defines the format of a logged event. Default to `pattern`. Possible values are `pattern`, `json`, `basic`, `coloured`, `messagePassThrough`, `dummy`.
-- **LOG_PATTERN**: Defines the log [pattern](https://github.com/log4js-node/log4js-node/blob/master/docs/layouts.md#pattern-format) if `LOG_TYPE=pattern`. Default to `[%d] [%p] %c - %.10000m`.
+- **LOG_PATTERN**: Defines the log [pattern](https://github.com/log4js-node/log4js-node/blob/master/docs/layouts.md#pattern-format) if `LOG_TYPE=pattern`. Default to `[%d] [%p] [%X{DOCID}] [%X{USERID}] %c - %.10000m`.
 - **METRICS_ENABLED**: Specifies the enabling StatsD for ONLYOFFICE Docs. Defaults to `false`.
 - **METRICS_HOST**: Defines StatsD listening host. Defaults to `localhost`.
 - **METRICS_PORT**: Defines StatsD listening port. Defaults to `8125`.
