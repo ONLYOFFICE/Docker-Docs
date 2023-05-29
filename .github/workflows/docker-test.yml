@@ -1,7 +1,6 @@
 run-name: "Scheduled tests Docker-Docs"
 
 on:
-  push:
   pull_request:
     types: [opened, reopened, synchronize]
     paths-ignore:
@@ -13,6 +12,7 @@ jobs:
   start_test_files:
     name: "${{ matrix.name }}"
     runs-on: ubuntu-latest
+    if: ${{ github.base_ref }}
     strategy:
       fail-fast: false
       matrix:
@@ -218,7 +218,6 @@ jobs:
 
       - name: "${{ matrix.name }}"
         run: |
-            chmod +x ./tests/test.sh
             export PRODUCT_EDITION=""
             export RELEASE_VERSION=""
             for v in ${{ matrix.variables }}; do
