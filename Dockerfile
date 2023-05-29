@@ -1,3 +1,7 @@
+ARG POSTGRES_VERSION="latest"
+ARG MYSQL_VERSION="latest"
+ARG MARIADB_VERSION="latest"
+
 FROM amazonlinux:2 AS ds-base
 
 LABEL maintainer Ascensio System SIA <support@onlyoffice.com>
@@ -6,6 +10,7 @@ ARG COMPANY_NAME=onlyoffice
 ENV COMPANY_NAME=$COMPANY_NAME \
     NODE_ENV=production-linux \
     NODE_CONFIG_DIR=/etc/$COMPANY_NAME/documentserver
+
 
 RUN yum install sudo -y && \
     yum install shadow-utils -y && \
@@ -47,9 +52,7 @@ COPY --chown=ds:ds \
 COPY --chown=ds:ds \
     plugins/ \
     /var/www/$COMPANY_NAME/documentserver/sdkjs-plugins/
-RUN documentserver-generate-allfonts.sh true && \
-    documentserver-pluginsmanager.sh -r false \
-    --update=\"/var/www/$COMPANY_NAME/documentserver/sdkjs-plugins/plugin-list-default.json\"
+RUN documentserver-generate-allfonts.sh true
 
 FROM ds-base AS proxy
 ENV DOCSERVICE_HOST_PORT=localhost:8000 \
@@ -259,6 +262,14 @@ FROM statsd/statsd AS metrics
 ARG COMPANY_NAME=onlyoffice
 COPY --from=ds-service /var/www/$COMPANY_NAME/documentserver/server/Metrics/config/config.js /usr/src/app/config.js
 
-FROM postgres:9.5 AS db
+FROM postgres:$POSTGRES_VERSION AS db
 ARG COMPANY_NAME=onlyoffice
 COPY --from=ds-service /var/www/$COMPANY_NAME/documentserver/server/schema/postgresql/createdb.sql /docker-entrypoint-initdb.d/
+
+FROM mysql:$MYSQL_VERSION AS mysqldb
+ARG COMPANY_NAME=onlyoffice
+COPY --chown=ds:ds --chmod=777 --from=ds-service /var/www/$COMPANY_NAME/documentserver/server/schema/mysql/createdb.sql /docker-entrypoint-initdb.d/
+
+FROM mariadb:$MARIADB_VERSION AS db-mariadb
+ARG COMPANY_NAME=onlyoffice
+COPY --from=ds-service /var/www/$COMPANY_NAME/documentserver/server/schema/mysql/createdb.sql /docker-entrypoint-initdb.d/

@@ -1,0 +1,229 @@
+run-name: "Scheduled tests Docker-Docs"
+
+on:
+  push:
+  pull_request:
+    types: [opened, reopened, synchronize]
+    paths-ignore:
+      - '.github/**'
+      - '**'
+      - '**/README.md'
+
+jobs:
+  start_test_files:
+    name: "${{ matrix.name }}"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - compose_file: 
+              "postgres.yml
+               rabbitmq.yml
+               services.yml"
+            variables: "POSTGRES_VERSION=9.5"
+            name: "Test with PostgreSQL 9.5 and Rabbitmq"            
+
+          - compose_file: 
+              "postgres.yml
+               rabbitmq.yml
+               services.yml"
+            variables: "POSTGRES_VERSION=10"
+            name: "Test with PostgreSQL 10 and Rabbitmq"
+
+          - compose_file: 
+              "postgres.yml
+               rabbitmq.yml
+               services.yml"
+            variables: "POSTGRES_VERSION=11"
+            name: "Test with PostgreSQL 11 and Rabbitmq"
+          
+          - compose_file: 
+              "postgres.yml
+               rabbitmq.yml
+               services.yml"
+            variables: "POSTGRES_VERSION=13"
+            name: "Test with PostgreSQL 13 and Rabbitmq"
+
+          - compose_file: 
+              "postgres.yml
+               activemq.yml
+               services.yml"
+            variables: "
+                ACTIVEMQ_VERSION=5.14.3
+                AMQP_TYPE=activemq
+                AMQP_HOST=activemq"
+            name: "Test with Activemq 5.14.3 and PostgreSQL"
+
+          - compose_file: 
+              "postgres.yml
+               activemq.yml
+               services.yml"
+            variables: "
+                ACTIVEMQ_VERSION=latest
+                AMQP_TYPE=activemq
+                AMQP_HOST=activemq"
+            name: "Test with Activemq latest and PostgreSQL"
+
+          - compose_file: 
+              "postgres.yml
+               rabbitmq.yml
+               services.yml"
+            variables: "RABBITMQ_VERSION=3"
+            name: "Test with Rabbitmq 3 and PostgreSQL"
+
+          - compose_file: 
+              "mysql.yml
+               rabbitmq.yml
+               services.yml"
+            variables: "
+                MYSQL_VERSION=5
+                DB_TYPE=mysql
+                DB_HOST=mysql
+                DB_PORT=3306"
+            name: "Test with MySQL 5 and Rabbitmq"
+
+          - compose_file: 
+              "mysql.yml
+               rabbitmq.yml
+               services.yml"
+            variables: "
+                MYSQL_VERSION=5.7
+                DB_TYPE=mysql
+                DB_HOST=mysql
+                DB_PORT=3306"
+            name: "Test with MySQL 5.7 and Rabbitmq"
+
+          - compose_file: 
+              "mysql.yml
+               rabbitmq.yml
+               services.yml"
+            variables: "
+                MYSQL_VERSION=8
+                DB_TYPE=mysql
+                DB_HOST=mysql
+                DB_PORT=3306"
+            name: "Test with MySQL 8 and Rabbitmq"
+            
+          - compose_file: 
+              "mysql.yml
+               activemq.yml
+               services.yml"
+            variables: "
+                ACTIVEMQ_VERSION=5.14.3
+                DB_TYPE=mysql
+                DB_HOST=mysql
+                DB_PORT=3306
+                AMQP_TYPE=activemq
+                AMQP_HOST=activemq"
+            name: "Test with Activemq 5.14.3 and MySQL"
+
+          - compose_file: 
+              "mysql.yml
+               activemq.yml
+               services.yml"
+            variables: "
+                ACTIVEMQ_VERSION=latest
+                DB_TYPE=mysql
+                DB_HOST=mysql
+                DB_PORT=3306
+                AMQP_TYPE=activemq
+                AMQP_HOST=activemq"
+            name: "Test with Activemq latest and MySQL"
+
+          - compose_file: 
+              "mysql.yml
+               rabbitmq.yml
+               services.yml"
+            variables: "
+                RABBITMQ_VERSION=3
+                DB_TYPE=mysql
+                DB_HOST=mysql
+                DB_PORT=3306"
+            name: "Test with Rabbitmq 3 and MySQL"
+            
+          - compose_file: 
+              "mariadb.yml
+               rabbitmq.yml
+               services.yml"
+            variables: "
+                MARIADB_VERSION=10.5
+                DB_TYPE=mariadb
+                DB_HOST=mariadb
+                DB_PORT=3306"
+            name: "Test with MariaDB 10.5 and Rabbitmq"
+
+          - compose_file: 
+              "mariadb.yml
+               rabbitmq.yml
+               services.yml"
+            variables: "
+                MARIADB_VERSION=10.6
+                DB_TYPE=mariadb
+                DB_HOST=mariadb
+                DB_PORT=3306"
+            name: "Test with MariaDB 10.6 and Rabbitmq"
+
+          - compose_file: 
+              "mariadb.yml
+               rabbitmq.yml
+               services.yml"
+            variables: "
+                MARIADB_VERSION=10.8
+                DB_TYPE=mariadb
+                DB_HOST=mariadb
+                DB_PORT=3306"
+            name: "Test with MariaDB 10.8 and Rabbitmq"
+            
+          - compose_file: 
+              "mariadb.yml
+               activemq.yml
+               services.yml"
+            variables: "
+                ACTIVEMQ_VERSION=5.14.3
+                DB_TYPE=mariadb
+                DB_HOST=mariadb
+                DB_PORT=3306
+                AMQP_TYPE=activemq
+                AMQP_HOST=activemq"
+            name: "Test with Activemq 5.14.3 and MariaDB"
+
+          - compose_file: 
+              "mariadb.yml
+               activemq.yml
+               services.yml"
+            variables: "
+                ACTIVEMQ_VERSION=latest
+                DB_TYPE=mariadb
+                DB_HOST=mariadb
+                DB_PORT=3306
+                AMQP_TYPE=activemq
+                AMQP_HOST=activemq"
+            name: "Test with Activemq latest and MariaDB"
+
+          - compose_file: 
+              "mariadb.yml
+               rabbitmq.yml
+               services.yml"
+            variables: "
+                RABBITMQ_VERSION=3
+                DB_TYPE=mariadb
+                DB_HOST=mariadb
+                DB_PORT=3306"
+            name: "Test with Rabbitmq 3 and MariaDB"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: "${{ matrix.name }}"
+        run: |
+            chmod +x ./tests/test.sh
+            export PRODUCT_EDITION=""
+            export RELEASE_VERSION=""
+            for v in ${{ matrix.variables }}; do
+                export $v
+            done
+            NEW_ARR+=(${{ matrix.compose_file }})
+            export config=${NEW_ARR[@]}
+            ./tests/test.sh

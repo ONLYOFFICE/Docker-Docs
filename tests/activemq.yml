@@ -1,0 +1,11 @@
+version: '3.8'
+services:
+  activemq:
+    container_name: activemq
+    image: webcenter/activemq:${ACTIVEMQ_VERSION:-latest}
+    environment:
+      - ACTIVEMQ_USERS_guest=${ACTIVEMQ_USERS_guest:-guest}
+      - ACTIVEMQ_GROUPS_owners=${ACTIVEMQ_GROUPS_owners:-guest}
+    restart: always
+    expose:
+      - '5672'
