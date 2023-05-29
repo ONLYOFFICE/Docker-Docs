@@ -1,4 +1,4 @@
-ARG POSTGRES_VERSION="latest"
+ARG POSTGRES_VERSION="9.5"
 ARG MYSQL_VERSION="latest"
 ARG MARIADB_VERSION="latest"
 
@@ -268,7 +268,7 @@ COPY --from=ds-service /var/www/$COMPANY_NAME/documentserver/server/schema/postg
 
 FROM mysql:$MYSQL_VERSION AS mysqldb
 ARG COMPANY_NAME=onlyoffice
-COPY --chown=ds:ds --chmod=777 --from=ds-service /var/www/$COMPANY_NAME/documentserver/server/schema/mysql/createdb.sql /docker-entrypoint-initdb.d/
+COPY --chmod=777 --from=ds-service /var/www/$COMPANY_NAME/documentserver/server/schema/mysql/createdb.sql /docker-entrypoint-initdb.d/
 
 FROM mariadb:$MARIADB_VERSION AS db-mariadb
 ARG COMPANY_NAME=onlyoffice

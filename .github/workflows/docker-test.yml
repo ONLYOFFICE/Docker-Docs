@@ -5,14 +5,14 @@ on:
     types: [opened, reopened, synchronize]
     paths-ignore:
       - '.github/**'
-      - '**'
+      - 'tests/**'
       - '**/README.md'
 
 jobs:
   start_test_files:
     name: "${{ matrix.name }}"
     runs-on: ubuntu-latest
-    if: ${{ github.base_ref }}
+    if: ${{ github.base_ref == 'master' }}
     strategy:
       fail-fast: false
       matrix:
