@@ -52,7 +52,9 @@ COPY --chown=ds:ds \
 COPY --chown=ds:ds \
     plugins/ \
     /var/www/$COMPANY_NAME/documentserver/sdkjs-plugins/
-RUN documentserver-generate-allfonts.sh true
+RUN documentserver-generate-allfonts.sh true && \
+    documentserver-pluginsmanager.sh -r false \
+    --update=\"/var/www/$COMPANY_NAME/documentserver/sdkjs-plugins/plugin-list-default.json\"
 
 FROM ds-base AS proxy
 ENV DOCSERVICE_HOST_PORT=localhost:8000 \

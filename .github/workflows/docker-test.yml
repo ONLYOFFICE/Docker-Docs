@@ -10,9 +10,9 @@ on:
 
 jobs:
   start_test_files:
-    name: "${{ matrix.name }}"
     runs-on: ubuntu-latest
     if: ${{ github.base_ref == 'master' }}
+    name: ${{ matrix.name }}
     strategy:
       fail-fast: false
       matrix:
