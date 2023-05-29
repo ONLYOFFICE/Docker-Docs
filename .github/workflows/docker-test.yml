@@ -1,4 +1,6 @@
-run-name: "Scheduled tests Docker-Docs"
+name: "Docker-Docs CI"
+
+run-name: "CI tests Docker-Docs"
 
 on:
   pull_request:
