@@ -30,3 +30,4 @@ else
   echo "Healthcheck failed!"
   exit 1
 fi
+
