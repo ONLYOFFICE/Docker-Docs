@@ -51,7 +51,7 @@ COPY --chown=ds:ds \
 COPY --chown=ds:ds \
     plugins/ \
     /var/www/$COMPANY_NAME/documentserver/sdkjs-plugins/
-RUN documentserver-generate-allfonts.sh true && \
+RUN documentserver-generate-allfonts.sh true
     # documentserver-pluginsmanager.sh -r false \
     # --update=\"/var/www/$COMPANY_NAME/documentserver/sdkjs-plugins/plugin-list-default.json\"
 
