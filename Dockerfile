@@ -1,3 +1,7 @@
+ARG POSTGRES_VERSION="9.5"
+ARG MYSQL_VERSION="latest"
+ARG MARIADB_VERSION="latest"
+
 FROM amazonlinux:2 AS ds-base
 
 LABEL maintainer Ascensio System SIA <support@onlyoffice.com>
@@ -259,6 +263,14 @@ FROM statsd/statsd AS metrics
 ARG COMPANY_NAME=onlyoffice
 COPY --from=ds-service /var/www/$COMPANY_NAME/documentserver/server/Metrics/config/config.js /usr/src/app/config.js
 
-FROM postgres:9.5 AS db
+FROM postgres:$POSTGRES_VERSION AS db
 ARG COMPANY_NAME=onlyoffice
 COPY --from=ds-service /var/www/$COMPANY_NAME/documentserver/server/schema/postgresql/createdb.sql /docker-entrypoint-initdb.d/
+
+FROM mysql:$MYSQL_VERSION AS mysqldb
+ARG COMPANY_NAME=onlyoffice
+COPY --chmod=777 --from=ds-service /var/www/$COMPANY_NAME/documentserver/server/schema/mysql/createdb.sql /docker-entrypoint-initdb.d/
+
+FROM mariadb:$MARIADB_VERSION AS db-mariadb
+ARG COMPANY_NAME=onlyoffice
+COPY --from=ds-service /var/www/$COMPANY_NAME/documentserver/server/schema/mysql/createdb.sql /docker-entrypoint-initdb.d/

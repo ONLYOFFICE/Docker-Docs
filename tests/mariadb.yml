@@ -1,0 +1,24 @@
+version: '3.9'
+services:
+  mariadb:
+    container_name: mariadb
+    build:
+      context: ../.
+      args:
+        MARIADB_VERSION: ${MARIADB_VERSION:-10.5}
+      target: db-mariadb
+    environment:
+      - MARIADB_VERSION=${MARIADB_VERSION:-10.5}
+      - MYSQL_DATABASE=${MYSQL_DATABASE:-onlyoffice}
+      - MYSQL_USER=${MYSQL_USER:-myuser}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-onlyoffice}
+      - MYSQL_ALLOW_EMPTY_PASSWORD=${MYSQL_ALLOW_EMPTY_PASSWORD:-yes}
+    restart: always
+    volumes:
+      - mysql_data:/var/lib/mysql
+    expose:
+      - '3306' 
+
+volumes:
+  mysql_data:
+

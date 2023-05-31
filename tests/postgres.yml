@@ -1,0 +1,23 @@
+version: '3.8'
+services:
+  postgresql:
+    container_name: postgresql
+    build:
+      context: ../.
+      args:
+        POSTGRES_VERSION: ${POSTGRES_VERSION:-9.5}
+      target: db
+    environment:
+      - POSTGRES_VERSION=${POSTGRES_VERSION:-9.5}
+      - POSTGRES_DB=${POSTGRES_DB:-onlyoffice}
+      - POSTGRES_USER=myuser
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    restart: always
+    expose:
+      - '5432'
+    volumes:
+      - postgresql_data:/var/lib/postgresql
+
+volumes:
+  postgresql_data:
+
