@@ -12,7 +12,7 @@ on:
 
 jobs:
   start_test_files:
-    name: Docker-docs ci tests
+    name: Docker-Docs ci tests
     runs-on: ubuntu-latest
     if: ${{ github.base_ref == 'master' }}
     strategy:
