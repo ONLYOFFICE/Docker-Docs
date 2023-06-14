@@ -76,6 +76,12 @@ export NODE_CONFIG='{
         "session": {
           "string": "'${JWT_SECRET}'"
         }        
+      },
+      "request-filtering-agent" : {
+        "allowPrivateIPAddress": '${ALLOW_PRIVATE_IP_ADDRESS:-false}',
+        "allowMetaIPAddress": '${ALLOW_META_IP_ADDRESS:-false}',
+        "allowIPAddressList": '${ALLOW_IP_ADDRESS_LIST:-[]}',
+        "denyIPAddressList": '${DENY_IP_ADDRESS_LIST:-[]}'
       }
     }
   },

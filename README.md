@@ -175,6 +175,10 @@ Below is the complete list of parameters for `onlyoffice/docs-docservice`, `only
 - **METRICS_HOST**: Defines StatsD listening host. Defaults to `localhost`.
 - **METRICS_PORT**: Defines StatsD listening port. Defaults to `8125`.
 - **METRICS_PREFIX**: Defines StatsD metrics prefix for backend services. Defaults to `ds.`.
+- **ALLOW_PRIVATE_IP_ADDRESS**: Defines if it is allowed to connect private IP address or not. Defaults to `false`.
+- **ALLOW_META_IP_ADDRESS**: Defines if it is allowed to connect meta address or not. Defaults to `false`.
+- **ALLOW_IP_ADDRESS_LIST**: Defines the list of IP addresses allowed to connect. This values are preferred than denyAddressList. Defaults to `[]`.
+- **DENY_IP_ADDRESS_LIST**: Defines the list of IP addresses deny to connect. Defaults to `[]`.
 
 Below is the complete list of parameters for `onlyoffice/docs-example`.
 - **DS_URL**: Specifies ONLYOFFICE Docs server address. Defaults to `/`. You have specyfing this field to correct work ONLYOFFICE Docs Example. Example `http://onlyoffice-docs-address/`.
