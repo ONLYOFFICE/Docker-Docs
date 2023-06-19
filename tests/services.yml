@@ -8,7 +8,6 @@ services:
     image: onlyoffice/docs-proxy${PRODUCT_EDITION}:latest
     environment:
       - DOCSERVICE_HOST_PORT=docservice:8000
-      - EXAMPLE_HOST_PORT=example:3000
     stdin_open: true
     restart: always
     ports:
