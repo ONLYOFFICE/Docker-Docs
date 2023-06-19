@@ -8,7 +8,6 @@ services:
     image: onlyoffice/docs-proxy${PRODUCT_EDITION}:latest
     environment:
       - DOCSERVICE_HOST_PORT=docservice:8000
-      - EXAMPLE_HOST_PORT=example:3000
     stdin_open: true
     restart: always
     ports:
@@ -87,22 +86,6 @@ services:
     expose:
       - '8125'
       - '8126'
-
-  example:
-    image: onlyoffice/docs-example:latest
-    container_name: example
-    environment:
-      - JWT_ENABLED=true
-      - JWT_HEADER=Authorization
-      - JWT_SECRET=secret
-      # Uncomment the line below and enter your ONLYOFFICE Docs address
-      # - DS_URL=http://onlyoffice-docs-address/
-    depends_on:
-      - proxy
-    stdin_open: true
-    restart: always
-    expose:
-      - '3000'
 
   redis:
     container_name: redis
