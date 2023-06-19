@@ -1,0 +1,99 @@
+version: '3.8'
+services:
+  proxy:
+    container_name: proxy
+    build:
+      context: ../.
+      target: proxy
+    image: onlyoffice/docs-proxy${PRODUCT_EDITION}:latest
+    environment:
+      - DOCSERVICE_HOST_PORT=docservice:8000
+    stdin_open: true
+    restart: always
+    ports:
+      - '80:8888'
+    volumes:
+      - common_data:/var/lib/onlyoffice 
+       
+  docservice:
+    build:
+      context: ../.
+      target: docservice
+    image: onlyoffice/docs-docservice${PRODUCT_EDITION}:latest
+    deploy:
+      replicas: 1
+    environment:
+      - DB_HOST=${DB_HOST:-postgresql}
+      - DB_TYPE=${DB_TYPE:-postgres}
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_NAME=onlyoffice
+      - DB_USER=myuser
+      - REDIST_SERVER_HOST=redis
+      - AMQP_HOST=${AMQP_HOST:-rabbitmq}
+      - AMQP_TYPE=${AMQP_TYPE:-rabbitmq}
+      - METRICS_HOST=metrics
+      - METRICS_ENABLED=true
+      - WOPI_ENABLED=false
+      - JWT_ENABLED=true
+      - JWT_HEADER=Authorization
+      - JWT_SECRET=secret
+    depends_on:
+      - proxy
+      - redis
+      - metrics
+    stdin_open: true
+    restart: always
+    expose:
+      - '8000'
+    volumes:
+     - common_data:/var/lib/onlyoffice
+
+  converter:
+    build:
+      context: ../.
+      target: converter
+    image: onlyoffice/docs-converter${PRODUCT_EDITION}:latest
+    deploy:
+      replicas: 2
+    environment:
+      - DB_HOST=${DB_HOST:-postgresql}
+      - DB_TYPE=${DB_TYPE:-postgres}
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_NAME=onlyoffice
+      - DB_USER=myuser
+      - REDIST_SERVER_HOST=redis
+      - AMQP_HOST=${AMQP_HOST:-rabbitmq}
+      - AMQP_TYPE=${AMQP_TYPE:-rabbitmq}
+      - METRICS_HOST=metrics
+      - METRICS_ENABLED=true
+      - JWT_ENABLED=true
+      - JWT_HEADER=Authorization
+      - JWT_SECRET=secret
+    depends_on:
+      - proxy
+      - redis
+      - metrics
+    stdin_open: true
+    restart: always
+    volumes:
+     - common_data:/var/lib/onlyoffice
+
+  metrics:
+    build:
+      context: ../.
+      target: metrics
+    container_name: metrics
+    expose:
+      - '8125'
+      - '8126'
+
+  redis:
+    container_name: redis
+    image: redis:${REDIS_VERSION:-latest}
+    restart: always
+    expose:
+      - '6379'
+
+volumes: 
+  common_data:
+

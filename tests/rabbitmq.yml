@@ -1,0 +1,8 @@
+version: '3.8'
+services:
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:${RABBITMQ_VERSION:-latest}
+    restart: always
+    expose:
+      - '5672'
