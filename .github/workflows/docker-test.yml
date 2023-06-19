@@ -9,12 +9,15 @@ on:
       - '.github/**'
       - 'tests/**'
       - '**/README.md'
+  push:
+    branches: 
+      - 'feature/ci-remove-example'
 
 jobs:
   start_test_files:
     name: ${{ matrix.name }}
     runs-on: ubuntu-latest
-    if: ${{ github.base_ref == 'master' }}
+    #if: ${{ github.base_ref == 'master' }}
     strategy:
       fail-fast: false
       matrix:
