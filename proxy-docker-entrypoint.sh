@@ -16,7 +16,7 @@ if [[ ! -f "/proc/net/if_inet6" ]]; then
   sed '/listen\s\+\[::[0-9]*\].\+/d' -i /tmp/proxy_nginx/conf.d/ds.conf
 fi
 if [[ $DS_PREFIX -ne "/" ]]; then
-sed 's|<a href="/example/">|<a href="'$DS_PREFIX'/example/"|g' -i /var/www/onlyoffice/documentserver-example/welcome/k8s.html
+  sed 's|<a href="/example/">|<a href="'$DS_PREFIX'/example/">|g' -i /var/www/onlyoffice/documentserver-example/welcome/k8s.html
 fi
 if [[ -n "$INFO_ALLOWED_IP" ]]; then
   declare -a IP_ALL=($INFO_ALLOWED_IP)
