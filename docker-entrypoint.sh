@@ -23,6 +23,12 @@ case $AMQP_PROTO in
     ;;
 esac
 
+if [[ "${REDIS_SENTINEL}" == 'true' ]]; then
+  REDIS_NAME="ioredis"
+else
+  REDIS_NAME="redis"
+fi
+
 export NODE_CONFIG='{
   "statsd": {
     "useMetrics": '${METRICS_ENABLED:-false}',
@@ -41,12 +47,25 @@ export NODE_CONFIG='{
         "dbPass": "'${DB_PWD:-onlyoffice}'"
       },
       "redis": {
+        "name": "'${REDIS_NAME}'",
         "host": "'${REDIS_SERVER_HOST:-${REDIST_SERVER_HOST:-localhost}}'",
         "port": '${REDIS_SERVER_PORT:-${REDIST_SERVER_PORT:-6379}}',
         "options": {
-          "user": "'${REDIS_SERVER_USER:=default}'",
+          "user": "'${REDIS_SERVER_USER:-default}'",
           "password": "'${REDIS_SERVER_PWD}'",
-          "db": "'${REDIS_SERVER_DB_NUM:=0}'"
+          "db": "'${REDIS_SERVER_DB_NUM:-0}'"
+        },
+        "iooptions": {
+          "sentinels": [
+            {
+            "host": "'${REDIS_SERVER_HOST:-localhost}'",
+            "port": '${REDIS_SERVER_PORT:-6379}'
+            }
+          ],
+          "name": "'${REDIS_SENTINEL_GROUP_NAME:-mymaster}'",
+          "username": "'${REDIS_SERVER_USER:-default}'",
+          "password": "'${REDIS_SERVER_PWD}'",
+          "db": "'${REDIS_SERVER_DB_NUM:-0}'"
         }
       },
       "token": {
