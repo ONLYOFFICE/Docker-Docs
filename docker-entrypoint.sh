@@ -23,12 +23,6 @@ case $AMQP_PROTO in
     ;;
 esac
 
-if [[ "${REDIS_SENTINEL}" == 'true' ]]; then
-  REDIS_NAME="ioredis"
-else
-  REDIS_NAME="redis"
-fi
-
 export NODE_CONFIG='{
   "statsd": {
     "useMetrics": '${METRICS_ENABLED:-false}',
@@ -47,7 +41,7 @@ export NODE_CONFIG='{
         "dbPass": "'${DB_PWD:-onlyoffice}'"
       },
       "redis": {
-        "name": "'${REDIS_NAME}'",
+        "name": "'${REDIS_CONNECTOR_NAME:-redis}'",
         "host": "'${REDIS_SERVER_HOST:-${REDIST_SERVER_HOST:-localhost}}'",
         "port": '${REDIS_SERVER_PORT:-${REDIST_SERVER_PORT:-6379}}',
         "options": {
