@@ -41,12 +41,25 @@ export NODE_CONFIG='{
         "dbPass": "'${DB_PWD:-onlyoffice}'"
       },
       "redis": {
+        "name": "'${REDIS_CONNECTOR_NAME:-redis}'",
         "host": "'${REDIS_SERVER_HOST:-${REDIST_SERVER_HOST:-localhost}}'",
         "port": '${REDIS_SERVER_PORT:-${REDIST_SERVER_PORT:-6379}}',
         "options": {
-          "user": "'${REDIS_SERVER_USER:=default}'",
+          "user": "'${REDIS_SERVER_USER:-default}'",
           "password": "'${REDIS_SERVER_PWD}'",
-          "db": "'${REDIS_SERVER_DB_NUM:=0}'"
+          "db": "'${REDIS_SERVER_DB_NUM:-0}'"
+        },
+        "iooptions": {
+          "sentinels": [
+            {
+            "host": "'${REDIS_SERVER_HOST:-localhost}'",
+            "port": '${REDIS_SERVER_PORT:-6379}'
+            }
+          ],
+          "name": "'${REDIS_SENTINEL_GROUP_NAME:-mymaster}'",
+          "username": "'${REDIS_SERVER_USER:-default}'",
+          "password": "'${REDIS_SERVER_PWD}'",
+          "db": "'${REDIS_SERVER_DB_NUM:-0}'"
         }
       },
       "token": {
