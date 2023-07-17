@@ -49,7 +49,7 @@ jobs:
         run: |
           echo "source-tag=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
 
-      - name: Build Community-Edition
+      - name: "Build Docs${{ matrix.edition }}"
         env:
            SOURCE_TAG: ${{ steps.tag-name.outputs.source-tag }}
            NOPLUG_POSTFIX: ${{ matrix.postfix }}
