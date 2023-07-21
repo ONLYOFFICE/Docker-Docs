@@ -8,15 +8,26 @@ on:
       
 jobs:
   build:
-    name: Build 
+    name: "${{ matrix.name }} ${{ matrix.edition }}"
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
+        name: ["Build Docs"]
+        dockerfile: ["Dockerfile"]
         edition: [ "", "-ee", "-de"]
         images: [ "proxy docservice converter" ]
         include:
+          - edition: "-de"
+            name: "Build Docs non-plugins"
+            dockerfile: "Dockerfile.noplugins"
+            images: "proxy docservice converter"
+            postfix: "-noplugins"
+
           - edition: ""
-            images: "example utils" 
+            name: "Build utils"
+            dockerfile: "Dockerfile"
+            images: "example utils"
     steps:
       - name: Checkout code 
         uses: actions/checkout@v3
@@ -38,12 +49,15 @@ jobs:
         run: |
           echo "source-tag=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
 
-      - name: Build Community-Edition
+      - name: "Build Docs${{ matrix.edition }}"
         env:
            SOURCE_TAG: ${{ steps.tag-name.outputs.source-tag }}
+           NOPLUG_POSTFIX: ${{ matrix.postfix }}
+           DOCKERFILE: ${{ matrix.dockerfile }}
         run: |
           DOCKER_TAG=$(echo ${SOURCE_TAG} | sed 's/^.//')
-          PRODUCT_EDITION=${{ matrix.edition }} TAG=$DOCKER_TAG \
+          PRODUCT_EDITION=${{ matrix.edition }} \
+          TAG=$DOCKER_TAG \
             docker buildx bake \
             -f docker-bake.hcl ${{ matrix.images }} \
             --push
