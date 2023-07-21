@@ -67,6 +67,8 @@ Possible values:
 
 If you want to use a ONLYOFFICE Docs version other than the latest one, specify the version you need in the `RELEASE_VERSION` variable. If no value is defined, the latest up-to-date version will be used.
 
+If you want to build images with no plugins at all, then change the value of the `DOCKERFILE` variable to `Dockerfile.noplugins` in the `.env` file.
+
 #### 2. Run the build
 
 To start the build, run the following command:
@@ -153,11 +155,13 @@ Below is the complete list of parameters for `onlyoffice/docs-docservice`, `only
 - **AMQP_HOST**: The IP address or the name of the host where the AMQP server is running.
 - **AMQP_PORT**: The port for the connection to AMQP server. Default to `5672`.
 - **AMQP_VHOST**: The virtual host for the connection to AMQP server. Default to `/`.
+- **REDIS_CONNECTOR_NAME**: Defines which connector to use to connect to Redis. Default to `redis`. If you need to connect to Redis Sentinel, set the value `ioredis`.
 - **REDIS_SERVER_HOST**: The IP address or the name of the host where the Redis server is running.
 - **REDIS_SERVER_PORT**:  The Redis server port number. Default to `6379`.
 - **REDIS_SERVER_USER**: The Redis user name.
 - **REDIS_SERVER_PWD**: The password set for the Redis account.
 - **REDIS_SERVER_DB_NUM**: Number of the redis logical database to be [selected](https://redis.io/commands/select/). Default to `0`.
+- **REDIS_SENTINEL_GROUP_NAME**: Name of a group of Redis instances composed of a master and one or more slaves. Default to `mymaster`.
 - **JWT_ENABLED**: Specifies the enabling the JSON Web Token validation by the ONLYOFFICE Docs. Common for inbox and outbox requests. Defaults to `true`.
 - **JWT_ENABLED_INBOX**: Specifies the enabling the JSON Web Token validation by the ONLYOFFICE Docs only for inbox requests. Default, the value of the variable `JWT_ENABLED` is used.
 - **JWT_ENABLED_OUTBOX**: Specifies the enabling the JSON Web Token validation by the ONLYOFFICE Docs only for outbox requests. Default, the value of the variable `JWT_ENABLED` is used.
