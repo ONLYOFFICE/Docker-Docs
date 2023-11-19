@@ -21,4 +21,9 @@ if [[ -n "$INFO_ALLOWED_IP" ]]; then
     sed -i '/(info)/a\  allow '$ip'\;' /tmp/proxy_nginx/includes/ds-docservice.conf
   done
 fi
+if [[ -n "$INFO_ALLOWED_USER" ]]; then
+  htpasswd -c -b /tmp/auth "${INFO_ALLOWED_USER}" "${INFO_ALLOWED_PASSWORD:-password}"
+  sed -i '/(info)/a\  auth_basic \"Authentication Required\"\;' /tmp/proxy_nginx/includes/ds-docservice.conf
+  sed -i '/auth_basic/a\  auth_basic_user_file \/tmp\/auth\;' /tmp/proxy_nginx/includes/ds-docservice.conf
+fi
 exec nginx -c /tmp/proxy_nginx/nginx.conf -g 'daemon off;'

@@ -63,7 +63,7 @@ ENV DOCSERVICE_HOST_PORT=localhost:8000 \
     NGINX_WORKER_CONNECTIONS=4096
 EXPOSE 8888
 RUN yum -y updateinfo && \
-    yum -y install gettext nginx && \
+    yum -y install gettext nginx httpd-tools && \
     yum clean all && \
     rm -f /var/log/*log
 COPY --chown=ds:ds config/nginx/nginx.conf /etc/nginx/nginx.conf
