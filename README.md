@@ -140,6 +140,8 @@ Below is the complete list of parameters for `onlyoffice/docs-proxy`.
 - **NGINX_WORKER_CONNECTIONS**: Defines the nginx config [worker_connections](https://nginx.org/en/docs/ngx_core_module.html#worker_connections) directive. Defaults to `4096`.
 - **SECURE_LINK_SECRET**: Defines secret for the nginx config directive [secure_link_md5](http://nginx.org/ru/docs/http/ngx_http_secure_link_module.html#secure_link_md5). Defaults to `verysecretstring`.
 - **INFO_ALLOWED_IP**: Defines ip addresses for accessing the info page. You can specify multiple values separated by a space.
+- **INFO_ALLOWED_USER**: Defines user name for accessing the info page. If not set to, [Nginx Basic Authentication](https://nginx.org/en/docs/http/ngx_http_auth_basic_module.html) will not be applied to access the info page.
+- **INFO_ALLOWED_PASSWORD**: Defines user password for accessing the info page. Used if `INFO_ALLOWED_USER` is set.
 
 Below is the complete list of parameters for `onlyoffice/docs-docservice`, `onlyoffice/docs-converter`.
 - **DB_TYPE**: The database type. Supported values are `postgres`, `mariadb` or `mysql`. Defaults to `postgres`.
