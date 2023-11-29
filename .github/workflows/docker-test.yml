@@ -23,29 +23,36 @@ jobs:
               "postgres.yml
                rabbitmq.yml
                services.yml"
-            variables: "POSTGRES_VERSION=9.5"
-            name: "Test with PostgreSQL 9.5 and Rabbitmq"            
+            variables: "POSTGRES_VERSION=12"
+            name: "Test with PostgreSQL 12 and Rabbitmq"            
 
-          - compose_file: 
-              "postgres.yml
-               rabbitmq.yml
-               services.yml"
-            variables: "POSTGRES_VERSION=10"
-            name: "Test with PostgreSQL 10 and Rabbitmq"
-
-          - compose_file: 
-              "postgres.yml
-               rabbitmq.yml
-               services.yml"
-            variables: "POSTGRES_VERSION=11"
-            name: "Test with PostgreSQL 11 and Rabbitmq"
-          
           - compose_file: 
               "postgres.yml
                rabbitmq.yml
                services.yml"
             variables: "POSTGRES_VERSION=13"
             name: "Test with PostgreSQL 13 and Rabbitmq"
+
+          - compose_file: 
+              "postgres.yml
+               rabbitmq.yml
+               services.yml"
+            variables: "POSTGRES_VERSION=14"
+            name: "Test with PostgreSQL 14 and Rabbitmq"
+          
+          - compose_file: 
+              "postgres.yml
+               rabbitmq.yml
+               services.yml"
+            variables: "POSTGRES_VERSION=15"
+            name: "Test with PostgreSQL 15 and Rabbitmq"
+          
+          - compose_file: 
+              "postgres.yml
+               rabbitmq.yml
+               services.yml"
+            variables: "POSTGRES_VERSION=16"
+            name: "Test with PostgreSQL 16 and Rabbitmq"
 
           - compose_file: 
               "postgres.yml
