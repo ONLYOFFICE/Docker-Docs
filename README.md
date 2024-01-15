@@ -137,6 +137,7 @@ Below is the complete list of parameters for `onlyoffice/docs-proxy`.
 - **EXAMPLE_HOST_PORT**: Defaults to `localhost:3000`.
 - **NGINX_ACCESS_LOG**: Defines the nginx config [access_log](https://nginx.org/ru/docs/http/ngx_http_log_module.html#access_log) directive. Defaults to `off`.
 - **NGINX_GZIP_PROXIED**: Defines the nginx config [gzip_proxied](https://nginx.org/ru/docs/http/ngx_http_gzip_module.html#gzip_proxied) directive. Defaults to `off`.
+- **NGINX_CLIENT_MAX_BODY_SIZE**: Defines the nginx config [client_max_body_size](https://nginx.org/en/docs/http/ngx_http_core_module.html#client_max_body_size) directive. Defaults to `100m`.
 - **NGINX_WORKER_CONNECTIONS**: Defines the nginx config [worker_connections](https://nginx.org/en/docs/ngx_core_module.html#worker_connections) directive. Defaults to `4096`.
 - **SECURE_LINK_SECRET**: Defines secret for the nginx config directive [secure_link_md5](http://nginx.org/ru/docs/http/ngx_http_secure_link_module.html#secure_link_md5). Defaults to `verysecretstring`.
 - **INFO_ALLOWED_IP**: Defines ip addresses for accessing the info page. You can specify multiple values separated by a space.

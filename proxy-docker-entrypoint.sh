@@ -12,6 +12,7 @@ fi
 envsubst < /tmp/proxy_nginx/includes/http-upstream.conf > /tmp/http-upstream.conf
 envsubst < /etc/nginx/includes/ds-common.conf | tee /tmp/proxy_nginx/includes/ds-common.conf > /dev/null
 sed "s,\(set \+\$secure_link_secret\).*,\1 "${SECURE_LINK_SECRET:-verysecretstring}";," -i /tmp/proxy_nginx/conf.d/ds.conf
+sed "s/\(client_max_body_size\).*/\1 $NGINX_CLIENT_MAX_BODY_SIZE;/" -i /tmp/proxy_nginx/includes/ds-common.conf
 if [[ ! -f "/proc/net/if_inet6" ]]; then
   sed '/listen\s\+\[::[0-9]*\].\+/d' -i /tmp/proxy_nginx/conf.d/ds.conf
 fi
