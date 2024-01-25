@@ -30,7 +30,7 @@ if [[ -n "$REDIS_CLUSTER_NODES" ]]; then
     REDIS_CLUSTER_NODES_ARRAY+=('{ "url": "redis://'$node'" }')
   done
   OLD_IFS="$IFS"
-  IFS=", "
+  IFS=","
   NODES=$(echo "${REDIS_CLUSTER_NODES_ARRAY[*]}")
   IFS="$OLD_IFS"
   REDIS_CLUSTER='"rootNodes": [ '$NODES' ], "defaults": { "username": "'${REDIS_SERVER_USER:-default}'", "password": "'$REDIS_SERVER_PWD'" }'
