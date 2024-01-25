@@ -23,6 +23,21 @@ case $AMQP_PROTO in
     ;;
 esac
 
+if [[ -n "$REDIS_CLUSTER_NODES" ]]; then
+  declare -a REDIS_CLUSTER_NODES_ALL=($REDIS_CLUSTER_NODES)
+  REDIS_CLUSTER_NODES_ARRAY=()
+  for node in "${REDIS_CLUSTER_NODES_ALL[@]}"; do
+    REDIS_CLUSTER_NODES_ARRAY+=('{ "url": "redis://'$node'" }')
+  done
+  OLD_IFS="$IFS"
+  IFS=","
+  NODES=$(echo "${REDIS_CLUSTER_NODES_ARRAY[*]}")
+  IFS="$OLD_IFS"
+  REDIS_CLUSTER='"rootNodes": [ '$NODES' ], "defaults": { "username": "'${REDIS_SERVER_USER:-default}'", "password": "'$REDIS_SERVER_PWD'" }'
+else
+  CLUSTER=''
+fi
+
 export NODE_CONFIG='{
   "statsd": {
     "useMetrics": '${METRICS_ENABLED:-false}',
@@ -49,6 +64,7 @@ export NODE_CONFIG='{
           "password": "'${REDIS_SERVER_PWD}'",
           "db": "'${REDIS_SERVER_DB_NUM:-0}'"
         },
+        "optionsCluster": { '${REDIS_CLUSTER}' },
         "iooptions": {
           "sentinels": [
             {
