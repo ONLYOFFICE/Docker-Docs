@@ -35,7 +35,7 @@ if [[ -n "$REDIS_CLUSTER_NODES" ]]; then
   IFS="$OLD_IFS"
   REDIS_CLUSTER='"rootNodes": [ '$NODES' ], "defaults": { "username": "'${REDIS_SERVER_USER:-default}'", "password": "'$REDIS_SERVER_PWD'" }'
 else
-  CLUSTER=''
+  REDIS_CLUSTER=''
 fi
 
 export NODE_CONFIG='{
