@@ -137,6 +137,7 @@ Below is the complete list of parameters for `onlyoffice/docs-proxy`.
 - **EXAMPLE_HOST_PORT**: Defaults to `localhost:3000`.
 - **NGINX_ACCESS_LOG**: Defines the nginx config [access_log](https://nginx.org/ru/docs/http/ngx_http_log_module.html#access_log) directive. Defaults to `off`.
 - **NGINX_GZIP_PROXIED**: Defines the nginx config [gzip_proxied](https://nginx.org/ru/docs/http/ngx_http_gzip_module.html#gzip_proxied) directive. Defaults to `off`.
+- **NGINX_CLIENT_MAX_BODY_SIZE**: Defines the nginx config [client_max_body_size](https://nginx.org/en/docs/http/ngx_http_core_module.html#client_max_body_size) directive. Defaults to `100m`.
 - **NGINX_WORKER_CONNECTIONS**: Defines the nginx config [worker_connections](https://nginx.org/en/docs/ngx_core_module.html#worker_connections) directive. Defaults to `4096`.
 - **SECURE_LINK_SECRET**: Defines secret for the nginx config directive [secure_link_md5](http://nginx.org/ru/docs/http/ngx_http_secure_link_module.html#secure_link_md5). Defaults to `verysecretstring`.
 - **INFO_ALLOWED_IP**: Defines ip addresses for accessing the info page. You can specify multiple values separated by a space.
@@ -164,6 +165,7 @@ Below is the complete list of parameters for `onlyoffice/docs-docservice`, `only
 - **REDIS_SERVER_PWD**: The password set for the Redis account.
 - **REDIS_SERVER_DB_NUM**: Number of the redis logical database to be [selected](https://redis.io/commands/select/). Default to `0`.
 - **REDIS_SENTINEL_GROUP_NAME**: Name of a group of Redis instances composed of a master and one or more slaves. Default to `mymaster`.
+- **REDIS_CLUSTER_NODES**: List of nodes in the Redis cluster. There is no need to specify every node in the cluster, 3 should be enough. You can specify multiple values separated by a space. It must be specified in the `host:port` format.
 - **JWT_ENABLED**: Specifies the enabling the JSON Web Token validation by the ONLYOFFICE Docs. Common for inbox and outbox requests. Defaults to `true`.
 - **JWT_ENABLED_INBOX**: Specifies the enabling the JSON Web Token validation by the ONLYOFFICE Docs only for inbox requests. Default, the value of the variable `JWT_ENABLED` is used.
 - **JWT_ENABLED_OUTBOX**: Specifies the enabling the JSON Web Token validation by the ONLYOFFICE Docs only for outbox requests. Default, the value of the variable `JWT_ENABLED` is used.

@@ -60,6 +60,7 @@ ENV DOCSERVICE_HOST_PORT=localhost:8000 \
     EXAMPLE_HOST_PORT=localhost:3000 \
     NGINX_ACCESS_LOG=off \
     NGINX_GZIP_PROXIED=off \
+    NGINX_CLIENT_MAX_BODY_SIZE=100m \
     NGINX_WORKER_CONNECTIONS=4096
 EXPOSE 8888
 RUN yum -y updateinfo && \
@@ -203,7 +204,7 @@ RUN mkdir -p \
 USER ds
 ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/FileConverter/converter
 
-FROM node:buster AS example
+FROM node:lts-buster-slim AS example
 LABEL maintainer Ascensio System SIA <support@onlyoffice.com>
 
 ENV LANG=en_US.UTF-8 \
@@ -214,7 +215,9 @@ ENV LANG=en_US.UTF-8 \
 
 WORKDIR /var/www/onlyoffice/documentserver-example/
 
-RUN git clone \
+RUN apt update -y && \
+    apt install git -y && \
+    git clone \
       --depth 1 \
       --recurse-submodules \
       https://github.com/ONLYOFFICE/document-server-integration.git && \
