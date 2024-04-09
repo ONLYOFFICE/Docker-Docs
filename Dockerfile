@@ -159,9 +159,9 @@ COPY --chown=ds:ds --from=ds-service \
 COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/document-templates/new \
     /var/www/$COMPANY_NAME/documentserver/document-templates/new
-COPY docker-entrypoint.sh /usr/local/bin/
+COPY docker-entrypoint.py /
 USER ds
-ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/DocService/docservice
+ENTRYPOINT ["python", "/docker-entrypoint.py", "/var/www/$COMPANY_NAME/documentserver/server/DocService/docservice"]
 HEALTHCHECK --interval=10s --timeout=3s CMD curl -sf http://localhost:8000/index.html
 
 FROM ds-base AS converter
@@ -196,13 +196,13 @@ COPY --from=ds-service \
 COPY --from=ds-service \
     /ds/usr/lib64/* \
     /usr/lib64/
-COPY docker-entrypoint.sh /usr/local/bin/
+COPY docker-entrypoint.py /
 RUN mkdir -p \
         /var/lib/$COMPANY_NAME/documentserver/App_Data/cache/files \
         /var/lib/$COMPANY_NAME/documentserver/App_Data/docbuilder && \
     chown -R ds:ds /var/lib/$COMPANY_NAME/documentserver
 USER ds
-ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/FileConverter/converter
+ENTRYPOINT ["python", "/docker-entrypoint.py", "/var/www/$COMPANY_NAME/documentserver/server/FileConverter/converter"]
 
 FROM node:lts-buster-slim AS example
 LABEL maintainer Ascensio System SIA <support@onlyoffice.com>
