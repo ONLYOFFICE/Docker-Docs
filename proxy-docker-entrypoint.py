@@ -1,9 +1,7 @@
 import os, re, shutil
-import os
  
 if not os.path.isdir("/tmp/proxy_nginx"):
     shutil.copytree("/etc/nginx", "/tmp/proxy_nginx")
-
 
 nginxConfPath = "/tmp/proxy_nginx/nginx.conf"
 dsConfPath = "/tmp/proxy_nginx/conf.d/ds.conf"
@@ -13,7 +11,6 @@ dsDocservicePath = "/tmp/proxy_nginx/includes/ds-docservice.conf"
 def envsubst(inPath, outPath):
   with open(inPath, 'r') as file:
     conf = file.read()
-
     for i in re.findall(r'\$[a-zA-Z_]*', conf):
         for j in os.environ:
             if i[1:] == j:

@@ -2,40 +2,11 @@ import os, json, sys
 LOG_LEVEL = os.environ.get("LOG_LEVEL")
 LOG_TYPE = os.environ.get("LOG_TYPE")
 LOG_PATTERN = os.environ.get("LOG_PATTERN")
-COMPANY_NAME = os.environ.get("COMPANY_NAME", "onlyoffice")
-METRICS_ENABLED = os.environ.get("METRICS_ENABLED", "false") 
-METRICS_HOST = os.environ.get("METRICS_HOST", "localhost") 
-METRICS_PORT = os.environ.get("METRICS_PORT", "8125")
-METRICS_PREFIX = os.environ.get("METRICS_PREFIX", "ds.")
-DB_TYPE = os.environ.get("DB_TYPE", "postgres")
-DB_HOST = os.environ.get("DB_HOST", "localhost")
-DB_PORT = os.environ.get("DB_PORT", "5432") 
-DB_USER = os.environ.get("DB_USER", "onlyoffice")
-DB_NAME = os.environ.get("DB_NAME", DB_USER) 
-DB_PWD =  os.environ.get("DB_PWD", "")
-REDIS_CONNECTOR_NAME = os.environ.get("REDIS_CONNECTOR_NAME", "redis") 
-REDIS_SERVER_HOST = os.environ.get("REDIS_SERVER_HOST", "localhost")
-REDIS_SERVER_PORT = os.environ.get("REDIS_SERVER_PORT", "6379")
 REDIS_SERVER_USER = os.environ.get("REDIS_SERVER_USER", "default")
 REDIS_SERVER_PWD = os.environ.get("REDIS_SERVER_PWD", "")
-REDIS_SERVER_DB_NUM = os.environ.get("REDIS_SERVER_DB_NUM", "0") 
 REDIS_CLUSTER = os.environ.get("REDIS_CLUSTER")
 REDIS_CLUSTER_NODES = os.environ.get("REDIS_CLUSTER_NODES")
 REDIS_SENTINEL_GROUP_NAME = os.environ.get("REDIS_SENTINEL_GROUP_NAME", "mymaster")
-JWT_ENABLED = os.environ.get("JWT_ENABLED", "true")
-JWT_ENABLED_INBOX = os.environ.get("JWT_ENABLED_INBOX", JWT_ENABLED)
-JWT_ENABLED_OUTBOX = os.environ.get("JWT_ENABLED_OUTBOX", JWT_ENABLED)
-JWT_HEADER = os.environ.get("JWT_HEADER", "Authorization")
-JWT_HEADER_INBOX = os.environ.get("JWT_HEADER_INBOX", JWT_HEADER)
-JWT_HEADER_OUTBOX = os.environ.get("JWT_HEADER_OUTBOX", JWT_HEADER)
-JWT_IN_BODY = os.environ.get("JWT_IN_BODY", "false")
-JWT_SECRET = os.environ.get("JWT_SECRET", "secret")
-JWT_SECRET_INBOX = os.environ.get("JWT_SECRET_INBOX", "secret")
-JWT_SECRET_OUTBOX = os.environ.get("JWT_SECRET_OUTBOX", "secret")
-ALLOW_PRIVATE_IP_ADDRESS = os.environ.get("ALLOW_PRIVATE_IP_ADDRESS", "false")
-ALLOW_META_IP_ADDRESS = os.environ.get("ALLOW_META_IP_ADDRESS", "false")
-ALLOW_IP_ADDRESS_LIST = os.environ.get("ALLOW_IP_ADDRESS_LIST", "[]")
-DENY_IP_ADDRESS_LIST = os.environ.get("DENY_IP_ADDRESS_LIST", "[]")
 AMQP_TYPE = os.environ.get("AMQP_TYPE", "rabbitmq")
 AMQP_PORT = os.environ.get("AMQP_PORT", "5672")
 AMQP_HOST = os.environ.get("AMQP_HOST", "localhost")
@@ -45,12 +16,9 @@ ACTIVEMQ_TRANSPORT = os.environ.get("ACTIVEMQ_TRANSPORT")
 AMQP_PROTO = os.environ.get("AMQP_PROTO", "amqp")
 AMQP_VHOST = os.environ.get("AMQP_VHOST", "/")
 AMQP_URI =  os.environ.get("AMQP_URI", AMQP_PROTO + "://" + AMQP_USER + ":" + AMQP_PWD + "@" + AMQP_HOST + ":" + AMQP_PORT + AMQP_VHOST)
-WOPI_ENABLED = os.environ.get("WOPI_ENABLED", "false")
-SECURE_LINK_SECRET = os.environ.get("SECURE_LINK_SECRET", "verysecretstring")
 
 if LOG_LEVEL or LOG_TYPE or LOG_PATTERN:
-    #filePath = "/etc/" + COMPANY_NAME + "/documentserver/log4js/production.json"
-    filePath = "c:\\Users\\pc\\Documents\\ttt.json"
+    filePath = "/etc/{0}/documentserver/log4js/production.json".format(os.environ.get("COMPANY_NAME", "onlyoffice"))
     with open(filePath, 'r') as json_file:
         logConfig = json.load(json_file)
     if LOG_LEVEL:
@@ -81,77 +49,77 @@ else:
 
 nodeDict = {
   "statsd": {
-    "useMetrics": METRICS_ENABLED,
-	  "host": METRICS_HOST,
-	  "port": METRICS_PORT,
-	  "prefix": METRICS_PREFIX
+    "useMetrics": os.environ.get("METRICS_ENABLED", "false"),
+	  "host": os.environ.get("METRICS_HOST", "localhost"),
+	  "port": os.environ.get("METRICS_PORT", "8125"),
+	  "prefix": os.environ.get("METRICS_PREFIX", "ds.")
 	},
   "services": {
     "CoAuthoring": {
       "sql": {
-        "type": DB_TYPE,
-        "dbHost": DB_HOST,
-        "dbPort": DB_PORT,
-        "dbUser": DB_USER,
-        "dbName": DB_NAME,
-        "dbPass": DB_PWD
+        "type": os.environ.get("DB_TYPE", "postgres"),
+        "dbHost": os.environ.get("DB_HOST", "localhost"),
+        "dbPort": os.environ.get("DB_PORT", "5432"),
+        "dbUser": os.environ.get("DB_USER", "onlyoffice"),
+        "dbName": os.environ.get("DB_NAME", os.environ.get("DB_USER", "onlyoffice")),
+        "dbPass": os.environ.get("DB_PWD", "")
       },
       "redis": {
-        "name": REDIS_CONNECTOR_NAME,
-        "host": REDIS_SERVER_HOST,
-        "port": REDIS_SERVER_PORT,
+        "name": os.environ.get("REDIS_CONNECTOR_NAME", "redis"),
+        "host": os.environ.get("REDIS_SERVER_HOST", "localhost"),
+        "port": os.environ.get("REDIS_SERVER_PORT", "6379"),
         "options": {
           "user": REDIS_SERVER_USER,
           "password": REDIS_SERVER_PWD,
-          "db": REDIS_SERVER_DB_NUM
+          "db": os.environ.get("REDIS_SERVER_DB_NUM", "0")
         },
         "optionsCluster": REDIS_CLUSTER,
         "iooptions": {
           "sentinels": [
             {
-              "host": REDIS_SERVER_HOST,
-              "port": REDIS_SERVER_PORT
+              "host": os.environ.get("REDIS_SERVER_HOST", "localhost"),
+              "port": os.environ.get("REDIS_SERVER_PORT", "6379")
             }
           ],
           "name": REDIS_SENTINEL_GROUP_NAME,
           "username": REDIS_SERVER_USER,
           "password": REDIS_SERVER_PWD,
-          "db": REDIS_SERVER_DB_NUM
+          "db": os.environ.get("REDIS_SERVER_DB_NUM", "0")
         }
       },
       "token": {
         "enable": {
-          "browser": JWT_ENABLED,
+          "browser": os.environ.get("JWT_ENABLED", "true"),
           "request": {
-            "inbox": JWT_ENABLED_INBOX,
-            "outbox": JWT_ENABLED_OUTBOX
+            "inbox": os.environ.get("JWT_ENABLED_INBOX", os.environ.get("JWT_ENABLED", "true")),
+            "outbox": os.environ.get("JWT_ENABLED_OUTBOX", os.environ.get("JWT_ENABLED", "true"))
           }
         },
         "inbox": {
-          "header": JWT_HEADER_INBOX,
-          "inBody": JWT_IN_BODY
+          "header": os.environ.get("JWT_HEADER_INBOX", os.environ.get("JWT_HEADER", "Authorization")),
+          "inBody": os.environ.get("JWT_IN_BODY", "false")
         },
         "outbox": {
-          "header": JWT_HEADER_OUTBOX,
-          "inBody": JWT_IN_BODY
+          "header": os.environ.get("JWT_HEADER_OUTBOX", os.environ.get("JWT_HEADER", "Authorization")),
+          "inBody": os.environ.get("JWT_IN_BODY", "false")
         }
       },
       "secret": {
         "inbox": {
-          "string": JWT_SECRET_INBOX
+          "string": os.environ.get("JWT_SECRET_INBOX", "secret")
         },
         "outbox": {
-          "string": JWT_SECRET_OUTBOX
+          "string": os.environ.get("JWT_SECRET_OUTBOX", "secret")
         },
         "session": {
-          "string": JWT_SECRET
+          "string": os.environ.get("JWT_SECRET", "secret")
         }        
       },
       "request-filtering-agent" : {
-        "allowPrivateIPAddress": ALLOW_PRIVATE_IP_ADDRESS,
-        "allowMetaIPAddress": ALLOW_META_IP_ADDRESS,
-        "allowIPAddressList": ALLOW_IP_ADDRESS_LIST,
-        "denyIPAddressList": DENY_IP_ADDRESS_LIST
+        "allowPrivateIPAddress": os.environ.get("ALLOW_PRIVATE_IP_ADDRESS", "false"),
+        "allowMetaIPAddress": os.environ.get("ALLOW_META_IP_ADDRESS", "false"),
+        "allowIPAddressList": os.environ.get("ALLOW_IP_ADDRESS_LIST", "[]"),
+        "denyIPAddressList": os.environ.get("DENY_IP_ADDRESS_LIST", "[]")
       }
     }
   },
@@ -171,7 +139,7 @@ nodeDict = {
     "url": AMQP_URI
   },
   "wopi": {
-    "enable": WOPI_ENABLED
+    "enable": os.environ.get("WOPI_ENABLED", "false")
   },
   "FileConverter": {
     "converter": {
@@ -180,7 +148,7 @@ nodeDict = {
   },
   "storage": {
     "fs": {
-      "secretString": SECURE_LINK_SECRET
+      "secretString": os.environ.get("SECURE_LINK_SECRET", "verysecretstring")
     }
   }
 }
