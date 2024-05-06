@@ -62,7 +62,7 @@ nodeDict = {
         "dbPort": os.environ.get("DB_PORT", "5432"),
         "dbUser": os.environ.get("DB_USER", "onlyoffice"),
         "dbName": os.environ.get("DB_NAME", os.environ.get("DB_USER", "onlyoffice")),
-        "dbPass": os.environ.get("DB_PWD", "")
+        "dbPass": os.environ.get("DB_PWD", "onlyoffice")
       },
       "redis": {
         "name": os.environ.get("REDIS_CONNECTOR_NAME", "redis"),
