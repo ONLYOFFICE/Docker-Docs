@@ -139,8 +139,17 @@ export NODE_CONFIG='{
   },
   "storage": {
     "fs": {
+      "folderPath": "/var/lib/'${COMPANY_NAME}'/documentserver/App_Data/cache/files/'${STORAGE_SUBDIRECTORY_NAME:-latest}'",
       "secretString": "'${SECURE_LINK_SECRET:-verysecretstring}'"
-    }
+    },
+    "storageFolderName": "files/'${STORAGE_SUBDIRECTORY_NAME:-latest}'"
+  },
+  "persistentStorage": {
+    "fs": {
+      "folderPath": "/var/lib/'${COMPANY_NAME}'/documentserver/App_Data/cache/files",
+      "secretString": "'${SECURE_LINK_SECRET:-verysecretstring}'"
+    },
+    "storageFolderName": "files"
   }
 }'
 
