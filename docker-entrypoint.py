@@ -7,6 +7,7 @@ REDIS_SERVER_PWD = os.environ.get("REDIS_SERVER_PWD", "")
 REDIS_CLUSTER = os.environ.get("REDIS_CLUSTER")
 REDIS_CLUSTER_NODES = os.environ.get("REDIS_CLUSTER_NODES")
 REDIS_SENTINEL_GROUP_NAME = os.environ.get("REDIS_SENTINEL_GROUP_NAME", "mymaster")
+REDIS_CONNECTOR_NAME = os.environ.get("REDIS_CONNECTOR_NAME", "redis")
 AMQP_TYPE = os.environ.get("AMQP_TYPE", "rabbitmq")
 AMQP_PORT = os.environ.get("AMQP_PORT", "5672")
 AMQP_HOST = os.environ.get("AMQP_HOST", "localhost")
@@ -40,12 +41,33 @@ if REDIS_CLUSTER_NODES:
     nodes = []
     for i in lst:
         nodes.append({ "url": "redis://" + i })
-    nodesDict = {"rootNodes": nodes, "defaults": { "username": REDIS_SERVER_USER, "password": REDIS_SERVER_PWD }}
-    nodesString = json.dumps(nodesDict)
-    nodesString = nodesString[1:-1]
-    os.environ['REDIS_CLUSTER'] = nodesString
+    redisConfig = {"optionsCluster": {"rootNodes": nodes, "defaults": { "username": REDIS_SERVER_USER, "password": REDIS_SERVER_PWD }}}
+elif REDIS_CONNECTOR_NAME == "ioredis":
+    redisConfig = {
+        "iooptions": {
+          "sentinels": [
+            {
+              "host": os.environ.get("REDIS_SERVER_HOST", "localhost"),
+              "port": os.environ.get("REDIS_SERVER_PORT", "6379")
+            }
+          ],
+          "name": REDIS_SENTINEL_GROUP_NAME,
+          "username": REDIS_SERVER_USER,
+          "password": REDIS_SERVER_PWD,
+          "db": os.environ.get("REDIS_SERVER_DB_NUM", "0")
+        }
+    }
 else:
-    os.environ['REDIS_CLUSTER'] = ''
+    redisConfig = {
+        "name": os.environ.get("REDIS_CONNECTOR_NAME", "redis"),
+        "host": os.environ.get("REDIS_SERVER_HOST", "localhost"),
+        "port": os.environ.get("REDIS_SERVER_PORT", "6379"),
+        "options": {
+          "user": REDIS_SERVER_USER,
+          "password": REDIS_SERVER_PWD,
+          "db": os.environ.get("REDIS_SERVER_DB_NUM", "0")
+        }
+    }
 
 nodeDict = {
   "statsd": {
@@ -64,29 +86,7 @@ nodeDict = {
         "dbName": os.environ.get("DB_NAME", os.environ.get("DB_USER", "onlyoffice")),
         "dbPass": os.environ.get("DB_PWD", "onlyoffice")
       },
-      "redis": {
-        "name": os.environ.get("REDIS_CONNECTOR_NAME", "redis"),
-        "host": os.environ.get("REDIS_SERVER_HOST", "localhost"),
-        "port": os.environ.get("REDIS_SERVER_PORT", "6379"),
-        "options": {
-          "user": REDIS_SERVER_USER,
-          "password": REDIS_SERVER_PWD,
-          "db": os.environ.get("REDIS_SERVER_DB_NUM", "0")
-        },
-        "optionsCluster": REDIS_CLUSTER,
-        "iooptions": {
-          "sentinels": [
-            {
-              "host": os.environ.get("REDIS_SERVER_HOST", "localhost"),
-              "port": os.environ.get("REDIS_SERVER_PORT", "6379")
-            }
-          ],
-          "name": REDIS_SENTINEL_GROUP_NAME,
-          "username": REDIS_SERVER_USER,
-          "password": REDIS_SERVER_PWD,
-          "db": os.environ.get("REDIS_SERVER_DB_NUM", "0")
-        }
-      },
+      "redis": redisConfig,        
       "token": {
         "enable": {
           "browser": os.environ.get("JWT_ENABLED", "true"),
