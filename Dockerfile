@@ -252,7 +252,7 @@ FROM python:3.11 AS builder
 RUN pip install redis psycopg2  PyMySQL pika python-qpid-proton func_timeout requests kubernetes flask
 FROM python:3.11-slim AS utils
 COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
-RUN apt update  && apt install -y postgresql-client default-mysql-client curl wget && \
+RUN apt update  && apt install -y postgresql-client default-mysql-client curl wget jq && \
     curl -LO \
       https://storage.googleapis.com/kubernetes-release/release/`curl \
       -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl && \
