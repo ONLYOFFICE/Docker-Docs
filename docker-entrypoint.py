@@ -32,11 +32,6 @@ if LOG_LEVEL or LOG_TYPE or LOG_PATTERN:
     with open(filePath, "w") as json_file:
         json.dump(logConfig, json_file, indent=4)
 
-if AMQP_PROTO == "amqps" or AMQP_PROTO == "amqp+ssl":
-    ACTIVEMQ_TRANSPORT = "tls"
-else:
-    ACTIVEMQ_TRANSPORT = "tcp"
-
 if REDIS_CLUSTER_NODES:
     lst = REDIS_CLUSTER_NODES.split()
     nodes = []
@@ -87,7 +82,7 @@ nodeDict = {
         "dbName": os.environ.get("DB_NAME", os.environ.get("DB_USER", "onlyoffice")),
         "dbPass": os.environ.get("DB_PWD", "onlyoffice")
       },
-      "redis": redisConfig,        
+      "redis": redisConfig,       
       "token": {
         "enable": {
           "browser": os.environ.get("JWT_ENABLED", "true"),
@@ -127,18 +122,6 @@ nodeDict = {
   "queue": {
     "type": AMQP_TYPE
   },
-  "activemq": {
-    "connectOptions": {
-      "port": AMQP_PORT,
-      "host": AMQP_HOST,
-      "username": AMQP_USER,
-      "password": AMQP_PWD,
-      "transport": ACTIVEMQ_TRANSPORT
-    }
-  },
-  "rabbitmq": {
-    "url": AMQP_URI
-  },
   "wopi": {
     "enable": os.environ.get("WOPI_ENABLED", "false")
   },
@@ -149,19 +132,40 @@ nodeDict = {
   },
   "storage": {
     "fs": {
-      "folderPath": "/var/lib/" + COMPANY_NAME + "/documentserver/App_Data/cache/files/" + os.environ.get("STORAGE_SUBDIRECTORY_NAME", "latest"),
+      "folderPath": "/var/lib/{0}/documentserver/App_Data/cache/files/".format(COMPANY_NAME) + os.environ.get("STORAGE_SUBDIRECTORY_NAME", "latest"),
       "secretString": os.environ.get("SECURE_LINK_SECRET", "verysecretstring")
     },
     "storageFolderName": "files/" + os.environ.get("STORAGE_SUBDIRECTORY_NAME", "latest")
   },
   "persistentStorage": {
     "fs": {
-      "folderPath": "/var/lib/" + COMPANY_NAME + "/documentserver/App_Data/cache/files",
+      "folderPath": "/var/lib/{0}/documentserver/App_Data/cache/files".format(COMPANY_NAME),
       "secretString": os.environ.get("SECURE_LINK_SECRET", "verysecretstring")
     },
     "storageFolderName": "files"
   }
 }
+
+if AMQP_TYPE == "rabbitmq":
+    amqpConfig = {
+      "url": AMQP_URI
+    }
+    nodeDict['rabbitmq'] = amqpConfig
+elif AMQP_TYPE == "activemq":
+    if AMQP_PROTO == "amqps" or AMQP_PROTO == "amqp+ssl":
+        ACTIVEMQ_TRANSPORT = "tls"
+    else:
+        ACTIVEMQ_TRANSPORT = "tcp"
+    amqpConfig = {
+      "connectOptions": {
+        "port": AMQP_PORT,
+        "host": AMQP_HOST,
+        "username": AMQP_USER,
+        "password": AMQP_PWD,
+        "transport": ACTIVEMQ_TRANSPORT
+        }
+    }
+    nodeDict['activemq'] = amqpConfig
 
 NODE_CONFIG = json.dumps(nodeDict, indent=4)
 os.environ['NODE_CONFIG'] = NODE_CONFIG
