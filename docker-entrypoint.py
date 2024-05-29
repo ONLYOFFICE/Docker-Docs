@@ -2,6 +2,7 @@ import os, json, sys
 LOG_LEVEL = os.environ.get("LOG_LEVEL")
 LOG_TYPE = os.environ.get("LOG_TYPE")
 LOG_PATTERN = os.environ.get("LOG_PATTERN")
+COMPANY_NAME = os.environ.get("COMPANY_NAME", "onlyoffice")
 REDIS_SERVER_USER = os.environ.get("REDIS_SERVER_USER", "default")
 REDIS_SERVER_PWD = os.environ.get("REDIS_SERVER_PWD", "")
 REDIS_CLUSTER = os.environ.get("REDIS_CLUSTER")
@@ -19,7 +20,7 @@ AMQP_VHOST = os.environ.get("AMQP_VHOST", "/")
 AMQP_URI =  os.environ.get("AMQP_URI", AMQP_PROTO + "://" + AMQP_USER + ":" + AMQP_PWD + "@" + AMQP_HOST + ":" + AMQP_PORT + AMQP_VHOST)
 
 if LOG_LEVEL or LOG_TYPE or LOG_PATTERN:
-    filePath = "/etc/{0}/documentserver/log4js/production.json".format(os.environ.get("COMPANY_NAME", "onlyoffice"))
+    filePath = "/etc/{0}/documentserver/log4js/production.json".format(COMPANY_NAME)
     with open(filePath, 'r') as json_file:
         logConfig = json.load(json_file)
     if LOG_LEVEL:
@@ -144,12 +145,21 @@ nodeDict = {
   "FileConverter": {
     "converter": {
         "maxprocesscount": 0.001
-    }  
+    }
   },
   "storage": {
     "fs": {
+      "folderPath": "/var/lib/" + COMPANY_NAME + "/documentserver/App_Data/cache/files/" + os.environ.get("STORAGE_SUBDIRECTORY_NAME", "latest"),
       "secretString": os.environ.get("SECURE_LINK_SECRET", "verysecretstring")
-    }
+    },
+    "storageFolderName": "files/" + os.environ.get("STORAGE_SUBDIRECTORY_NAME", "latest")
+  },
+  "persistentStorage": {
+    "fs": {
+      "folderPath": "/var/lib/" + COMPANY_NAME + "/documentserver/App_Data/cache/files",
+      "secretString": os.environ.get("SECURE_LINK_SECRET", "verysecretstring")
+    },
+    "storageFolderName": "files"
   }
 }
 
