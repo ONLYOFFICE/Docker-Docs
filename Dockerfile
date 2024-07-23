@@ -19,6 +19,9 @@ RUN yum install sudo -y && \
     useradd --system -g ds --no-create-home --shell /sbin/nologin --uid 101 ds && \
     rm -f /var/log/*log
 
+FROM python:2.7 AS redis-lib
+RUN pip install redis
+
 FROM ds-base AS ds-service
 ARG TARGETARCH
 ARG PRODUCT_EDITION=
@@ -159,6 +162,12 @@ COPY --chown=ds:ds --from=ds-service \
 COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/document-templates/new \
     /var/www/$COMPANY_NAME/documentserver/document-templates/new
+COPY  --from=redis-lib \
+    /usr/local/lib/python2.7/site-packages/redis \
+    /usr/lib/python2.7/site-packages/redis
+COPY  --from=redis-lib \
+    /usr/local/lib/python2.7/site-packages/redis-3.5.3.dist-info \
+    /usr/lib/python2.7/site-packages/redis-3.5.3.dist-info
 COPY docker-entrypoint.sh /usr/local/bin/
 USER ds
 ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/DocService/docservice
