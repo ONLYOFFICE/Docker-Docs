@@ -20,7 +20,7 @@ RUN yum install sudo -y && \
     rm -f /var/log/*log
 
 FROM python:2.7 AS redis-lib
-RUN pip install redis
+RUN pip install redis==3.5.3
 
 FROM ds-base AS ds-service
 ARG TARGETARCH
