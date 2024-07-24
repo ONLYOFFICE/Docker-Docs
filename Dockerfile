@@ -213,7 +213,7 @@ RUN mkdir -p \
 USER ds
 ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/FileConverter/converter
 
-FROM node:lts-buster-slim AS example
+FROM node:alpine3.19 AS example
 LABEL maintainer Ascensio System SIA <support@onlyoffice.com>
 
 ENV LANG=en_US.UTF-8 \
@@ -224,8 +224,8 @@ ENV LANG=en_US.UTF-8 \
 
 WORKDIR /var/www/onlyoffice/documentserver-example/
 
-RUN apt update -y && \
-    apt install git -y && \
+RUN apk update && \
+    apk add git && \
     git clone \
       --depth 1 \
       --recurse-submodules \
@@ -234,14 +234,14 @@ RUN apt update -y && \
     cp -r ./document-server-integration/web/documentserver-example/nodejs/. \
       /var/www/onlyoffice/documentserver-example/ && \
     rm -rf ./document-server-integration && \
-    groupadd --system --gid 1001 ds && \
-    useradd \
-      --system \
-      -g ds \
-      --home-dir /var/www/onlyoffice/documentserver-example \
-      --create-home \
-      --shell /sbin/nologin \
-      --uid 1001 ds && \
+    addgroup -S -g 1001 ds && \
+    adduser \
+      -S \
+      -G ds \
+      -D \
+      -h /var/www/onlyoffice/documentserver-example \
+      -s /sbin/nologin \
+      -u 1001 ds && \
     chown -R ds:ds /var/www/onlyoffice/documentserver-example/ && \
     mkdir -p /var/lib/onlyoffice/documentserver-example/ && \
     chown -R ds:ds /var/lib/onlyoffice/ && \
