@@ -64,7 +64,8 @@ ENV DOCSERVICE_HOST_PORT=localhost:8000 \
     NGINX_ACCESS_LOG=off \
     NGINX_GZIP_PROXIED=off \
     NGINX_CLIENT_MAX_BODY_SIZE=100m \
-    NGINX_WORKER_CONNECTIONS=4096
+    NGINX_WORKER_CONNECTIONS=4096 \
+    NGINX_WORKER_PROCESSES=1
 EXPOSE 8888
 RUN yum -y updateinfo && \
     yum -y install gettext nginx httpd-tools && \
