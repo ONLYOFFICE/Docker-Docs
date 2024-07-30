@@ -6,6 +6,7 @@ if ! [ -d /tmp/proxy_nginx ]; then
 fi
 cp -r /etc/nginx/* /tmp/proxy_nginx/
 sed 's|\(worker_connections\) [[:digit:]]*;|\1 '$NGINX_WORKER_CONNECTIONS';|g' -i /tmp/proxy_nginx/nginx.conf
+sed "s/\(worker_processes\).*/\1 $NGINX_WORKER_PROCESSES;/" -i /tmp/proxy_nginx/nginx.conf
 if [ $NGINX_ACCESS_LOG != "off" ]; then
   sed 's|#*\(\s*access_log\).*;|\1 /var/log/nginx/access.log '$NGINX_ACCESS_LOG';|g' -i /tmp/proxy_nginx/nginx.conf
 fi
