@@ -19,6 +19,9 @@ RUN yum install sudo -y && \
     useradd --system -g ds --no-create-home --shell /sbin/nologin --uid 101 ds && \
     rm -f /var/log/*log
 
+FROM python:2.7 AS redis-lib
+RUN pip install redis==3.5.3
+
 FROM ds-base AS ds-service
 ARG TARGETARCH
 ARG PRODUCT_EDITION=
@@ -61,7 +64,8 @@ ENV DOCSERVICE_HOST_PORT=localhost:8000 \
     NGINX_ACCESS_LOG=off \
     NGINX_GZIP_PROXIED=off \
     NGINX_CLIENT_MAX_BODY_SIZE=100m \
-    NGINX_WORKER_CONNECTIONS=4096
+    NGINX_WORKER_CONNECTIONS=4096 \
+    NGINX_WORKER_PROCESSES=1
 EXPOSE 8888
 RUN yum -y updateinfo && \
     yum -y install gettext nginx httpd-tools && \
@@ -159,6 +163,12 @@ COPY --chown=ds:ds --from=ds-service \
 COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/document-templates/new \
     /var/www/$COMPANY_NAME/documentserver/document-templates/new
+COPY  --from=redis-lib \
+    /usr/local/lib/python2.7/site-packages/redis \
+    /usr/lib/python2.7/site-packages/redis
+COPY  --from=redis-lib \
+    /usr/local/lib/python2.7/site-packages/redis-3.5.3.dist-info \
+    /usr/lib/python2.7/site-packages/redis-3.5.3.dist-info
 COPY docker-entrypoint.sh /usr/local/bin/
 USER ds
 ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/DocService/docservice
@@ -204,7 +214,7 @@ RUN mkdir -p \
 USER ds
 ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/FileConverter/converter
 
-FROM node:lts-buster-slim AS example
+FROM node:alpine3.19 AS example
 LABEL maintainer Ascensio System SIA <support@onlyoffice.com>
 
 ENV LANG=en_US.UTF-8 \
@@ -215,8 +225,8 @@ ENV LANG=en_US.UTF-8 \
 
 WORKDIR /var/www/onlyoffice/documentserver-example/
 
-RUN apt update -y && \
-    apt install git -y && \
+RUN apk update && \
+    apk add git && \
     git clone \
       --depth 1 \
       --recurse-submodules \
@@ -225,14 +235,14 @@ RUN apt update -y && \
     cp -r ./document-server-integration/web/documentserver-example/nodejs/. \
       /var/www/onlyoffice/documentserver-example/ && \
     rm -rf ./document-server-integration && \
-    groupadd --system --gid 1001 ds && \
-    useradd \
-      --system \
-      -g ds \
-      --home-dir /var/www/onlyoffice/documentserver-example \
-      --create-home \
-      --shell /sbin/nologin \
-      --uid 1001 ds && \
+    addgroup -S -g 1001 ds && \
+    adduser \
+      -S \
+      -G ds \
+      -D \
+      -h /var/www/onlyoffice/documentserver-example \
+      -s /sbin/nologin \
+      -u 1001 ds && \
     chown -R ds:ds /var/www/onlyoffice/documentserver-example/ && \
     mkdir -p /var/lib/onlyoffice/documentserver-example/ && \
     chown -R ds:ds /var/lib/onlyoffice/ && \
