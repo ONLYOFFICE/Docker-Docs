@@ -42,6 +42,9 @@ COPY --chown=ds:ds \
     config/nginx/includes/http-upstream.conf \
     /etc/$COMPANY_NAME/documentserver/nginx/includes/
 COPY --chown=ds:ds \
+    config/documentserver/default.json \
+    /etc/$COMPANY_NAME/documentserver/default.json
+COPY --chown=ds:ds \
     fonts/ \
     /var/www/$COMPANY_NAME/documentserver/core-fonts/custom/
 COPY --chown=ds:ds \
