@@ -15,6 +15,9 @@ RUN yum install sudo -y && \
     useradd --system -g ds --no-create-home --shell /sbin/nologin --uid 101 ds && \
     rm -f /var/log/*log
 
+FROM python:2.7 AS redis-lib
+RUN pip install redis==3.5.3
+
 FROM ds-base AS ds-service
 ARG TARGETARCH
 ARG PRODUCT_EDITION=
@@ -42,6 +45,9 @@ COPY --chown=ds:ds \
     config/nginx/includes/http-upstream.conf \
     /etc/$COMPANY_NAME/documentserver/nginx/includes/
 COPY --chown=ds:ds \
+    config/documentserver/default.json \
+    /etc/$COMPANY_NAME/documentserver/default.json
+COPY --chown=ds:ds \
     fonts/ \
     /var/www/$COMPANY_NAME/documentserver/core-fonts/custom/
 COPY --chown=ds:ds \
@@ -54,6 +60,7 @@ ENV DOCSERVICE_HOST_PORT=localhost:8000 \
     EXAMPLE_HOST_PORT=localhost:3000 \
     NGINX_ACCESS_LOG=off \
     NGINX_GZIP_PROXIED=off \
+    NGINX_CLIENT_MAX_BODY_SIZE=100m \
     NGINX_WORKER_CONNECTIONS=4096 \
     NGINX_WORKER_PROCESSES=1
 EXPOSE 8888
@@ -147,6 +154,12 @@ COPY --chown=ds:ds --from=ds-service \
 COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/document-templates/new \
     /var/www/$COMPANY_NAME/documentserver/document-templates/new
+COPY  --from=redis-lib \
+    /usr/local/lib/python2.7/site-packages/redis \
+    /usr/lib/python2.7/site-packages/redis
+COPY  --from=redis-lib \
+    /usr/local/lib/python2.7/site-packages/redis-3.5.3.dist-info \
+    /usr/lib/python2.7/site-packages/redis-3.5.3.dist-info
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN mkdir -p /var/www/$COMPANY_NAME/documentserver/sdkjs-plugins
 USER ds
@@ -193,7 +206,7 @@ RUN mkdir -p \
 USER ds
 ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/FileConverter/converter
 
-FROM node:buster AS example
+FROM node:alpine3.19 AS example
 LABEL maintainer Ascensio System SIA <support@onlyoffice.com>
 
 ENV LANG=en_US.UTF-8 \
@@ -204,7 +217,9 @@ ENV LANG=en_US.UTF-8 \
 
 WORKDIR /var/www/onlyoffice/documentserver-example/
 
-RUN git clone \
+RUN apk update && \
+    apk add git && \
+    git clone \
       --depth 1 \
       --recurse-submodules \
       https://github.com/ONLYOFFICE/document-server-integration.git && \
@@ -212,14 +227,14 @@ RUN git clone \
     cp -r ./document-server-integration/web/documentserver-example/nodejs/. \
       /var/www/onlyoffice/documentserver-example/ && \
     rm -rf ./document-server-integration && \
-    groupadd --system --gid 1001 ds && \
-    useradd \
-      --system \
-      -g ds \
-      --home-dir /var/www/onlyoffice/documentserver-example \
-      --create-home \
-      --shell /sbin/nologin \
-      --uid 1001 ds && \
+    addgroup -S -g 1001 ds && \
+    adduser \
+      -S \
+      -G ds \
+      -D \
+      -h /var/www/onlyoffice/documentserver-example \
+      -s /sbin/nologin \
+      -u 1001 ds && \
     chown -R ds:ds /var/www/onlyoffice/documentserver-example/ && \
     mkdir -p /var/lib/onlyoffice/documentserver-example/ && \
     chown -R ds:ds /var/lib/onlyoffice/ && \
@@ -235,16 +250,18 @@ USER ds
 
 ENTRYPOINT /var/www/onlyoffice/documentserver-example/docker-entrypoint.sh npm start
 
-FROM alpine:latest AS utils
-LABEL maintainer Ascensio System SIA <support@onlyoffice.com>
-RUN apk add bash postgresql-client mysql-client curl wget && \
+FROM python:3.11 AS builder
+RUN pip install redis psycopg2  PyMySQL pika python-qpid-proton func_timeout requests kubernetes flask
+FROM python:3.11-slim AS utils
+COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+RUN apt update  && apt install -y postgresql-client default-mysql-client curl wget jq && \
     curl -LO \
       https://storage.googleapis.com/kubernetes-release/release/`curl \
       -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl && \
     chmod +x ./kubectl && \
     mv ./kubectl /usr/local/bin/kubectl && \
-    addgroup --system --gid 101 ds && \
-    adduser --system -G ds -h /home/ds --shell /bin/bash --uid 101 ds && \
+    groupadd --system -g 1006 ds && \
+    useradd --system -g ds -d /home/ds -s /bin/bash -u 101 ds && \
     mkdir /scripts && \
     chown -R ds:ds /scripts
 USER ds
