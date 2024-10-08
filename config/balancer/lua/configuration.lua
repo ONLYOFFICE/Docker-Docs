@@ -41,7 +41,7 @@ function _M.handle_endpoints()
     local none_status = check_none(endpoints)
       
     if none_status then
-       print("[BALANCER.HANDLER]: Empty endpoint table incode, set backends to none")
+       print("[BALANCER.HANDLER]: Empty endpoint table is come, seting backends to none")
        local none_endpoints = '[{"address": "none"}]'
        local success, err = endpoints_data:set("backends", none_endpoints)
        if not success then
