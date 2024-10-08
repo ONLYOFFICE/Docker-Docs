@@ -7,7 +7,7 @@ from kubernetes import client, watch
 ep_name = os.environ["DS_EP_NAME"]
 field_name = f'metadata.name={ep_name}'
 
-url_sending = f'http://127.0.0.1/configuration'
+url_sending = f'http://127.0.0.1:8000/configuration'
 
 k8s_host = os.environ["KUBERNETES_SERVICE_HOST"]
 api_server = f'https://{k8s_host}'
