@@ -6,12 +6,23 @@ ENV TZ=Etc/UTC
 RUN apt-get update -y && \
     apt-get install python3.10 vim -y && \
     apt-get install python3-pip -y && \
+    luarocks install lua-cjson && \
     python3 -m pip install --upgrade pip && \
     pip install redis requests kubernetes && \
     rm -rf /var/lib/apt/lists/* && \
-    mkdir -p /ds_ep_observer /cm_observer
+    mkdir -p /ds_ep_observer \
+             /cm_observer \
+             /var/tmp/docs_cache \
+             /etc/nginx/mnt_config \
+             /etc/nginx/lua && \
+    rm -f /etc/nginx/conf.d/default.conf \
+          /usr/local/openresty/nginx/conf/nginx.conf
 
 COPY scripts/ds-ep-observer.py /ds_ep_observer/ds-ep-observer.py
+COPY config/balancer/conf.d/balancer-server.conf /etc/nginx/conf.d/
+COPY config/balancer/conf.d/handler-server.conf /etc/nginx/conf.d/
+COPY config/balancer/nginx.conf /usr/local/openresty/nginx/conf/
+COPY config/balancer/lua/configuration.lua /etc/nginx/lua/
 
 EXPOSE 80 443
 
