@@ -42,6 +42,11 @@ jobs:
             name: "Build utils"
             dockerfile: "Dockerfile"
             images: "example utils"
+
+          - edition: ""
+            name: "Build balancer"
+            dockerfile: "Dockerfile.balancer"
+            images: "balancer"
     steps:
       - name: Checkout code 
         uses: actions/checkout@v3

@@ -84,3 +84,10 @@ target "utils" {
     }
 }
 
+target "balancer" {
+    target = "balancer"
+    dockerfile = "${DOCKERFILE}"
+    tags = ["docker.io/${COMPANY_NAME}/${PREFIX_NAME}-balancer:${TAG}"]
+    platforms = ["linux/amd64", "linux/arm64"]
+}
+
