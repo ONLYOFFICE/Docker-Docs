@@ -1,0 +1,18 @@
+FROM openresty/openresty:jammy as balancer
+
+LABEL maintainer Ascensio System SIA <support@onlyoffice.com>
+ARG DEBIAN_FRONTEND=noninteractive
+ENV TZ=Etc/UTC
+RUN apt-get update -y && \
+    apt-get install python3.10 vim -y && \
+    apt-get install python3-pip -y && \
+    python3 -m pip install --upgrade pip && \
+    pip install redis requests kubernetes && \
+    rm -rf /var/lib/apt/lists/* && \
+    mkdir -p /ds_ep_observer /cm_observer
+
+COPY scripts/ds-ep-observer.py /ds_ep_observer/ds-ep-observer.py
+
+EXPOSE 80 443
+
+#ENTRYPOINT
