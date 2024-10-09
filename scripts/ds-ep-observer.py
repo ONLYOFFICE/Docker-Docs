@@ -53,7 +53,7 @@ def get_ep_list(ep_ds, ep_port):
             ds_ep_list.append(json.dumps(total_result))
         except Exception as msg_url:
             logger_endpoints_ds.error(f'Failed to build a list of endpoints: {ds_ep_list}... {msg_url}')
-    all_ep = f'{ds_ep_list}'.replace("'", "").replace("[", "'[").replace("]", "]'")
+    all_ep = f'{ds_ep_list}'.replace("'", "")
     requests.post(url_sending, data=all_ep)
 
 
