@@ -1,0 +1,34 @@
+FROM openresty/openresty:jammy as balancer
+
+LABEL maintainer Ascensio System SIA <support@onlyoffice.com>
+ARG DEBIAN_FRONTEND=noninteractive
+ENV TZ=Etc/UTC \
+    BALANCER_WORKER_CONNECTIONS=16384 \
+    BALANCER_WORKER_PROCESSES=1
+RUN apt-get update -y && \
+    apt-get install python3.10 vim -y && \
+    apt-get install python3-pip -y && \
+    luarocks install lua-cjson && \
+    python3 -m pip install --upgrade pip && \
+    pip install redis requests kubernetes && \
+    rm -rf /var/lib/apt/lists/* && \
+    wget -O /usr/local/bin/dumb-init https://github.com/Yelp/dumb-init/releases/download/v1.2.5/dumb-init_1.2.5_x86_64 && \
+    chmod +x /usr/local/bin/dumb-init && \
+    mkdir -p /ds_ep_observer \
+             /cm_observer \
+             /var/tmp/docs_cache \
+             /etc/nginx/mnt_config \
+             /etc/nginx/lua && \
+    rm -f /etc/nginx/conf.d/default.conf \
+          /usr/local/openresty/nginx/conf/nginx.conf
+
+COPY scripts/ds-ep-observer.py /ds_ep_observer/ds-ep-observer.py
+COPY config/balancer/conf.d/balancer-server.conf /etc/nginx/conf.d/
+COPY config/balancer/conf.d/handler-server.conf /etc/nginx/conf.d/
+COPY config/balancer/nginx.conf /usr/local/openresty/nginx/conf/
+COPY config/balancer/lua/configuration.lua /etc/nginx/lua/
+COPY --chmod=755 balancer-docker-entrypoint.py /docker_entrypoint.py
+
+EXPOSE 80 443
+
+ENTRYPOINT ["dumb-init", "python3", "/docker_entrypoint.py"]
