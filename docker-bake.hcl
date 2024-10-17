@@ -23,6 +23,10 @@ variable "NOPLUG_POSTFIX" {
     default = ""
 }
 
+variable "DS_VERSION_HASH" {
+    default = ""
+}
+
 group "apps" {
     targets = ["proxy", "converter", "docservice", "example"]
 }
@@ -44,6 +48,7 @@ target "proxy" {
     platforms = ["linux/amd64", "linux/arm64"]
     args = {
         "PRODUCT_EDITION": "${PRODUCT_EDITION}"
+        "DS_VERSION_HASH": "${DS_VERSION_HASH}"
     }
 }
 
@@ -54,6 +59,7 @@ target "converter" {
     platforms = ["linux/amd64", "linux/arm64"]
     args = {
         "PRODUCT_EDITION": "${PRODUCT_EDITION}"
+        "DS_VERSION_HASH": "${DS_VERSION_HASH}"
     }
 }
 
@@ -64,6 +70,7 @@ target "docservice" {
     platforms = ["linux/amd64", "linux/arm64"]
     args = {
         "PRODUCT_EDITION": "${PRODUCT_EDITION}"
+        "DS_VERSION_HASH": "${DS_VERSION_HASH}"
     }
 }
 
@@ -72,5 +79,8 @@ target "utils" {
     dockerfile = "${DOCKERFILE}"
     tags = ["docker.io/${COMPANY_NAME}/${PREFIX_NAME}-utils:${TAG}"]
     platforms = ["linux/amd64", "linux/arm64"]
+    args = {
+        "DS_VERSION_HASH": "${DS_VERSION_HASH}"
+    }
 }
 

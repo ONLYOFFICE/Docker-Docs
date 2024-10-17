@@ -7,14 +7,19 @@ FROM amazonlinux:2 AS ds-base
 LABEL maintainer Ascensio System SIA <support@onlyoffice.com>
 
 ARG COMPANY_NAME=onlyoffice
+ARG DS_VERSION_HASH
 ENV COMPANY_NAME=$COMPANY_NAME \
+    APPLICATION_NAME=$COMPANY_NAME \
+    DS_VERSION_HASH=$DS_VERSION_HASH \
     NODE_ENV=production-linux \
     NODE_CONFIG_DIR=/etc/$COMPANY_NAME/documentserver
 
 RUN yum install sudo -y && \
     yum install shadow-utils -y && \
     amazon-linux-extras install epel -y && \
-    yum install procps-ng tar -y && \
+    yum install procps-ng tar wget -y && \
+    wget -O /usr/local/bin/dumb-init https://github.com/Yelp/dumb-init/releases/download/v1.2.5/dumb-init_1.2.5_x86_64 && \
+    chmod +x /usr/local/bin/dumb-init && \
     groupadd --system --gid 101 ds && \
     useradd --system -g ds --no-create-home --shell /sbin/nologin --uid 101 ds && \
     rm -f /var/log/*log
@@ -24,14 +29,16 @@ RUN pip install redis==3.5.3
 
 FROM ds-base AS ds-service
 ARG TARGETARCH
+ARG DS_VERSION_HASH
 ARG PRODUCT_EDITION=
 ARG RELEASE_VERSION
 ARG PRODUCT_URL=https://download.onlyoffice.com/install/documentserver/linux/onlyoffice-documentserver$PRODUCT_EDITION$RELEASE_VERSION.$TARGETARCH.rpm
-ENV TARGETARCH=$TARGETARCH
+ENV TARGETARCH=$TARGETARCH \
+    DS_VERSION_HASH=$DS_VERSION_HASH
 WORKDIR /ds
 RUN useradd --no-create-home --shell /sbin/nologin nginx && \
     yum -y updateinfo && \
-    yum -y install cabextract fontconfig xorg-x11-font-utils xorg-x11-server-utils wget rpm2cpio && \
+    yum -y install cabextract fontconfig xorg-x11-font-utils xorg-x11-server-utils rpm2cpio && \
     rpm -i https://downloads.sourceforge.net/project/mscorefonts2/rpms/msttcore-fonts-installer-2.6-1.noarch.rpm && \
     PRODUCT_URL=$(echo $PRODUCT_URL | sed "s/"$TARGETARCH"/"$(uname -m)"/g") && \
     PACKAGE_NAME=$(basename "$PRODUCT_URL") && \
@@ -49,15 +56,13 @@ COPY --chown=ds:ds \
     config/nginx/includes/http-upstream.conf \
     /etc/$COMPANY_NAME/documentserver/nginx/includes/
 COPY --chown=ds:ds \
-    config/documentserver/default.json \
-    /etc/$COMPANY_NAME/documentserver/default.json
-COPY --chown=ds:ds \
     fonts/ \
     /var/www/$COMPANY_NAME/documentserver/core-fonts/custom/
 COPY --chown=ds:ds \
     plugins/ \
     /var/www/$COMPANY_NAME/documentserver/sdkjs-plugins/
 RUN documentserver-generate-allfonts.sh true && \
+    documentserver-flush-cache.sh -h $DS_VERSION_HASH -r false && \
     documentserver-pluginsmanager.sh -r false \
     --update=\"/var/www/$COMPANY_NAME/documentserver/sdkjs-plugins/plugin-list-default.json\"
 
@@ -81,6 +86,7 @@ COPY --chown=ds:ds --chmod=644 --from=ds-service \
     /etc/nginx/conf.d/
 COPY --chown=ds:ds --chmod=644 --from=ds-service \
     /etc/$COMPANY_NAME/documentserver*/nginx/includes/*.conf \
+    /etc/nginx/includes/ds-cache.conf \
     /etc/nginx/includes/
 COPY --chown=ds:ds --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/fonts \
@@ -174,7 +180,7 @@ COPY  --from=redis-lib \
     /usr/lib/python2.7/site-packages/redis-3.5.3.dist-info
 COPY docker-entrypoint.sh /usr/local/bin/
 USER ds
-ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/DocService/docservice
+ENTRYPOINT dumb-init docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/DocService/docservice
 HEALTHCHECK --interval=10s --timeout=3s CMD curl -sf http://localhost:8000/index.html
 
 FROM ds-base AS converter
@@ -215,7 +221,7 @@ RUN mkdir -p \
         /var/lib/$COMPANY_NAME/documentserver/App_Data/docbuilder && \
     chown -R ds:ds /var/lib/$COMPANY_NAME/documentserver
 USER ds
-ENTRYPOINT docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/FileConverter/converter
+ENTRYPOINT dumb-init docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/FileConverter/converter
 
 FROM node:alpine3.19 AS example
 LABEL maintainer Ascensio System SIA <support@onlyoffice.com>
@@ -264,8 +270,16 @@ ENTRYPOINT /var/www/onlyoffice/documentserver-example/docker-entrypoint.sh npm s
 FROM python:3.11 AS builder
 RUN pip install redis psycopg2  PyMySQL pika python-qpid-proton func_timeout requests kubernetes flask
 FROM python:3.11-slim AS utils
+ARG DS_VERSION_HASH
+ENV DS_VERSION_HASH=$DS_VERSION_HASH
+COPY --from=ds-base /usr/local/bin/dumb-init /usr/local/bin/dumb-init
 COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
-RUN apt update  && apt install -y postgresql-client default-mysql-client curl wget jq && \
+RUN apt update && \
+    apt-get install -y wget gnupg2 lsb-release && \
+    echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
+    wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && \
+    apt-get update && \
+    apt install -y postgresql-client-17 default-mysql-client curl wget jq && \
     curl -LO \
       https://storage.googleapis.com/kubernetes-release/release/`curl \
       -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl && \
@@ -274,7 +288,8 @@ RUN apt update  && apt install -y postgresql-client default-mysql-client curl wg
     groupadd --system -g 1006 ds && \
     useradd --system -g ds -d /home/ds -s /bin/bash -u 101 ds && \
     mkdir /scripts && \
-    chown -R ds:ds /scripts
+    chown -R ds:ds /scripts && \
+    chmod +x /usr/local/bin/dumb-init
 USER ds
 
 FROM statsd/statsd AS metrics

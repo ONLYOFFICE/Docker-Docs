@@ -67,6 +67,8 @@ Possible values:
 
 If you want to use a ONLYOFFICE Docs version other than the latest one, specify the version you need in the `RELEASE_VERSION` variable. If no value is defined, the latest up-to-date version will be used.
 
+If you are not using the script `build.sh` to build images, then change the value in the `DS_VERSION_HASH` variable at each build. This variable defines the hash that will be appended to the ONLYOFFICE Docs version in the request URLs.
+
 If you want to build images with no plugins at all, then change the value of the `DOCKERFILE` variable to `Dockerfile.noplugins` in the `.env` file.
 
 #### 2. Run the build

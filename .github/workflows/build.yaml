@@ -7,9 +7,23 @@ on:
       - "v*"
       
 jobs:
+  prepare-build:
+    name: "Prepare build"
+    runs-on: ubuntu-latest
+    outputs:
+      sourceTag: ${{ steps.prepare.outputs.sourceTag }}
+      dsHash: ${{ steps.prepare.outputs.dsHash }}
+    steps:
+      - name: prepare-build
+        id: prepare
+        run: |
+          echo "sourceTag=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+          echo "dsHash=$(echo -n "$(date +'%Y.%m.%d-%H%M')" | md5sum | awk '{print $1}')" >> "$GITHUB_OUTPUT"
+
   build:
     name: "${{ matrix.name }} ${{ matrix.edition }}"
     runs-on: ubuntu-latest
+    needs: [prepare-build]
     strategy:
       fail-fast: false
       matrix:
@@ -44,18 +58,17 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-      - name: Get Tag Name
-        id: tag-name
-        run: |
-          echo "source-tag=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
-
       - name: "Build Docs${{ matrix.edition }}"
         env:
-           SOURCE_TAG: ${{ steps.tag-name.outputs.source-tag }}
+           DS_VERSION_HASH: ${{ needs.prepare-build.outputs.dsHash }}
+           SOURCE_TAG: ${{ needs.prepare-build.outputs.sourceTag }}
            NOPLUG_POSTFIX: ${{ matrix.postfix }}
            DOCKERFILE: ${{ matrix.dockerfile }}
         run: |
-          DOCKER_TAG=$(echo ${SOURCE_TAG} | sed 's/^.//')
+          : ${DS_VERSION_HASH:?Should be set!}
+
+          DS_VERSION_HASH=${DS_VERSION_HASH} \
+          DOCKER_TAG=$(echo ${SOURCE_TAG} | sed 's/^.//') \
           PRODUCT_EDITION=${{ matrix.edition }} \
           TAG=$DOCKER_TAG \
             docker buildx bake \
