@@ -223,7 +223,7 @@ RUN mkdir -p \
 USER ds
 ENTRYPOINT dumb-init docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/FileConverter/converter
 
-FROM node:alpine3.19 AS example
+FROM node:20-alpine3.19 AS example
 LABEL maintainer Ascensio System SIA <support@onlyoffice.com>
 
 ENV LANG=en_US.UTF-8 \
