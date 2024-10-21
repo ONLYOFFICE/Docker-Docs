@@ -58,7 +58,6 @@ def get_ep_list(ep_ds, ep_port):
     total_result = {}
     for ep_ip in ep_ds:
         try:
-            url = ep_ip.ip + ':' + ep_port
             pod_name = ep_ip.target_ref.name
             ver_ds = read_pod_annotation(pod_name)
             total_result['address'] = ep_ip.ip

@@ -39,7 +39,8 @@ def running_services():
     try:
         running_nginx = ["/usr/local/openresty/bin/openresty", "-g", "daemon off;"]
         running_get_ds_ep = ["python3", "/ds_ep_observer/ds-ep-observer.py"]
-        all_cmd = [running_nginx, running_get_ds_ep]
+        running_get_ds_pod = ["python3", "/ds_ep_observer/ds-pod-observer.py"]
+        all_cmd = [running_nginx, running_get_ds_ep, running_get_ds_pod]
         for cmd in all_cmd:
             cmd_process = subprocess.Popen(cmd)
             logger_endpoints_ds.info(f'The "{cmd_process.pid}" process has been running')
