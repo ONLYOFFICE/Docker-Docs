@@ -72,7 +72,8 @@ def get_ds_pod():
             w = watch.Watch()
             for event in w.stream(v1.list_namespaced_pod, namespace=ns, label_selector=label):
                 try:
-                    get_running_pod()
+                    if event['object'].metadata.deletion_timestamp:
+                        get_running_pod()
                 except Exception as msg_list_pod:
                     logger_pod_ds.error(f'Error when trying to list "{label}" Pods... {msg_list_pod}')
                     requests.post(url_sending, data="none")
