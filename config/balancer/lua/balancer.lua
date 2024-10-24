@@ -6,8 +6,6 @@ function _M.balance()
    local ngx_balancer = require("ngx.balancer")
    local data
    local random_endpoint
-   local request_uri = ngx.var.request_uri
-   local ver = request_uri:match("/([%d%.%-]+%-[^/]+)/")
    local wopisrc = ngx.var.arg_WOPISrc 
    local shardkey = ngx.var.arg_shardkey
    local api_key
