@@ -10,6 +10,8 @@ function _M.balance()
    local shardkey = ngx.var.arg_shardkey
    local api_key
    
+   local rr_live_dict = ngx.shared.rr_live_index
+
    if wopisrc then
      api_key = wopisrc
    end
@@ -38,7 +40,17 @@ function _M.balance()
              table.insert(matching_addresses, entry.address .. ":" .. entry.port)
    end
 
-   random_endpoint = tostring((matching_addresses[math.random(1, #matching_addresses)]))
+   local idx = rr_live_dict:get("last_used_index") or 1
+
+   random_endpoint = matching_addresses[idx]
+
+   -- Update to the next index for the next request
+   idx = idx + 1
+   if idx > #matching_addresses then
+     idx = 1
+   end
+
+   rr_live_dict:set("last_used_index", idx)
 
    if api_key then
      return random_endpoint
