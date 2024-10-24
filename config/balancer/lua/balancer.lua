@@ -20,8 +20,6 @@ function _M.balance()
      api_key = shardkey
    end
 
-   print(ngx.var.request_uri)
-
    repeat
      data = configuration.get_backends_data()
      print(data)
