@@ -1,4 +1,5 @@
 local endpoints_data = ngx.shared.endpoints_data
+local reserved_data = ngx.shared.reserved_data
 local cjson = require("cjson.safe")
 
 local _M = {}
@@ -19,10 +20,24 @@ function _M.get_backends_data()
     return endpoints_data:get("backends")
 end
 
-function _M.handle_endpoints()
-    local value = endpoints_data:get("backends")
+function _M.get_reserved_data()
+    return reserved_data:get("backends")
+end
+
+local function handle_endpoints(type)
+    local dict
+    local dict_str
     
-    print("[BALANCER.HANDLER]: New endpoints update request income")
+    if type == "live" then
+      dict = ngx.shared.endpoints_data
+      dict_str = "LIVE_ENDPOINTS"
+    else if type == "reserved" then 
+      dict = ngx.shared.reserved_data
+      dict_str = "RESERVED_ENDPOINTS"
+    end
+    end
+
+    print(string.format("[BALANCER.HANDLER]: New endpoints update request income. Used dict: %s", dict_str))
     print(ngx.var.request_method)
     if ngx.var.request_method ~= "POST" and ngx.var.request_method ~= "GET" then
       ngx.status = ngx.HTTP_BAD_REQUEST                                                  
@@ -41,16 +56,16 @@ function _M.handle_endpoints()
     local none_status = check_none(endpoints)
       
     if none_status then
-       print("[BALANCER.HANDLER]: Empty endpoint table is come, seting backends to none")
+       print(string.format("[BALANCER.HANDLER]: Empty endpoint table is come, seting backends to none in dict: %s", dict_str))
        local none_endpoints = '[{"address": "none"}]'
-       local success, err = endpoints_data:set("backends", none_endpoints)
+       local success, err = dict:set("backends", none_endpoints)
        if not success then
           ngx.log(ngx.ERR, "[BALANCER.HANDLER]: dynamic-configuration: error updating configuration: " .. tostring(err))
           ngx.status = ngx.HTTP_BAD_REQUEST
           return
        end
     else
-       local success, err = endpoints_data:set("backends", endpoints)
+       local success, err = dict:set("backends", endpoints)
        if not success then
           ngx.log(ngx.ERR, "[BALANCER.HANDLER]: dynamic-configuration: error updating configuration: " .. tostring(err))
           ngx.status = ngx.HTTP_BAD_REQUEST
@@ -59,6 +74,20 @@ function _M.handle_endpoints()
     end
     
     ngx.status = ngx.HTTP_CREATED
+  end
+
+function _M.handle()
+  if ngx.var.request_uri == "/configuration" then
+    local type = "live"
+    handle_endpoints(type)
+    return
+  end
+
+  if ngx.var.request_uri == "/configuration_reserved" then
+    local type = "reserved"
+    handle_endpoints(type)
+    return
+  end
 end
 
 return _M
