@@ -73,6 +73,7 @@ export NODE_CONFIG='{
             }
           ],
           "name": "'${REDIS_SENTINEL_GROUP_NAME:-mymaster}'",
+          "sentinelPassword": "'${REDIS_SENTINEL_PWD}'",
           "username": "'${REDIS_SERVER_USER:-default}'",
           "password": "'${REDIS_SERVER_PWD}'",
           "db": "'${REDIS_SERVER_DB_NUM:-0}'"
