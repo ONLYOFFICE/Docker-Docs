@@ -32,7 +32,8 @@ ARG TARGETARCH
 ARG DS_VERSION_HASH
 ARG PRODUCT_EDITION=
 ARG RELEASE_VERSION
-ARG PRODUCT_URL=https://download.onlyoffice.com/install/documentserver/linux/onlyoffice-documentserver$PRODUCT_EDITION$RELEASE_VERSION.$TARGETARCH.rpm
+ARG PRODUCT_BASEURL=https://download.onlyoffice.com/install/documentserver/linux/onlyoffice-documentserver
+ARG PRODUCT_URL=${PRODUCT_BASEURL}${PRODUCT_EDITION}${RELEASE_VERSION}.${TARGETARCH}.rpm
 ENV TARGETARCH=$TARGETARCH \
     DS_VERSION_HASH=$DS_VERSION_HASH
 WORKDIR /ds

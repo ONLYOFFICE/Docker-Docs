@@ -1,10 +1,60 @@
 ### This workflow setup instance then build and push images ###
-name: Multi-arch build 
+name: Multi-arch build
+
+run-name: >-
+  Build Docs: [
+  ${{ inputs.docs-community && 'CE' || '-' }}
+  ${{ inputs.docs-enterprise && 'EE' || '-' }}
+  ${{ inputs.docs-developer && 'DE' || '-' }}
+  ]
+  ${{ inputs.docs-balancer && 'balancer: [✓]' || '' }}
+  ${{ inputs.docs-non-plugins && 'non-plugins: [✓]' || '' }}
+  ${{ inputs.docs-utils && 'utils: [✓]' || '' }}
+  VER: [${{ inputs.tag }}]
 
 on:
-  push:
-    tags:
-      - "v*"
+  workflow_dispatch:
+    inputs:
+      docs-community:
+        type: boolean
+        description: 'Build Docs-Community'
+        default: true
+      docs-enterprise:
+        type: boolean
+        description: 'Build Docs-Enterprise'
+        default: true
+      docs-developer:
+        type: boolean
+        description: 'Build Docs-Developer'
+        default: true
+      docs-non-plugins:
+        type: boolean
+        description: 'Build Docs-non-plugins'
+        default: true
+      docs-utils:
+        type: boolean
+        description: 'Build Docs-utils'
+        default: true
+      docs-balancer:
+        type: boolean
+        description: 'Build Docs-balancer'
+        default: true
+      tag:
+        description: 'Specify tag (ex. 7.0.0 or 7.0.0-rc25)'
+        type: string
+        required: true
+      test-repo:
+        type: boolean
+        description: 'Push to test repo'
+        default: true
+      test-version:
+        type: string
+        required: false
+        description: 'Specify version if test-repo enabled'
+      test-build:
+        type: string
+        required: false
+        description: 'Specify build if test-repo enabled'
       
 jobs:
   prepare-build:
@@ -13,69 +63,137 @@ jobs:
     outputs:
       sourceTag: ${{ steps.prepare.outputs.sourceTag }}
       dsHash: ${{ steps.prepare.outputs.dsHash }}
+      matrix: ${{ steps.prepare.outputs.matrix }}
     steps:
       - name: prepare-build
         id: prepare
+        shell: bash
         run: |
-          echo "sourceTag=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
-          echo "dsHash=$(echo -n "$(date +'%Y.%m.%d-%H%M')" | md5sum | awk '{print $1}')" >> "$GITHUB_OUTPUT"
+            ### Check that test-repo specifyed with rc postfix ###
+            if ${{ github.event.inputs.test-repo }}; then
+               if ! [[ ${{ github.event.inputs.tag }} == *rc* ]]; then 
+                  echo -e '\033[33m     ⚠ ALERT ⚠     \033[0m'
+                  echo -e 'Test-Repo: enabled[\033[32m✓\033[0m]'
+                  echo -e 'Please specify tag with <rc>...'
+                  echo -e '\033[33mFor example:\033[0m ${{ github.event.inputs.tag }}-rc25'
+                  exit 1
+               fi
+            fi
+
+            ### Make build matrix ###
+            matrix='{"include": []}'
+            if ${{ github.event.inputs.docs-community }}; then
+              matrix=$(echo $matrix | jq '.include += [
+                      {
+                              "name": "Build Docs Community", 
+                              "dockerfile": "Dockerfile", 
+                              "edition": "", 
+                              "images": "proxy docservice converter"
+                      }
+              ]')
+            fi
+            if ${{ github.event.inputs.docs-enterprise }}; then
+              matrix=$(echo $matrix | jq '.include += [
+                      {
+                              "name": "Build Docs Enterprise", 
+                              "dockerfile": "Dockerfile", 
+                              "edition": "-ee", 
+                              "images": "proxy docservice converter"
+                      }
+              ]')
+            fi
+            if ${{ github.event.inputs.docs-developer }}; then
+              matrix=$(echo $matrix | jq '.include += [
+                      {
+                              "name": "Build Docs Developer", 
+                              "dockerfile": "Dockerfile", 
+                              "edition": "-de", 
+                              "images": "proxy docservice converter"
+                      }
+              ]')
+            fi
+            if ${{ github.event.inputs.docs-non-plugins }}; then
+              matrix=$(echo $matrix | jq '.include += [
+                      {
+                              "name": "Build Docs non-plugins", 
+                              "dockerfile": "Dockerfile", 
+                              "edition": "-de", 
+                              "images": "proxy docservice converter",
+                              "postfix": "-noplugins"
+                      }
+              ]')
+            fi
+            if ${{ github.event.inputs.docs-utils }}; then
+              matrix=$(echo $matrix | jq '.include += [
+                      {
+                              "name": "Build Docs utils", 
+                              "dockerfile": "Dockerfile", 
+                              "edition": "", 
+                              "images": "example utils"
+                      }
+              ]')
+            fi
+            if ${{ github.event.inputs.docs-balancer }}; then
+              matrix=$(echo $matrix | jq '.include += [
+                      {
+                              "name": "Build Docs balancer", 
+                              "dockerfile": "Dockerfile.balancer", 
+                              "edition": "", 
+                              "images": "balancer"
+                      }
+              ]')
+            fi
+
+            ### Specify outputs ###
+            echo "sourceTag=${{ github.event.inputs.tag }}" >> "$GITHUB_OUTPUT"
+            echo "dsHash=$(echo -n "$(date +'%Y.%m.%d-%H%M')" | md5sum | awk '{print $1}')" >> "$GITHUB_OUTPUT"
+            echo "matrix=$(echo $matrix | jq -c)" >> "$GITHUB_OUTPUT"
 
   build:
-    name: "${{ matrix.name }} ${{ matrix.edition }}"
+    name: "${{ matrix.name }} ${{ github.event.inputs.tag }}"
     runs-on: ubuntu-latest
     needs: [prepare-build]
     strategy:
       fail-fast: false
-      matrix:
-        name: ["Build Docs"]
-        dockerfile: ["Dockerfile"]
-        edition: [ "", "-ee", "-de"]
-        images: [ "proxy docservice converter" ]
-        include:
-          - edition: "-de"
-            name: "Build Docs non-plugins"
-            dockerfile: "Dockerfile.noplugins"
-            images: "proxy docservice converter"
-            postfix: "-noplugins"
-
-          - edition: ""
-            name: "Build utils"
-            dockerfile: "Dockerfile"
-            images: "example utils"
-
-          - edition: ""
-            name: "Build balancer"
-            dockerfile: "Dockerfile.balancer"
-            images: "balancer"
+      matrix: ${{fromJSON(needs.prepare-build.outputs.matrix)}}
     steps:
       - name: Checkout code 
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-     
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+        uses: docker/setup-buildx-action@v3
 
-      - name: "Build Docs${{ matrix.edition }}"
+      - name: Login to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ inputs.test-repo && secrets.DOCKER_TEST_REGISTRY || 'docker.io' }}
+          username: ${{ inputs.test-repo && secrets.DOCKER_TEST_USERNAME || secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ inputs.test-repo && secrets.DOCKER_TEST_ACCESS_TOKEN || secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: "${{ matrix.name }}"
         env:
+           REGISTRY: ${{ inputs.test-repo && secrets.DOCKER_TEST_REGISTRY || 'docker.io' }}
            DS_VERSION_HASH: ${{ needs.prepare-build.outputs.dsHash }}
            SOURCE_TAG: ${{ needs.prepare-build.outputs.sourceTag }}
            NOPLUG_POSTFIX: ${{ matrix.postfix }}
            DOCKERFILE: ${{ matrix.dockerfile }}
+           TEST_VERSION: ${{ github.event.inputs.test-version }}
+           TEST_BUILD: ${{ github.event.inputs.test-build }}
         run: |
           : ${DS_VERSION_HASH:?Should be set!}
 
-          DS_VERSION_HASH=${DS_VERSION_HASH} \
-          DOCKER_TAG=$(echo ${SOURCE_TAG} | sed 's/^.//') \
+          if ${{ github.event.inputs.test-repo }}; then
+            : ${TEST_VERSION:?Should be set!}
+            : ${TEST_BUILD:?Should be set!}
+            export PRODUCT_BASEURL=${{ secrets.PRODUCT_BASEURL_RC }}
+            export RELEASE_VERSION="-${TEST_VERSION}-${TEST_BUILD}.el7"
+          fi
+
           PRODUCT_EDITION=${{ matrix.edition }} \
-          TAG=$DOCKER_TAG \
+          TAG=${SOURCE_TAG} \
             docker buildx bake \
             -f docker-bake.hcl ${{ matrix.images }} \
             --push
