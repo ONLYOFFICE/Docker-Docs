@@ -12,7 +12,7 @@ RUN apt-get update -y && \
     python3 -m pip install --upgrade pip && \
     pip install redis requests kubernetes && \
     rm -rf /var/lib/apt/lists/* && \
-    wget -O /usr/local/bin/dumb-init https://github.com/Yelp/dumb-init/releases/download/v1.2.5/dumb-init_1.2.5_x86_64 && \
+    wget -O /usr/local/bin/dumb-init https://github.com/Yelp/dumb-init/releases/download/v1.2.5/dumb-init_1.2.5_$(uname -m) && \
     chmod +x /usr/local/bin/dumb-init && \
     mkdir -p /ds_ep_observer \
              /cm_observer \

@@ -18,7 +18,7 @@ RUN yum install sudo -y && \
     yum install shadow-utils -y && \
     amazon-linux-extras install epel -y && \
     yum install procps-ng tar wget -y && \
-    wget -O /usr/local/bin/dumb-init https://github.com/Yelp/dumb-init/releases/download/v1.2.5/dumb-init_1.2.5_x86_64 && \
+    wget -O /usr/local/bin/dumb-init https://github.com/Yelp/dumb-init/releases/download/v1.2.5/dumb-init_1.2.5_$(uname -m) && \
     chmod +x /usr/local/bin/dumb-init && \
     groupadd --system --gid 101 ds && \
     useradd --system -g ds --no-create-home --shell /sbin/nologin --uid 101 ds && \
