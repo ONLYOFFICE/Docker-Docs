@@ -116,7 +116,7 @@ jobs:
               matrix=$(echo $matrix | jq '.include += [
                       {
                               "name": "Build Docs non-plugins", 
-                              "dockerfile": "Dockerfile", 
+                              "dockerfile": "Dockerfile.noplugins",
                               "edition": "-de", 
                               "images": "proxy docservice converter",
                               "postfix": "-noplugins"
