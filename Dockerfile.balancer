@@ -25,6 +25,7 @@ RUN apt-get update -y && \
 COPY scripts/ds-ep-observer.py \
      scripts/ds-pod-observer.py \
      /ds_ep_observer/
+COPY scripts/balancer-shutdown.py /
 COPY config/balancer/conf.d/balancer-server.conf /etc/nginx/conf.d/
 COPY config/balancer/conf.d/handler-server.conf /etc/nginx/conf.d/
 COPY config/balancer/nginx.conf /usr/local/openresty/nginx/conf/
