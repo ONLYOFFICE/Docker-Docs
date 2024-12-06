@@ -14,10 +14,11 @@ ENV COMPANY_NAME=$COMPANY_NAME \
     NODE_ENV=production-linux \
     NODE_CONFIG_DIR=/etc/$COMPANY_NAME/documentserver
 
-RUN yum install sudo -y && \
+RUN yum install sudo python3-pip -y && \
     yum install shadow-utils -y && \
     amazon-linux-extras install epel -y && \
     yum install procps-ng tar wget -y && \
+    pip3 install redis && \
     wget -O /usr/local/bin/dumb-init https://github.com/Yelp/dumb-init/releases/download/v1.2.5/dumb-init_1.2.5_$(uname -m) && \
     chmod +x /usr/local/bin/dumb-init && \
     groupadd --system --gid 101 ds && \
