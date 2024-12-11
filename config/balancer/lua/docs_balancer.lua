@@ -105,7 +105,7 @@ function _M.balance_ep()
      rr_live_dict:set("last_used_index", idx)
    end
 
-   if api_key then
+   if api_key and string.len(api_key) > 0 then
      return random_endpoint
    else
      ngx_balancer.set_more_tries(1)                                                               
