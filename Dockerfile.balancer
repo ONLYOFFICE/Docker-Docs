@@ -9,6 +9,7 @@ RUN apt-get update -y && \
     apt-get install python3.10 vim -y && \
     apt-get install python3-pip -y && \
     luarocks install lua-cjson && \
+    luarocks install lua-resty-redis-connector && \
     python3 -m pip install --upgrade pip && \
     pip install redis requests kubernetes && \
     rm -rf /var/lib/apt/lists/* && \

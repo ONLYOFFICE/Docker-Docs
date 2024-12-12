@@ -14,18 +14,16 @@ ENV COMPANY_NAME=$COMPANY_NAME \
     NODE_ENV=production-linux \
     NODE_CONFIG_DIR=/etc/$COMPANY_NAME/documentserver
 
-RUN yum install sudo -y && \
+RUN yum install sudo python3-pip -y && \
     yum install shadow-utils -y && \
     amazon-linux-extras install epel -y && \
     yum install procps-ng tar wget -y && \
+    pip3 install redis && \
     wget -O /usr/local/bin/dumb-init https://github.com/Yelp/dumb-init/releases/download/v1.2.5/dumb-init_1.2.5_$(uname -m) && \
     chmod +x /usr/local/bin/dumb-init && \
     groupadd --system --gid 101 ds && \
     useradd --system -g ds --no-create-home --shell /sbin/nologin --uid 101 ds && \
     rm -f /var/log/*log
-
-FROM python:2.7 AS redis-lib
-RUN pip install redis==3.5.3
 
 FROM ds-base AS ds-service
 ARG TARGETARCH
@@ -173,12 +171,6 @@ COPY --chown=ds:ds --from=ds-service \
 COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/document-templates/new \
     /var/www/$COMPANY_NAME/documentserver/document-templates/new
-COPY  --from=redis-lib \
-    /usr/local/lib/python2.7/site-packages/redis \
-    /usr/lib/python2.7/site-packages/redis
-COPY  --from=redis-lib \
-    /usr/local/lib/python2.7/site-packages/redis-3.5.3.dist-info \
-    /usr/lib/python2.7/site-packages/redis-3.5.3.dist-info
 COPY docker-entrypoint.sh /usr/local/bin/
 USER ds
 ENTRYPOINT dumb-init docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/DocService/docservice
