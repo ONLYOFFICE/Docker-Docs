@@ -64,6 +64,7 @@ jobs:
       sourceTag: ${{ steps.prepare.outputs.sourceTag }}
       dsHash: ${{ steps.prepare.outputs.dsHash }}
       matrix: ${{ steps.prepare.outputs.matrix }}
+      platform: ${{ steps.prepare.outputs.platform }}
     steps:
       - name: prepare-build
         id: prepare
@@ -79,6 +80,11 @@ jobs:
                   exit 1
                fi
             fi
+
+            ### Make build platforms ###
+            PLATFORMS+=("amd64")
+            [ ${{ github.event.inputs.test-repo }} != true ] && PLATFORMS+=("arm64")
+            PLATFORM=$(echo ${PLATFORMS[*]/#/linux/} | tr ' ' ',')
 
             ### Make build matrix ###
             matrix='{"include": []}'
@@ -148,6 +154,7 @@ jobs:
             echo "sourceTag=${{ github.event.inputs.tag }}" >> "$GITHUB_OUTPUT"
             echo "dsHash=$(echo -n "$(date +'%Y.%m.%d-%H%M')" | md5sum | awk '{print $1}')" >> "$GITHUB_OUTPUT"
             echo "matrix=$(echo $matrix | jq -c)" >> "$GITHUB_OUTPUT"
+            echo "platform=${PLATFORM[@]}" >> "$GITHUB_OUTPUT"
 
   build:
     name: "${{ matrix.name }} ${{ github.event.inputs.tag }}"
@@ -178,6 +185,7 @@ jobs:
            REGISTRY: ${{ inputs.test-repo && secrets.DOCKER_TEST_REGISTRY || 'docker.io' }}
            DS_VERSION_HASH: ${{ needs.prepare-build.outputs.dsHash }}
            SOURCE_TAG: ${{ needs.prepare-build.outputs.sourceTag }}
+           PLATFORM: ${{ needs.prepare-build.outputs.platform }}
            NOPLUG_POSTFIX: ${{ matrix.postfix }}
            DOCKERFILE: ${{ matrix.dockerfile }}
            TEST_VERSION: ${{ github.event.inputs.test-version }}
