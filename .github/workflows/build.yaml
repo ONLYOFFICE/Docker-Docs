@@ -24,8 +24,6 @@ on:
       edition:
         description: "Specify edition (ex. 'ce' or 'ce,ee,de')"
         type: string
-        required: true
-        default: 'de'
       docs-non-plugins:
         type: boolean
         description: 'Build Docs-non-plugins'
