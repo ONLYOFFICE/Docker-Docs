@@ -38,7 +38,6 @@ local function handle_endpoints(type)
     end
 
     print(string.format("[BALANCER.HANDLER]: New endpoints update request income. Used dict: %s", dict_str))
-    print(ngx.var.request_method)
     if ngx.var.request_method ~= "POST" and ngx.var.request_method ~= "GET" then
       ngx.status = ngx.HTTP_BAD_REQUEST                                                  
       ngx.print("[BALANCER.HANDLER]: Only POST and GET requests are allowed!")
@@ -51,7 +50,6 @@ local function handle_endpoints(type)
        ngx.status = ngx.HTTP_BAD_REQUEST                                                              
        return                                                                                         
     end 
-    print(endpoints)
     
     local none_status = check_none(endpoints)
       

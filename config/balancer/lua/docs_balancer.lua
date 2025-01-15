@@ -9,6 +9,7 @@ function _M.balance_ep()
    local ver = request_uri:match("/([%d%.%-]+%-[^/]+)/")
    local wopisrc = ngx.var.arg_WOPISrc 
    local shardkey = ngx.var.arg_shardkey
+   local log_level = os.getenv("LOG_LEVEL")
 
    local rr_live_dict = ngx.shared.rr_live_index
    local rr_reserved_dict = ngx.shared.rr_reserved_index
@@ -24,11 +25,11 @@ function _M.balance_ep()
 
    repeat
      data = configuration.get_backends_data()
-     print(data)
+     if log_level == "DEBUG" then
+       print(string.format("DEBUG: CURRENT LIVE TABLE:%s", data))
+     end
      local decoded_table = cjson.decode(data)
-     print(tostring(decoded_table))
      local address = decoded_table[1].address
-     print(cjson.encode(address))
      if address == "none" then
        ngx.sleep(1)
        print("No active shards found, waiting...")
@@ -58,15 +59,17 @@ function _M.balance_ep()
    end
 
    if ver and next(matching_addresses) == nil then
-     print(string.format("WARN: Can't find endpoint in live table. VER: %s", ver))
+     if log_level == "DEBUG" then
+       print(string.format("DEBUG: Can't find endpoint in live table. VER: %s", ver))
+     end
      local reserved_data
      repeat
        reserved_data = configuration.get_reserved_data()
-       print(string.format("RESERVED_DATA:%s", reserved_data))
+       if log_level == "DEBUG" then
+         print(string.format("DEBUG: CURRENT RESERVER TABLE:%s", reserved_data))
+       end
        local decoded_reserved_table = cjson.decode(reserved_data)
-       print(tostring(decoded_reserved_table))
        local address = decoded_reserved_table[1].address
-       print(cjson.encode(address))
        if address == "none" then
          ngx.sleep(1)
          print("No active shards found, waiting...")
