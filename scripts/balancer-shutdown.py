@@ -93,7 +93,8 @@ def ngx_shutdown():
 def shutdown_services():
     services = [
             'ds-ep-observer.py',
-            'ds-pod-observer.py'
+            'ds-pod-observer.py',
+            'balancer-cm-observer.py'
             ]
     try:
         for service in services:
