@@ -1,6 +1,7 @@
 local endpoints_data = ngx.shared.endpoints_data
 local reserved_data = ngx.shared.reserved_data
 local cjson = require("cjson.safe")
+local log_level = os.getenv("LOG_LEVEL")
 
 local _M = {}
 
@@ -49,8 +50,12 @@ local function handle_endpoints(type)
        ngx.log(ngx.ERR, "[BALANCER.HANDLER]: look's like body empty. Unable to read valid request body")                   
        ngx.status = ngx.HTTP_BAD_REQUEST                                                              
        return                                                                                         
-    end 
-    
+    end
+
+    if log_level == "DEBUG" then
+       print(endpoints)
+    end
+
     local none_status = check_none(endpoints)
       
     if none_status then
