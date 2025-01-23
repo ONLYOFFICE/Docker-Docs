@@ -84,18 +84,28 @@ function _M.balance_ep()
      end
 
      local idx = rr_reserved_dict:get("last_used_index") or 1
+     local max_index = #reserved_addresses
+
+     if idx > max_index then
+       idx = 1
+     end
 
      random_endpoint = reserved_addresses[idx]
 
      -- Update to the next index for the next request
      idx = idx + 1
-     if idx > #matching_addresses then
+     if idx > #reserved_addresses then
        idx = 1
      end
 
      rr_reserved_dict:set("last_used_index", idx)
    else
      local idx = rr_live_dict:get("last_used_index") or 1
+     local max_index = #matching_addresses
+
+     if idx > max_index then
+       idx = 1
+     end
 
      random_endpoint = matching_addresses[idx]
 
