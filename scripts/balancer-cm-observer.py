@@ -5,10 +5,12 @@ import requests
 import json
 import time
 import subprocess
+import hashlib
 
 cm_name = "balancer-lua-config"
 cm_key = "balancer-lua.conf"
 cm_path = "/etc/nginx/mnt_config/balancer-lua.conf"
+cm_sha = None
 
 k8s_host = os.environ["KUBERNETES_SERVICE_HOST"]
 api_server = f'https://{k8s_host}'
@@ -42,8 +44,16 @@ def init_logger(name):
     logger.addHandler(stdout)
     logger.info('Running Docs-Balancer configMap observer service...')
 
+def calculate_sha256(file_path):
+    sha256_hash = hashlib.sha256()
+    with open(file_path, "rb") as f:
+        for byte_block in iter(lambda: f.read(4096), b""):
+            sha256_hash.update(byte_block)
+    return sha256_hash.hexdigest()
+
 # Watch for changes in the ConfigMap
 def watch_configmap_changes():
+    global cm_sha
     field_selector = f"metadata.name={cm_name}"
     while True:
         try:
@@ -53,7 +63,10 @@ def watch_configmap_changes():
                     f = open(cm_path, "w")
                     f.write(event['object'].data[cm_key])
                     f.close()
-                    reload_nginx()
+                    new_sha256 = calculate_sha256(cm_path)
+                    if not cm_sha or cm_sha != new_sha256:
+                        cm_sha = new_sha256
+                        reload_nginx()
                 except Exception as msg_write_cm:
                     logger_cm_observer.error(f'Cant write in config file...{msg_write_cm}')
         except Exception as msg_get_cm:
