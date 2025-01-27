@@ -56,7 +56,7 @@ def get_running_pod():
                     total_result['ver'] = pod.metadata.annotations["ds-ver-hash"]
                     ds_ep_list.append(json.dumps(total_result))
             except Exception as msg_url:
-                logger_pod_ds.error(f'Failed to build a list of Running Pod: {ds_ep_list}... {msg_url}')
+                logger_pod_ds.error(f'Failed to build a list of Running {pod.metadata.name} Pod: {ds_ep_list}... {msg_url}')
         if not ds_ep_list:
             requests.post(url_sending, data="none")
         else:

@@ -71,20 +71,20 @@ def get_ep_list(ep_ds):
             try:
                 read_pod = v1.read_namespaced_pod(pod_name, ns)
             except Exception as msg_read_pod:
-                logger_endpoints_ds.error(f'Error when reading data from the Pod... {msg_read_pod}')
+                logger_endpoints_ds.error(f'Error when reading data from the {pod_name} Pod... {msg_read_pod}')
                 ver_ds = 'none'
                 pod_tag = 'none'
             else:
                 try:
                     ver_ds = read_pod.metadata.annotations["ds-ver-hash"]
                 except Exception as msg_read_annotation:
-                    logger_endpoints_ds.error(f'Error when reading an annotation to the Pod... {msg_read_annotation}')
+                    logger_endpoints_ds.error(f'Error when reading an annotation to the {pod_name} Pod... {msg_read_annotation}')
                     ver_ds = 'none'
                 try:
                     pod_tag = read_pod.spec.containers[1].image
                     pod_tag = pod_tag.split(":")[1]
                 except Exception as msg_read_pod_tag:
-                    logger_endpoints_ds.error(f'Error when reading the tag in the Pod... {msg_read_pod_tag}')
+                    logger_endpoints_ds.error(f'Error when reading the tag in the {pod_name} Pod... {msg_read_pod_tag}')
                     pod_tag = 'none'
             total_result['address'] = ep_ip.ip
             total_result['port'] = ep_port
