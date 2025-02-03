@@ -271,7 +271,7 @@ ENV DS_VERSION_HASH=$DS_VERSION_HASH
 COPY --from=ds-base /usr/local/bin/dumb-init /usr/local/bin/dumb-init
 COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 RUN apt update && \
-    apt-get install -y curl wget gnupg2 lsb-release jq xxd && \
+    apt-get install -y curl wget gnupg2 lsb-release jq xxd procps && \
     echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
     wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && \
     apt-get update && \
