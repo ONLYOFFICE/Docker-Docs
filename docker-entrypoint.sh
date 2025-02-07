@@ -131,7 +131,15 @@ export NODE_CONFIG='{
     "url": "'${AMQP_URI:-${AMQP_PROTO:-amqp}://${AMQP_USER}:${AMQP_PWD}@${AMQP_HOST}:${AMQP_PORT}${AMQP_VHOST:-/}}'"
   },
   "wopi": {
-    "enable": '${WOPI_ENABLED:-false}'
+    "enable": '${WOPI_ENABLED:-false}',
+    "privateKey": "'${WOPI_PRIVATE_KEY}'",
+    "privateKeyOld": "'${WOPI_PRIVATE_KEY_OLD}'",
+    "publicKey": "'${WOPI_PUBLIC_KEY}'",
+    "publicKeyOld": "'${WOPI_PUBLIC_KEY_OLD}'",
+    "modulus": "'${WOPI_MODULUS_KEY}'",
+    "modulusOld": "'${WOPI_MODULUS_KEY_OLD}'",
+    "exponent": '${WOPI_EXPONENT_KEY:=65537}',
+    "exponentOld": '${WOPI_EXPONENT_KEY_OLD:-${WOPI_EXPONENT_KEY}}'
   },
   "FileConverter": {
     "converter": {

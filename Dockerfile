@@ -2,7 +2,7 @@ ARG POSTGRES_VERSION="12"
 ARG MYSQL_VERSION="latest"
 ARG MARIADB_VERSION="latest"
 
-FROM amazonlinux:2 AS ds-base
+FROM amazonlinux:2023 AS ds-base
 
 LABEL maintainer Ascensio System SIA <support@onlyoffice.com>
 
@@ -14,18 +14,19 @@ ENV COMPANY_NAME=$COMPANY_NAME \
     NODE_ENV=production-linux \
     NODE_CONFIG_DIR=/etc/$COMPANY_NAME/documentserver
 
-RUN yum install sudo -y && \
-    yum install shadow-utils -y && \
-    amazon-linux-extras install epel -y && \
-    yum install procps-ng tar wget -y && \
+RUN dnf install sudo \
+                python3-pip \
+                findutils \
+                shadow-utils \
+                procps-ng \
+                tar \
+                wget -y && \
+    pip3 install redis && \
     wget -O /usr/local/bin/dumb-init https://github.com/Yelp/dumb-init/releases/download/v1.2.5/dumb-init_1.2.5_$(uname -m) && \
     chmod +x /usr/local/bin/dumb-init && \
     groupadd --system --gid 101 ds && \
     useradd --system -g ds --no-create-home --shell /sbin/nologin --uid 101 ds && \
     rm -f /var/log/*log
-
-FROM python:2.7 AS redis-lib
-RUN pip install redis==3.5.3
 
 FROM ds-base AS ds-service
 ARG TARGETARCH
@@ -38,8 +39,8 @@ ENV TARGETARCH=$TARGETARCH \
     DS_VERSION_HASH=$DS_VERSION_HASH
 WORKDIR /ds
 RUN useradd --no-create-home --shell /sbin/nologin nginx && \
-    yum -y updateinfo && \
-    yum -y install cabextract fontconfig xorg-x11-font-utils xorg-x11-server-utils rpm2cpio && \
+    dnf -y updateinfo && \
+    dnf -y install cabextract fontconfig xorg-x11-font-utils xorg-x11-server-utils cpio && \
     rpm -i https://downloads.sourceforge.net/project/mscorefonts2/rpms/msttcore-fonts-installer-2.6-1.noarch.rpm && \
     PRODUCT_URL=$(echo $PRODUCT_URL | sed "s/"$TARGETARCH"/"$(uname -m)"/g") && \
     PACKAGE_NAME=$(basename "$PRODUCT_URL") && \
@@ -55,6 +56,7 @@ RUN useradd --no-create-home --shell /sbin/nologin nginx && \
 COPY --chown=ds:ds \
     config/nginx/includes/http-common.conf \
     config/nginx/includes/http-upstream.conf \
+    config/nginx/includes/ds-docservice.conf \
     /etc/$COMPANY_NAME/documentserver/nginx/includes/
 COPY --chown=ds:ds \
     fonts/ \
@@ -76,9 +78,9 @@ ENV DOCSERVICE_HOST_PORT=localhost:8000 \
     NGINX_WORKER_CONNECTIONS=4096 \
     NGINX_WORKER_PROCESSES=1
 EXPOSE 8888
-RUN yum -y updateinfo && \
-    yum -y install gettext nginx httpd-tools && \
-    yum clean all && \
+RUN dnf -y updateinfo && \
+    dnf -y install gettext nginx httpd-tools && \
+    dnf clean all && \
     rm -f /var/log/*log
 COPY --chown=ds:ds config/nginx/nginx.conf /etc/nginx/nginx.conf
 COPY --chown=ds:ds proxy-docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
@@ -173,12 +175,6 @@ COPY --chown=ds:ds --from=ds-service \
 COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/document-templates/new \
     /var/www/$COMPANY_NAME/documentserver/document-templates/new
-COPY  --from=redis-lib \
-    /usr/local/lib/python2.7/site-packages/redis \
-    /usr/lib/python2.7/site-packages/redis
-COPY  --from=redis-lib \
-    /usr/local/lib/python2.7/site-packages/redis-3.5.3.dist-info \
-    /usr/lib/python2.7/site-packages/redis-3.5.3.dist-info
 COPY docker-entrypoint.sh /usr/local/bin/
 USER ds
 ENTRYPOINT dumb-init docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/DocService/docservice
@@ -276,11 +272,11 @@ ENV DS_VERSION_HASH=$DS_VERSION_HASH
 COPY --from=ds-base /usr/local/bin/dumb-init /usr/local/bin/dumb-init
 COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 RUN apt update && \
-    apt-get install -y wget gnupg2 lsb-release && \
+    apt-get install -y curl wget gnupg2 lsb-release jq xxd procps && \
     echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
     wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && \
     apt-get update && \
-    apt install -y postgresql-client-17 default-mysql-client curl wget jq && \
+    apt install -y postgresql-client-17 default-mysql-client && \
     curl -LO \
       https://storage.googleapis.com/kubernetes-release/release/`curl \
       -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl && \

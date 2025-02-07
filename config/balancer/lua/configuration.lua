@@ -1,6 +1,7 @@
 local endpoints_data = ngx.shared.endpoints_data
 local reserved_data = ngx.shared.reserved_data
 local cjson = require("cjson.safe")
+local log_level = os.getenv("LOG_LEVEL")
 
 local _M = {}
 
@@ -38,7 +39,6 @@ local function handle_endpoints(type)
     end
 
     print(string.format("[BALANCER.HANDLER]: New endpoints update request income. Used dict: %s", dict_str))
-    print(ngx.var.request_method)
     if ngx.var.request_method ~= "POST" and ngx.var.request_method ~= "GET" then
       ngx.status = ngx.HTTP_BAD_REQUEST                                                  
       ngx.print("[BALANCER.HANDLER]: Only POST and GET requests are allowed!")
@@ -50,9 +50,12 @@ local function handle_endpoints(type)
        ngx.log(ngx.ERR, "[BALANCER.HANDLER]: look's like body empty. Unable to read valid request body")                   
        ngx.status = ngx.HTTP_BAD_REQUEST                                                              
        return                                                                                         
-    end 
-    print(endpoints)
-    
+    end
+
+    if log_level == "DEBUG" then
+       print(endpoints)
+    end
+
     local none_status = check_none(endpoints)
       
     if none_status then

@@ -198,6 +198,14 @@ Below is the complete list of parameters for `onlyoffice/docs-example`.
 - **JWT_SECRET**: Defines the secret key to validate the JSON Web Token in the request to the ONLYOFFICE Docs. Defaults to `secret`.
 - **JWT_HEADER**: Defines the http header that will be used to send the JSON Web Token. Defaults to `Authorization`.
 - **WOPI_ENABLED**: Specifies the enabling the wopi handlers. Defaults to `false`.
+- **WOPI_PRIVATE_KEY**: Defines the private key that signs the ONLYOFFICE Docs request
+- **WOPI_PRIVATE_KEY_OLD**: Defines the old private key that signs the ONLYOFFICE Docs request
+- **WOPI_PUBLIC_KEY**: Defines the public key that the integrator uses to check the private key
+- **WOPI_PUBLIC_KEY_OLD**: Defines the old public key that the integrator uses to check the old private key
+- **WOPI_MODULUS_KEY**: Defines the RSA modulus in the Base64-encoded format that is used to retrieve the public key
+- **WOPI_MODULUS_KEY_OLD**: Defines the old RSA modulus in the Base64-encoded format that is used to retrieve the old public key
+- **WOPI_EXPONENT_KEY**: Defines the RSA exponent in the Base64-encoded format that is used to retrieve the public key
+- **WOPI_EXPONENT_KEY_OLD**: Defines the old RSA exponent in the Base64-encoded format that is used to retrieve the old public key
 
 ## Project Information
 

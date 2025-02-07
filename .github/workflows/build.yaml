@@ -3,9 +3,7 @@ name: Multi-arch build
 
 run-name: >-
   Build Docs: [
-  ${{ inputs.docs-community && 'CE' || '-' }}
-  ${{ inputs.docs-enterprise && 'EE' || '-' }}
-  ${{ inputs.docs-developer && 'DE' || '-' }}
+  ${{ inputs.edition }}
   ]
   ${{ inputs.docs-balancer && 'balancer: [✓]' || '' }}
   ${{ inputs.docs-non-plugins && 'non-plugins: [✓]' || '' }}
@@ -15,18 +13,17 @@ run-name: >-
 on:
   workflow_dispatch:
     inputs:
-      docs-community:
+      amd64:
         type: boolean
-        description: 'Build Docs-Community'
+        description: 'Build amd64'
         default: true
-      docs-enterprise:
+      arm64:
         type: boolean
-        description: 'Build Docs-Enterprise'
+        description: 'Build arm64'
         default: true
-      docs-developer:
-        type: boolean
-        description: 'Build Docs-Developer'
-        default: true
+      edition:
+        description: "Specify edition (ex. 'ce' or 'ce,ee,de')"
+        type: string
       docs-non-plugins:
         type: boolean
         description: 'Build Docs-non-plugins'
@@ -45,7 +42,7 @@ on:
         required: true
       test-repo:
         type: boolean
-        description: 'Push to test repo'
+        description: 'Push to test-repo'
         default: true
       test-version:
         type: string
@@ -64,6 +61,7 @@ jobs:
       sourceTag: ${{ steps.prepare.outputs.sourceTag }}
       dsHash: ${{ steps.prepare.outputs.dsHash }}
       matrix: ${{ steps.prepare.outputs.matrix }}
+      platform: ${{ steps.prepare.outputs.platform }}
     steps:
       - name: prepare-build
         id: prepare
@@ -80,43 +78,57 @@ jobs:
                fi
             fi
 
+            ### Make build platforms ###
+            [ ${{ github.event.inputs.amd64 }} = true ] && PLATFORMS+=("amd64")
+            [ ${{ github.event.inputs.arm64 }} = true ] && PLATFORMS+=("arm64")
+            PLATFORM=$(echo ${PLATFORMS[*]/#/linux/} | tr ' ' ',')
+
             ### Make build matrix ###
             matrix='{"include": []}'
-            if ${{ github.event.inputs.docs-community }}; then
-              matrix=$(echo $matrix | jq '.include += [
+            editions=($(printf "%s\n" ${{ github.event.inputs.edition }} | tr ',' ' '))
+            for e in ${editions[@]}; do
+              case ${e} in
+                ce)
+                   echo "Enable community build..."
+                   matrix=$(echo $matrix | jq '.include += [
                       {
-                              "name": "Build Docs Community", 
-                              "dockerfile": "Dockerfile", 
-                              "edition": "", 
+                              "name": "Build Docs Community",
+                              "dockerfile": "Dockerfile",
+                              "edition": "",
                               "images": "proxy docservice converter"
                       }
-              ]')
-            fi
-            if ${{ github.event.inputs.docs-enterprise }}; then
-              matrix=$(echo $matrix | jq '.include += [
+                   ]')
+                   ;;
+                ee)
+                   echo "Enable enterprise build..."
+                   matrix=$(echo $matrix | jq '.include += [
                       {
-                              "name": "Build Docs Enterprise", 
-                              "dockerfile": "Dockerfile", 
-                              "edition": "-ee", 
+                              "name": "Build Docs Enterprise",
+                              "dockerfile": "Dockerfile",
+                              "edition": "-ee",
                               "images": "proxy docservice converter"
                       }
-              ]')
-            fi
-            if ${{ github.event.inputs.docs-developer }}; then
-              matrix=$(echo $matrix | jq '.include += [
+                   ]')
+                   ;;
+                de)
+                   echo "Enable developer build..."
+                   matrix=$(echo $matrix | jq '.include += [
                       {
-                              "name": "Build Docs Developer", 
-                              "dockerfile": "Dockerfile", 
-                              "edition": "-de", 
+                              "name": "Build Docs Developer",
+                              "dockerfile": "Dockerfile",
+                              "edition": "-de",
                               "images": "proxy docservice converter"
                       }
-              ]')
-            fi
+                   ]')
+                   ;;
+              esac
+            done
+
             if ${{ github.event.inputs.docs-non-plugins }}; then
               matrix=$(echo $matrix | jq '.include += [
                       {
                               "name": "Build Docs non-plugins", 
-                              "dockerfile": "Dockerfile", 
+                              "dockerfile": "Dockerfile.noplugins",
                               "edition": "-de", 
                               "images": "proxy docservice converter",
                               "postfix": "-noplugins"
@@ -148,6 +160,7 @@ jobs:
             echo "sourceTag=${{ github.event.inputs.tag }}" >> "$GITHUB_OUTPUT"
             echo "dsHash=$(echo -n "$(date +'%Y.%m.%d-%H%M')" | md5sum | awk '{print $1}')" >> "$GITHUB_OUTPUT"
             echo "matrix=$(echo $matrix | jq -c)" >> "$GITHUB_OUTPUT"
+            echo "platform=${PLATFORM[@]}" >> "$GITHUB_OUTPUT"
 
   build:
     name: "${{ matrix.name }} ${{ github.event.inputs.tag }}"
@@ -178,6 +191,7 @@ jobs:
            REGISTRY: ${{ inputs.test-repo && secrets.DOCKER_TEST_REGISTRY || 'docker.io' }}
            DS_VERSION_HASH: ${{ needs.prepare-build.outputs.dsHash }}
            SOURCE_TAG: ${{ needs.prepare-build.outputs.sourceTag }}
+           PLATFORM: ${{ needs.prepare-build.outputs.platform }}
            NOPLUG_POSTFIX: ${{ matrix.postfix }}
            DOCKERFILE: ${{ matrix.dockerfile }}
            TEST_VERSION: ${{ github.event.inputs.test-version }}

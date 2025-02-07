@@ -5,8 +5,10 @@ import json
 import time
 from kubernetes import client, watch
 
+ep_port = os.environ["SHARD_PORT"]
 ep_name = os.environ["DS_EP_NAME"]
 field_name = f'metadata.name={ep_name}'
+deployment_name = os.environ.get('DS_DEPLOYMENT_NAME')
 
 url_sending = f'http://127.0.0.1:8000/configuration'
 
@@ -30,6 +32,7 @@ configuration.debug = False
 configuration.api_key = {"authorization": "Bearer " + token}
 client.Configuration.set_default(configuration)
 v1 = client.CoreV1Api()
+apps = client.AppsV1Api()
 
 
 def init_logger(name):
@@ -43,31 +46,62 @@ def init_logger(name):
     logger.info('Running the script to get the endpoints of the DocumentServer\n')
 
 
-def read_pod_annotation(pod_name):
+def get_deploy_version():
     try:
-        annotation = v1.read_namespaced_pod(pod_name, ns)
-        version = annotation.metadata.annotations["ds-ver-hash"]
-        return version
-    except Exception as msg_read_pod:
-        logger_endpoints_ds.error(f'Error when reading an annotation to the Pod... {msg_read_pod}')
+        containers_list = apps.read_namespaced_deployment(name=deployment_name, namespace=ns)
+        image = containers_list.spec.template.spec.containers[1].image
+        tag = image.split(":")[1]
+        if tag != '':
+            return tag
+        else:
+            return 'none'
+    except Exception as msg_read_tag:
+        logger_endpoints_ds.error(f'Error reading the tag to the Deployment... {msg_read_tag}')
         return 'none'
 
 
-def get_ep_list(ep_ds, ep_port):
+def get_ep_list(ep_ds):
     ds_ep_list = []
+    ds_ep_list_tag = []
     total_result = {}
+    deploy_tag = get_deploy_version()
     for ep_ip in ep_ds:
         try:
             pod_name = ep_ip.target_ref.name
-            ver_ds = read_pod_annotation(pod_name)
+            try:
+                read_pod = v1.read_namespaced_pod(pod_name, ns)
+            except Exception as msg_read_pod:
+                logger_endpoints_ds.error(f'Error when reading data from the {pod_name} Pod... {msg_read_pod}')
+                ver_ds = 'none'
+                pod_tag = 'none'
+            else:
+                try:
+                    ver_ds = read_pod.metadata.annotations["ds-ver-hash"]
+                except Exception as msg_read_annotation:
+                    logger_endpoints_ds.error(f'Error when reading an annotation to the {pod_name} Pod... {msg_read_annotation}')
+                    ver_ds = 'none'
+                try:
+                    pod_tag = read_pod.spec.containers[1].image
+                    pod_tag = pod_tag.split(":")[1]
+                except Exception as msg_read_pod_tag:
+                    logger_endpoints_ds.error(f'Error when reading the tag in the {pod_name} Pod... {msg_read_pod_tag}')
+                    pod_tag = 'none'
             total_result['address'] = ep_ip.ip
             total_result['port'] = ep_port
             total_result['ver'] = ver_ds
-            ds_ep_list.append(json.dumps(total_result))
+            total_result['tag'] = pod_tag
+            if pod_tag != deploy_tag:
+                ds_ep_list.append(json.dumps(total_result))
+            else:
+                ds_ep_list_tag.append(json.dumps(total_result))
         except Exception as msg_url:
             logger_endpoints_ds.error(f'Failed to build a list of endpoints: {ds_ep_list}... {msg_url}')
-    all_ep = f'{ds_ep_list}'.replace("'", "")
-    requests.post(url_sending, data=all_ep)
+    if len(ds_ep_list_tag) > 0:
+        all_ep = f'{ds_ep_list_tag}'.replace("'", "")
+        requests.post(url_sending, data=all_ep)
+    else:
+        all_ep = f'{ds_ep_list}'.replace("'", "")
+        requests.post(url_sending, data=all_ep)
 
 
 def get_ds_status():
@@ -78,12 +112,11 @@ def get_ds_status():
                 try:
                     if event['object'].subsets:
                         ep_ds = event['object'].subsets[0].addresses
-                        ep_port = str(event['object'].subsets[0].ports[0].port)
                         if not ep_ds:
                             logger_endpoints_ds.warning(f'Empty "{ep_name}" endpoints list')
                             requests.post(url_sending, data="none")
                         else:
-                            get_ep_list(ep_ds, ep_port)
+                            get_ep_list(ep_ds)
                     else:
                         logger_endpoints_ds.warning(f'There are no addresses for endpoint "{ep_name}"')
                         requests.post(url_sending, data="none")

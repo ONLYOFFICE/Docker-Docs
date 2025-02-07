@@ -21,14 +21,16 @@ def set_nginx_parameter():
     logger_endpoints_ds.info('Running the setting of values in Nginx config')
     nginx_worker_processes = os.environ.get('BALANCER_WORKER_PROCESSES')
     nginx_worker_connections = os.environ.get('BALANCER_WORKER_CONNECTIONS')
+    nginx_worker_timeout = os.environ.get('BALANCER_WORKER_TIMEOUT')
     path = '/usr/local/openresty/nginx/conf/nginx.conf'
     try:
         with open(path, "r") as nginx_conf_read:
             nginx_config = nginx_conf_read.read()
         worker_processes = re.sub(r"worker_processes.*", f'worker_processes {nginx_worker_processes};', nginx_config)
         worker_connections = re.sub(r"worker_connections.*", f'worker_connections {nginx_worker_connections};', worker_processes)
+        worker_shutdown = re.sub(r"worker_shutdown_timeout.*", f'worker_shutdown_timeout {nginx_worker_timeout};', worker_connections)
         with open(path, "w") as config_write:
-            config_write.write(worker_connections)
+            config_write.write(worker_shutdown)
     except Exception as msg_set_nginx_conf:
         logger_endpoints_ds.error(f'Failed when trying to set a value in the Nginx config... {msg_set_nginx_conf}\n')
     else:
@@ -38,9 +40,10 @@ def set_nginx_parameter():
 def running_services():
     try:
         running_nginx = ["/usr/local/openresty/bin/openresty", "-g", "daemon off;"]
-        running_get_ds_ep = ["python3", "/ds_ep_observer/ds-ep-observer.py"]
-        running_get_ds_pod = ["python3", "/ds_ep_observer/ds-pod-observer.py"]
-        all_cmd = [running_nginx, running_get_ds_ep, running_get_ds_pod]
+        running_cm_observer = ["python3", "/scripts/balancer-cm-observer.py"]
+        running_get_ds_ep = ["python3", "/scripts/ds-ep-observer.py"]
+        running_get_ds_pod = ["python3", "/scripts/ds-pod-observer.py"]
+        all_cmd = [running_nginx, running_cm_observer, running_get_ds_ep, running_get_ds_pod]
         for cmd in all_cmd:
             cmd_process = subprocess.Popen(cmd)
             logger_endpoints_ds.info(f'The "{cmd_process.pid}" process has been running')
