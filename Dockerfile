@@ -56,7 +56,6 @@ RUN useradd --no-create-home --shell /sbin/nologin nginx && \
 COPY --chown=ds:ds \
     config/nginx/includes/http-common.conf \
     config/nginx/includes/http-upstream.conf \
-    config/nginx/includes/ds-docservice.conf \
     /etc/$COMPANY_NAME/documentserver/nginx/includes/
 COPY --chown=ds:ds \
     fonts/ \

@@ -31,8 +31,8 @@ services:
       - DB_USER=myuser
       - REDIST_SERVER_HOST=redis
       - AMQP_HOST=rabbitmq
-     #- METRICS_HOST=metrics
-     #- METRICS_ENABLED=true
+      - METRICS_HOST=metrics
+      - METRICS_ENABLED=true
       - WOPI_ENABLED=false
       - JWT_ENABLED=${JWT_ENABLED}
       - JWT_HEADER=${JWT_HEADER}
@@ -42,7 +42,7 @@ services:
       - postgresql
       - redis
       - rabbitmq
-     #- metrics
+      - metrics
     stdin_open: true
     restart: always
     expose:
@@ -64,8 +64,8 @@ services:
       - DB_USER=myuser
       - REDIST_SERVER_HOST=redis
       - AMQP_HOST=rabbitmq
-     #- METRICS_HOST=metrics
-     #- METRICS_ENABLED=true
+      - METRICS_HOST=metrics
+      - METRICS_ENABLED=true
       - JWT_ENABLED=${JWT_ENABLED}
       - JWT_HEADER=${JWT_HEADER}
       - JWT_SECRET=${JWT_SECRET}
@@ -74,21 +74,21 @@ services:
       - postgresql
       - redis
       - rabbitmq
-     #- metrics
+      - metrics
     stdin_open: true
     restart: always
     volumes:
      - common_data:/var/lib/${COMPANY_NAME}
 
- #metrics:
- #   build:
- #     context: .
- #     dockerfile: ${DOCKERFILE}
- #     target: metrics
- #   container_name: metrics
- #   expose:
- #     - '8125'
- #     - '8126'
+  metrics:
+    build:
+      context: .
+      dockerfile: ${DOCKERFILE}
+      target: metrics
+    container_name: metrics
+    expose:
+      - '8125'
+      - '8126'
 
   example:
     image: ${COMPANY_NAME}/${PREFIX_NAME}-example:${DOCKER_TAG}
