@@ -274,8 +274,10 @@ RUN apt update && \
     apt-get install -y curl wget gnupg2 lsb-release jq xxd procps libaio1 unzip && \
     echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
     wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && \
+    curl -sSL https://packages.microsoft.com/keys/microsoft.asc | tee /etc/apt/trusted.gpg.d/microsoft.asc && \
+    echo "deb [arch=amd64] https://packages.microsoft.com/debian/$(lsb_release -rs)/prod $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/mssql.list && \
     apt-get update && \
-    apt install -y postgresql-client-17 default-mysql-client && \
+    ACCEPT_EULA=Y apt install -y postgresql-client-17 default-mysql-client mssql-tools18 unixodbc-dev && \
     curl -LO \
       https://storage.googleapis.com/kubernetes-release/release/`curl \
       -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl && \
