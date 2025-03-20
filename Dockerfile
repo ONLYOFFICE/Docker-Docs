@@ -271,21 +271,32 @@ ENV DS_VERSION_HASH=$DS_VERSION_HASH
 COPY --from=ds-base /usr/local/bin/dumb-init /usr/local/bin/dumb-init
 COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 RUN apt update && \
-    apt-get install -y curl wget gnupg2 lsb-release jq xxd procps && \
+    apt-get install -y curl wget gnupg2 lsb-release jq xxd procps libaio1 unzip && \
     echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
     wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && \
+    curl -sSL https://packages.microsoft.com/keys/microsoft.asc | tee /etc/apt/trusted.gpg.d/microsoft.asc && \
+    echo "deb [arch=amd64] https://packages.microsoft.com/debian/$(lsb_release -rs)/prod $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/mssql.list && \
     apt-get update && \
-    apt install -y postgresql-client-17 default-mysql-client && \
+    ACCEPT_EULA=Y apt install -y postgresql-client-17 default-mysql-client mssql-tools18 unixodbc-dev && \
     curl -LO \
       https://storage.googleapis.com/kubernetes-release/release/`curl \
       -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl && \
     chmod +x ./kubectl && \
     mv ./kubectl /usr/local/bin/kubectl && \
+    mkdir -p ~/oracle/instantclient && \
+    wget -O ~/oracle/basic.zip https://download.oracle.com/otn_software/linux/instantclient/2370000/instantclient-basic-linux.x64-23.7.0.25.01.zip && \
+    wget -O ~/oracle/sqlplus.zip https://download.oracle.com/otn_software/linux/instantclient/2370000/instantclient-sqlplus-linux.x64-23.7.0.25.01.zip && \
+    unzip ~/oracle/basic.zip -d ~/oracle/instantclient && \
+    unzip -o ~/oracle/sqlplus.zip -d ~/oracle/instantclient && \
+    mkdir /oracle && \
+    mv ~/oracle/instantclient/instantclient_23_7 /oracle/instantclient && \
+    rm -rf ~/oracle && \
     groupadd --system -g 1006 ds && \
     useradd --system -g ds -d /home/ds -s /bin/bash -u 101 ds && \
     mkdir /scripts && \
     chown -R ds:ds /scripts && \
     chmod +x /usr/local/bin/dumb-init
+COPY scripts/sqlplus /usr/bin/sqlplus
 USER ds
 
 FROM statsd/statsd AS metrics
