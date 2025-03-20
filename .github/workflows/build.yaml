@@ -158,7 +158,7 @@ jobs:
 
             ### Specify outputs ###
             echo "sourceTag=${{ github.event.inputs.tag }}" >> "$GITHUB_OUTPUT"
-            echo "dsHash=$(echo -n "$(date +'%Y.%m.%d-%H%M')" | md5sum | awk '{print $1}')" >> "$GITHUB_OUTPUT"
+            echo "dsHash=1cfa284907105ac8a46411086fdd9087" >> "$GITHUB_OUTPUT"
             echo "matrix=$(echo $matrix | jq -c)" >> "$GITHUB_OUTPUT"
             echo "platform=${PLATFORM[@]}" >> "$GITHUB_OUTPUT"
 
