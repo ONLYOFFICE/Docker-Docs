@@ -289,15 +289,16 @@ RUN apt update && \
     wget -O ~/oracle/sqlplus.zip https://download.oracle.com/otn_software/linux/instantclient/2370000/instantclient-sqlplus-linux.x64-23.7.0.25.01.zip && \
     unzip ~/oracle/basic.zip -d ~/oracle/instantclient && \
     unzip -o ~/oracle/sqlplus.zip -d ~/oracle/instantclient && \
-    mkdir /oracle && \
+    mkdir /oracle /dameng /scripts && \
     mv ~/oracle/instantclient/instantclient_23_7 /oracle/instantclient && \
     rm -rf ~/oracle && \
     groupadd --system -g 1006 ds && \
     useradd --system -g ds -d /home/ds -s /bin/bash -u 101 ds && \
-    mkdir /scripts && \
     chown -R ds:ds /scripts && \
     chmod +x /usr/local/bin/dumb-init
 COPY scripts/sqlplus /usr/bin/sqlplus
+COPY scripts/disql /usr/bin/disql
+COPY --from=onlyoffice/damengdb:8.1.2 /opt/dmdbms/bin /dameng
 USER ds
 
 FROM statsd/statsd AS metrics
