@@ -23,6 +23,23 @@ case $AMQP_PROTO in
     ;;
 esac
 
+if [[ -n "$REDIS_SENTINEL_NODES" ]]; then
+  declare -a REDIS_SENTINEL_NODES_ALL=($REDIS_SENTINEL_NODES)
+  REDIS_SENTINEL_NODES_ARRAY=()
+  for node in "${REDIS_SENTINEL_NODES_ALL[@]}"; do
+    host="${node%%:*}"
+    port="${node##*:}"
+    REDIS_SENTINEL_NODES_ARRAY+=('{ "host": "'$host'", "port": '$port' }')
+  done
+  OLD_IFS="$IFS"
+  IFS=","
+  NODES=$(echo "${REDIS_SENTINEL_NODES_ARRAY[*]}")
+  IFS="$OLD_IFS"
+  REDIS_SENTINEL='[ '$NODES' ],'
+else
+  REDIS_SENTINEL='[ { "host": "'${REDIS_SERVER_HOST:-localhost}'", "port": '${REDIS_SERVER_PORT:-6379}' } ],'
+fi
+
 if [[ -n "$REDIS_CLUSTER_NODES" ]]; then
   declare -a REDIS_CLUSTER_NODES_ALL=($REDIS_CLUSTER_NODES)
   REDIS_CLUSTER_NODES_ARRAY=()
@@ -66,12 +83,7 @@ export NODE_CONFIG='{
         },
         "optionsCluster": { '${REDIS_CLUSTER}' },
         "iooptions": {
-          "sentinels": [
-            {
-            "host": "'${REDIS_SERVER_HOST:-localhost}'",
-            "port": '${REDIS_SERVER_PORT:-6379}'
-            }
-          ],
+          "sentinels": '${REDIS_SENTINEL}'
           "name": "'${REDIS_SENTINEL_GROUP_NAME:-mymaster}'",
           "sentinelPassword": "'${REDIS_SENTINEL_PWD}'",
           "username": "'${REDIS_SERVER_USER:-default}'",
