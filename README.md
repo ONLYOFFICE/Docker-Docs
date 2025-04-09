@@ -1,7 +1,7 @@
 ﻿## Overview
 [![Multi-arch build](https://github.com/ONLYOFFICE/Docker-Docs/actions/workflows/build.yaml/badge.svg)](https://github.com/ONLYOFFICE/Docker-Docs/actions/workflows/build.yaml)
 
-ONLYOFFICE Docs is an online office suite comprising viewers and editors for texts, spreadsheets and presentations and enabling collaborative editing in real time. The suite provides maximum compatibility with Office Open XML formats: .docx, .xlsx, .pptx. 
+ONLYOFFICE Docs is an open-source office suite that comprises all the tools you need to work with documents, spreadsheets, presentations, PDFs, and PDF forms. The suite supports office files of all popular formats (DOCX, ODT, XLSX, ODS, CSV, PPTX, ODP, etc.) and enables collaborative editing in real time.
 
 This set of images contain the same functionality as [Document Server](https://github.com/ONLYOFFICE/DocumentServer) but internal services are decoupled into multiple containers.
 
@@ -123,7 +123,7 @@ NOTE: If you wanna scale your container on runtime it is necessary to deploy ser
 docker service scale <deploy_name>_docservice=2
 ```
 
-#### Available сonfiguration parameters
+#### Available configuration parameters
 
 ONLYOFFICE Docs consists of set of images:
 
