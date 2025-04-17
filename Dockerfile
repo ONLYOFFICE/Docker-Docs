@@ -266,6 +266,7 @@ ENTRYPOINT /var/www/onlyoffice/documentserver-example/docker-entrypoint.sh npm s
 FROM python:3.11 AS builder
 RUN pip install redis psycopg2  PyMySQL pika python-qpid-proton func_timeout requests kubernetes flask
 FROM python:3.11-slim AS utils
+ARG TARGETARCH
 ARG DS_VERSION_HASH
 ENV DS_VERSION_HASH=$DS_VERSION_HASH
 COPY --from=ds-base /usr/local/bin/dumb-init /usr/local/bin/dumb-init
@@ -275,7 +276,7 @@ RUN apt update && \
     echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
     wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && \
     curl -sSL https://packages.microsoft.com/keys/microsoft.asc | tee /etc/apt/trusted.gpg.d/microsoft.asc && \
-    echo "deb [arch=amd64] https://packages.microsoft.com/debian/$(lsb_release -rs)/prod $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/mssql.list && \
+    echo "deb [arch=${TARGETARCH}] https://packages.microsoft.com/debian/$(lsb_release -rs)/prod $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/mssql.list && \
     apt-get update && \
     ACCEPT_EULA=Y apt install -y postgresql-client-17 default-mysql-client mssql-tools18 unixodbc-dev && \
     curl -LO \
@@ -288,15 +289,16 @@ RUN apt update && \
     wget -O ~/oracle/sqlplus.zip https://download.oracle.com/otn_software/linux/instantclient/2370000/instantclient-sqlplus-linux.x64-23.7.0.25.01.zip && \
     unzip ~/oracle/basic.zip -d ~/oracle/instantclient && \
     unzip -o ~/oracle/sqlplus.zip -d ~/oracle/instantclient && \
-    mkdir /oracle && \
+    mkdir /oracle /dameng /scripts && \
     mv ~/oracle/instantclient/instantclient_23_7 /oracle/instantclient && \
     rm -rf ~/oracle && \
     groupadd --system -g 1006 ds && \
     useradd --system -g ds -d /home/ds -s /bin/bash -u 101 ds && \
-    mkdir /scripts && \
     chown -R ds:ds /scripts && \
     chmod +x /usr/local/bin/dumb-init
 COPY scripts/sqlplus /usr/bin/sqlplus
+COPY scripts/disql /usr/bin/disql
+COPY --from=onlyoffice/damengdb:8.1.2 /opt/dmdbms/bin /dameng
 USER ds
 
 FROM statsd/statsd AS metrics
