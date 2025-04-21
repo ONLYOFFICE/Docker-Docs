@@ -167,6 +167,7 @@ Below is the complete list of parameters for `onlyoffice/docs-docservice`, `only
 - **REDIS_SERVER_USER**: The Redis user name.
 - **REDIS_SERVER_PWD**: The password set for the Redis account.
 - **REDIS_SERVER_DB_NUM**: Number of the redis logical database to be [selected](https://redis.io/commands/select/). Default to `0`.
+- **REDIS_SENTINEL_NODES**: List of Redis Sentinel Nodes. There is no need to specify every node, 3 should be enough. You can specify multiple values separated by a space. It must be specified in the `host:port` format.
 - **REDIS_SENTINEL_GROUP_NAME**: Name of a group of Redis instances composed of a master and one or more slaves. Default to `mymaster`.
 - **REDIS_SENTINEL_PWD**: The password set for the Redis Sentinel nodes. Default to empty.
 - **REDIS_CLUSTER_NODES**: List of nodes in the Redis cluster. There is no need to specify every node in the cluster, 3 should be enough. You can specify multiple values separated by a space. It must be specified in the `host:port` format.
