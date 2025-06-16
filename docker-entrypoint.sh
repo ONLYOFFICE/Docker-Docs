@@ -58,10 +58,10 @@ fi
 export NODE_CONFIG='{
   "statsd": {
     "useMetrics": '${METRICS_ENABLED:-false}',
-		"host": "'${METRICS_HOST:-localhost}'",
-		"port": '${METRICS_PORT:-8125}',
-		"prefix": "'${METRICS_PREFIX:-ds.}'"
-	},
+    "host": "'${METRICS_HOST:-localhost}'",
+    "port": '${METRICS_PORT:-8125}',
+    "prefix": "'${METRICS_PREFIX:-ds.}'"
+  },
   "services": {
     "CoAuthoring": {
       "sql": {
@@ -117,7 +117,7 @@ export NODE_CONFIG='{
         },
         "session": {
           "string": "'${JWT_SECRET}'"
-        }        
+        }
       },
       "request-filtering-agent" : {
         "allowPrivateIPAddress": '${ALLOW_PRIVATE_IP_ADDRESS:-false}',
@@ -156,7 +156,7 @@ export NODE_CONFIG='{
   "FileConverter": {
     "converter": {
         "maxprocesscount": 0.001
-    }  
+    }
   },
   "storage": {
     "fs": {
