@@ -63,7 +63,7 @@ export NODE_CONFIG='{
     "prefix": "'${METRICS_PREFIX:-ds.}'"
   },
   "runtimeConfig": {
-    "filePath": "/var/www/'${COMPANY_NAME}'/config/ai/runtime.json"
+    "filePath": "/var/www/'${COMPANY_NAME}'/config/runtime.json"
   },
   "services": {
     "CoAuthoring": {
