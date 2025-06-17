@@ -62,6 +62,9 @@ export NODE_CONFIG='{
     "port": '${METRICS_PORT:-8125}',
     "prefix": "'${METRICS_PREFIX:-ds.}'"
   },
+  "runtimeConfig": {
+    "filePath": "/var/www/'${COMPANY_NAME}'/config/ai/runtime.json"
+  },
   "services": {
     "CoAuthoring": {
       "sql": {
