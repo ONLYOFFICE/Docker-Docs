@@ -22,7 +22,7 @@ on:
         description: 'Build arm64'
         default: true
       edition:
-        description: "Specify edition (ex. 'ce' or 'ce,ee,de')"
+        description: "Specify edition (ex. 'ee' or 'ee,de')"
         type: string
       docs-non-plugins:
         type: boolean
@@ -92,17 +92,6 @@ jobs:
             editions=($(printf "%s\n" ${{ github.event.inputs.edition }} | tr ',' ' '))
             for e in ${editions[@]}; do
               case ${e} in
-                ce)
-                   echo "Enable community build..."
-                   matrix=$(echo $matrix | jq '.include += [
-                      {
-                              "name": "Build Docs Community",
-                              "dockerfile": "Dockerfile",
-                              "edition": "",
-                              "images": "proxy docservice converter"
-                      }
-                   ]')
-                   ;;
                 ee)
                    echo "Enable enterprise build..."
                    matrix=$(echo $matrix | jq '.include += [

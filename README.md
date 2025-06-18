@@ -18,7 +18,7 @@ This repository is intended for images used in the Document Server [Helm package
 
 By default, ONLYOFFICE Docs includes only editors without any document management system. ONLYOFFICE Docs can be used as a part of [ONLYOFFICE Workspace](#onlyoffice-workspace) or with third-party sync&share solutions (e.g. Nextcloud, ownCloud, Seafile) to enable collaborative editing within their interface. 
 
-ONLYOFFICE Docs has three editions - [Community, Enterprise, and Developer](https://github.com/ONLYOFFICE/DocumentServer#onlyoffice-document-server-editions). Clustering is available only for commercial builds (Enterprise and Developer Edition).
+ONLYOFFICE Docs has two editions - [Enterprise, and Developer](https://github.com/ONLYOFFICE/DocumentServer#onlyoffice-document-server-editions). Clustering is available only for commercial builds (Enterprise and Developer Edition).
 
 ## Recommended system requirements
 
@@ -61,8 +61,7 @@ Change the value of the `ACCOUNT_NAME` variable in the `.env` file. It must cont
 Also, depending on the solution type, specify the required value for the `PRODUCT_EDITION` variable in the `.env` file.
 
 Possible values:
-  - Nothing is specified. For the open-source community version. Default,
-  - `-de`. For commercial Developer Edition,
+  - `-de`. For commercial Developer Edition, (by default)
   - `-ee`. For commercial Enterprise Edition.
 
 If you want to use a ONLYOFFICE Docs version other than the latest one, specify the version you need in the `RELEASE_VERSION` variable. If no value is defined, the latest up-to-date version will be used.
