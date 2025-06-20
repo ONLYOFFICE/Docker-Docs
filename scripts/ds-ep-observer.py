@@ -9,6 +9,7 @@ ep_port = os.environ["SHARD_PORT"]
 ep_name = os.environ["DS_EP_NAME"]
 field_name = f'metadata.name={ep_name}'
 deployment_name = os.environ.get('DS_DEPLOYMENT_NAME')
+log_level = os.environ.get('LOG_LEVEL')
 
 url_sending = f'http://127.0.0.1:8000/configuration'
 
@@ -106,6 +107,8 @@ def get_ep_list(ep_ds):
 
 def get_ds_status():
     while True:
+        if log_level == 'DEBUG':
+            logger_endpoints_ds.debug(f'The Watch cycle for the "{ep_name}" endpoints is running')
         try:
             w = watch.Watch()
             for event in w.stream(v1.list_namespaced_endpoints, namespace=ns, field_selector=field_name):
@@ -116,6 +119,8 @@ def get_ds_status():
                             logger_endpoints_ds.warning(f'Empty "{ep_name}" endpoints list')
                             requests.post(url_sending, data="none")
                         else:
+                            if log_level == 'DEBUG':
+                                logger_endpoints_ds.debug(f'Endpoints "{ep_name}" received and sent')
                             get_ep_list(ep_ds)
                     else:
                         logger_endpoints_ds.warning(f'There are no addresses for endpoint "{ep_name}"')
@@ -126,6 +131,8 @@ def get_ds_status():
         except Exception as msg_get_ep:
             logger_endpoints_ds.warning(f'Trying to search "{ep_name}" endpoints... {msg_get_ep}')
             time.sleep(1)
+        if log_level == 'DEBUG':
+            logger_endpoints_ds.debug(f'The Watch cycle for the "{ep_name}" endpoints is ending')
 
 
 init_logger('endpoints')

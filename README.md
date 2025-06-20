@@ -18,7 +18,7 @@ This repository is intended for images used in the Document Server [Helm package
 
 By default, ONLYOFFICE Docs includes only editors without any document management system. ONLYOFFICE Docs can be used as a part of [ONLYOFFICE Workspace](#onlyoffice-workspace) or with third-party sync&share solutions (e.g. Nextcloud, ownCloud, Seafile) to enable collaborative editing within their interface. 
 
-ONLYOFFICE Docs has three editions - [Community, Enterprise, and Developer](https://github.com/ONLYOFFICE/DocumentServer#onlyoffice-document-server-editions). Clustering is available only for commercial builds (Enterprise and Developer Edition).
+ONLYOFFICE Docs has two editions - [Enterprise, and Developer](https://github.com/ONLYOFFICE/DocumentServer#onlyoffice-document-server-editions). Clustering is available only for commercial builds (Enterprise and Developer Edition).
 
 ## Recommended system requirements
 
@@ -61,8 +61,7 @@ Change the value of the `ACCOUNT_NAME` variable in the `.env` file. It must cont
 Also, depending on the solution type, specify the required value for the `PRODUCT_EDITION` variable in the `.env` file.
 
 Possible values:
-  - Nothing is specified. For the open-source community version. Default,
-  - `-de`. For commercial Developer Edition,
+  - `-de`. For commercial Developer Edition, (by default)
   - `-ee`. For commercial Enterprise Edition.
 
 If you want to use a ONLYOFFICE Docs version other than the latest one, specify the version you need in the `RELEASE_VERSION` variable. If no value is defined, the latest up-to-date version will be used.
@@ -167,6 +166,7 @@ Below is the complete list of parameters for `onlyoffice/docs-docservice`, `only
 - **REDIS_SERVER_USER**: The Redis user name.
 - **REDIS_SERVER_PWD**: The password set for the Redis account.
 - **REDIS_SERVER_DB_NUM**: Number of the redis logical database to be [selected](https://redis.io/commands/select/). Default to `0`.
+- **REDIS_SENTINEL_NODES**: List of Redis Sentinel Nodes. There is no need to specify every node, 3 should be enough. You can specify multiple values separated by a space. It must be specified in the `host:port` format.
 - **REDIS_SENTINEL_GROUP_NAME**: Name of a group of Redis instances composed of a master and one or more slaves. Default to `mymaster`.
 - **REDIS_SENTINEL_PWD**: The password set for the Redis Sentinel nodes. Default to empty.
 - **REDIS_CLUSTER_NODES**: List of nodes in the Redis cluster. There is no need to specify every node in the cluster, 3 should be enough. You can specify multiple values separated by a space. It must be specified in the `host:port` format.

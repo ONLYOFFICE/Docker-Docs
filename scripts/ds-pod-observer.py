@@ -7,6 +7,7 @@ from kubernetes import client, watch
 
 label = os.environ["DS_POD_LABEL"]
 ep_port = os.environ["SHARD_PORT"]
+log_level = os.environ.get('LOG_LEVEL')
 
 url_sending = f'http://127.0.0.1:8000/configuration_reserved'
 
@@ -68,11 +69,15 @@ def get_running_pod():
 
 def get_ds_pod():
     while True:
+        if log_level == 'DEBUG':
+            logger_pod_ds.debug(f'The Watch cycle for the "{label}" Pods is running')
         try:
             w = watch.Watch()
             for event in w.stream(v1.list_namespaced_pod, namespace=ns, label_selector=label):
                 try:
                     if event['object'].metadata.deletion_timestamp:
+                        if log_level == 'DEBUG':
+                            logger_pod_ds.debug(f'Pods "{label}" received and sent')
                         get_running_pod()
                 except Exception as msg_list_pod:
                     logger_pod_ds.error(f'Error when trying to list "{label}" Pods... {msg_list_pod}')
@@ -80,6 +85,8 @@ def get_ds_pod():
         except Exception as msg_get_pod:
             logger_pod_ds.warning(f'Trying to search "{label}" Pods... {msg_get_pod}')
             time.sleep(1)
+        if log_level == 'DEBUG':
+            logger_pod_ds.debug(f'The Watch cycle for the "{label}" Pods is ending')
 
 
 init_logger('pods')

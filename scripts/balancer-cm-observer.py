@@ -11,6 +11,7 @@ cm_name = "balancer-lua-config"
 cm_key = "balancer-lua.conf"
 cm_path = "/etc/nginx/mnt_config/balancer-lua.conf"
 cm_sha = None
+log_level = os.environ.get('LOG_LEVEL')
 
 k8s_host = os.environ["KUBERNETES_SERVICE_HOST"]
 api_server = f'https://{k8s_host}'
@@ -56,6 +57,8 @@ def watch_configmap_changes():
     global cm_sha
     field_selector = f"metadata.name={cm_name}"
     while True:
+        if log_level == 'DEBUG':
+            logger_cm_observer.debug(f'The Watch cycle for the "{cm_name}" ConfigMap is running')
         try:
             w = watch.Watch()
             for event in w.stream(v1.list_namespaced_config_map, namespace=ns, field_selector=field_selector):
@@ -64,6 +67,8 @@ def watch_configmap_changes():
                     f.write(event['object'].data[cm_key])
                     f.close()
                     new_sha256 = calculate_sha256(cm_path)
+                    if log_level == 'DEBUG':
+                        logger_cm_observer.debug(f'ConfigMap "{cm_name}" received and sent')
                     if not cm_sha or cm_sha != new_sha256:
                         cm_sha = new_sha256
                         reload_nginx()
@@ -72,6 +77,8 @@ def watch_configmap_changes():
         except Exception as msg_get_cm:
             logger_cm_observer.warning(f'Trying to get cm data...{msg_get_cm}')
             time.sleep(1)
+        if log_level == 'DEBUG':
+            logger_cm_observer.debug(f'The Watch cycle for the "{cm_name}" ConfigMap is ending')
 
 
 def reload_nginx():

@@ -1,4 +1,4 @@
-ARG POSTGRES_VERSION="12"
+ARG POSTGRES_VERSION="15"
 ARG MYSQL_VERSION="latest"
 ARG MARIADB_VERSION="latest"
 
@@ -80,7 +80,8 @@ EXPOSE 8888
 RUN dnf -y updateinfo && \
     dnf -y install gettext nginx httpd-tools && \
     dnf clean all && \
-    rm -f /var/log/*log
+    rm -f /var/log/*log && \
+    mkdir -p /etc/nginx/includes
 COPY --chown=ds:ds config/nginx/nginx.conf /etc/nginx/nginx.conf
 COPY --chown=ds:ds proxy-docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 COPY --chown=ds:ds --chmod=644 --from=ds-service \
@@ -202,6 +203,9 @@ COPY --from=ds-service \
 COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/server/FileConverter \
     /var/www/$COMPANY_NAME/documentserver/server/FileConverter
+COPY --from=ds-service \
+    /var/www/$COMPANY_NAME/documentserver/server/info \
+    /var/www/$COMPANY_NAME/documentserver/server/info
 COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/web-apps \
     /var/www/$COMPANY_NAME/documentserver/web-apps

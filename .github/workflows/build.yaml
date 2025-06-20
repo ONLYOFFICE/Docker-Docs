@@ -22,7 +22,7 @@ on:
         description: 'Build arm64'
         default: true
       edition:
-        description: "Specify edition (ex. 'ce' or 'ce,ee,de')"
+        description: "Specify Docs edition (ex. 'ee' or 'ee,de') Keep empty if don't need build any Docs edition"
         type: string
       docs-non-plugins:
         type: boolean
@@ -44,14 +44,18 @@ on:
         type: boolean
         description: 'Push to test-repo'
         default: true
-      test-version:
+      version:
         type: string
         required: false
-        description: 'Specify version if test-repo enabled'
-      test-build:
-        type: string
-        required: false
-        description: 'Specify build if test-repo enabled'
+        description: 'Specify version like (ex. 1.0.0). Also can be set with build number (ex. 1.0.0-1)'
+      package-url:
+        description: Get package from
+        required: true
+        default: prod
+        type: choice
+        options:
+        - s3
+        - prod
       
 jobs:
   prepare-build:
@@ -88,17 +92,6 @@ jobs:
             editions=($(printf "%s\n" ${{ github.event.inputs.edition }} | tr ',' ' '))
             for e in ${editions[@]}; do
               case ${e} in
-                ce)
-                   echo "Enable community build..."
-                   matrix=$(echo $matrix | jq '.include += [
-                      {
-                              "name": "Build Docs Community",
-                              "dockerfile": "Dockerfile",
-                              "edition": "",
-                              "images": "proxy docservice converter"
-                      }
-                   ]')
-                   ;;
                 ee)
                    echo "Enable enterprise build..."
                    matrix=$(echo $matrix | jq '.include += [
@@ -157,7 +150,6 @@ jobs:
             fi
 
             ### Specify outputs ###
-            echo "sourceTag=${{ github.event.inputs.tag }}" >> "$GITHUB_OUTPUT"
             echo "dsHash=$(echo -n "$(date +'%Y.%m.%d-%H%M')" | md5sum | awk '{print $1}')" >> "$GITHUB_OUTPUT"
             echo "matrix=$(echo $matrix | jq -c)" >> "$GITHUB_OUTPUT"
             echo "platform=${PLATFORM[@]}" >> "$GITHUB_OUTPUT"
@@ -190,24 +182,32 @@ jobs:
         env:
            REGISTRY: ${{ inputs.test-repo && secrets.DOCKER_TEST_REGISTRY || 'docker.io' }}
            DS_VERSION_HASH: ${{ needs.prepare-build.outputs.dsHash }}
-           SOURCE_TAG: ${{ needs.prepare-build.outputs.sourceTag }}
+           TAG: ${{ github.event.inputs.tag }}
            PLATFORM: ${{ needs.prepare-build.outputs.platform }}
            NOPLUG_POSTFIX: ${{ matrix.postfix }}
            DOCKERFILE: ${{ matrix.dockerfile }}
-           TEST_VERSION: ${{ github.event.inputs.test-version }}
-           TEST_BUILD: ${{ github.event.inputs.test-build }}
+           IMAGES: ${{ matrix.images }}
+           VERSION: ${{ github.event.inputs.version }}
+           TEST_REPO: ${{ github.event.inputs.test-repo }}
+           PRODUCT_EDITION: ${{ matrix.edition }}
+           PACKAGE_URL: ${{  github.event.inputs.package-url }}
         run: |
           : ${DS_VERSION_HASH:?Should be set!}
 
-          if ${{ github.event.inputs.test-repo }}; then
-            : ${TEST_VERSION:?Should be set!}
-            : ${TEST_BUILD:?Should be set!}
+          if "${TEST_REPO}"; then
+            echo "Build in repo: 4testing"
             export PRODUCT_BASEURL=${{ secrets.PRODUCT_BASEURL_RC }}
-            export RELEASE_VERSION="-${TEST_VERSION}-${TEST_BUILD}.el7"
+            export RELEASE_VERSION="-${VERSION}.el7"
+          elif [[ "${TEST_REPO}" != "true" && -n "${VERSION}" ]]; then
+            echo "Build in repo: hub.docker"
+            export RELEASE_VERSION="-${VERSION}"
+            if [[ "${PACKAGE_URL}" == "s3" ]]; then
+              echo "S3 package url was specified..."
+              export PRODUCT_BASEURL=${{ secrets.PRODUCT_BASEURL_RC }}
+              export RELEASE_VERSION="-${VERSION}.el7"
+            fi
           fi
 
-          PRODUCT_EDITION=${{ matrix.edition }} \
-          TAG=${SOURCE_TAG} \
-            docker buildx bake \
-            -f docker-bake.hcl ${{ matrix.images }} \
+          docker buildx bake \
+            -f docker-bake.hcl ${IMAGES} \
             --push
