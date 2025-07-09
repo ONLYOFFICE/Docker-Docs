@@ -22,7 +22,12 @@ RUN apt-get update -y && \
     mkdir -p /scripts \
              /var/tmp/docs_cache \
              /etc/nginx/mnt_config \
-             /etc/nginx/lua && \
+             /etc/nginx/lua/resty/redis && \
+    wget https://raw.githubusercontent.com/steve0511/resty-redis-cluster/e080402bb29f7ab0d00dd81f1bdfb43037bd204a/lib/resty/rediscluster.lua \
+    -O /etc/nginx/lua/resty/redis/rediscluster.lua && \
+    wget https://raw.githubusercontent.com/steve0511/resty-redis-cluster/e080402bb29f7ab0d00dd81f1bdfb43037bd204a/lib/resty/xmodem.lua \
+    -O /etc/nginx/lua/resty/xmodem.lua && \
+    chmod 644 /etc/nginx/lua/resty/redis/rediscluster.lua /etc/nginx/lua/resty/xmodem.lua && \
     rm -f /etc/nginx/conf.d/default.conf \
           /usr/local/openresty/nginx/conf/nginx.conf
 
