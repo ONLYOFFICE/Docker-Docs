@@ -63,7 +63,11 @@ COPY --chown=ds:ds \
 COPY --chown=ds:ds \
     plugins/ \
     /var/www/$COMPANY_NAME/documentserver/sdkjs-plugins/
+COPY --chown=ds:ds \
+    dictionaries/ \
+    /var/www/onlyoffice/documentserver/dictionaries/
 RUN documentserver-generate-allfonts.sh true && \
+    python3 /var/www/onlyoffice/documentserver/server/dictionaries/update.py && \
     documentserver-flush-cache.sh -h $DS_VERSION_HASH -r false && \
     documentserver-pluginsmanager.sh -r false \
     --update=\"/var/www/$COMPANY_NAME/documentserver/sdkjs-plugins/plugin-list-default.json\"
