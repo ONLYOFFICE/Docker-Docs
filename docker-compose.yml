@@ -102,6 +102,16 @@ services:
     volumes:
      - common_data:/var/lib/${COMPANY_NAME}
 
+  utils:
+    container_name: utils
+    build:
+      context: .
+      dockerfile: ${DOCKERFILE}
+      target: utils
+    image: ${ACCOUNT_NAME}/${PREFIX_NAME}-utils:${DOCKER_TAG}
+    stdin_open: true
+    restart: always
+
   metrics:
     build:
       context: .

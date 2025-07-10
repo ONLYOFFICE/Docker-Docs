@@ -50,6 +50,10 @@ To add your custom fonts to the images, add your custom fonts to the `fonts` dir
 
 To add plugins to the images, add the folder with the plugin code to the `plugins` directory.
 
+### Adding custom Dictionaries (optional)
+
+To add your custom dictionaries to the images, please add your custom dictionaries into the `dictionaries` directory before the build.
+
 ### Building images
 
 To build images, please follow these steps
