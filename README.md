@@ -96,7 +96,7 @@ To publish the images, run the following command:
 docker-compose push
 ```
 
-## Make your own ci with Github Actions
+## Make your own Docs ci build with Github Actions
 
 You can create your own process for building and pushing Docker-Docs images using our github ci actions. 
 
