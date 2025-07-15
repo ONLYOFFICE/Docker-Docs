@@ -120,7 +120,7 @@ Add variable with name `COMPANY_NAME`
 
 The variable value should contain your account in hub.docker which will be used when pushing images in the tag, for example, if the variable value is `onlyoffice`, the images will be push to:
 
-`docker.io/onlyoffice/docs-docservice:<some_version>`
+`docker.io/onlyoffice/docs-docservice-<specifyed_edition>:<some_version>`
 
 Also please add two repository secrets for login in hub.docker:
 
