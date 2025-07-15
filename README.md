@@ -124,7 +124,7 @@ The variable value should contain your account in hub.docker which will be used 
 
 Also please add two repository secrets for login in hub.docker:
 
-- `DOCKER_HUB_USERNAME` - Stored your account name that will push images.
+- `DOCKER_HUB_USERNAME` - Stored your user name that will push images.
 
 - `DOCKER_HUB_ACCESS_TOKEN` - Stored your account user token.
 
