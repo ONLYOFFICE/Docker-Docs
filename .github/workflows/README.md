@@ -1,6 +1,6 @@
 ## Make your own Docs ci build with Github Actions
 
-NOTE: To set up your own image builds, you need to have accounts in hud.docker.com and github.com
+NOTE: To set up your own image builds, you need to have accounts in **hud.docker.com** and **github.com**
 
 You can create your own process for building and pushing Docker-Docs images using our github ci actions. 
 
