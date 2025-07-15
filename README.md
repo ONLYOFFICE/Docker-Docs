@@ -102,15 +102,15 @@ You can create your own process for building and pushing Docker-Docs images usin
 
 To do this:
 
-#### 1. Fork this repository.
+#### 1. Fork this repository
 
 Fork this repository to your account.
 
-#### 2. Enable actions.
+#### 2. Enable actions
 
 Follow to the tab of actions in forked repository and enable them.
 
-#### 3. Set-up resository action variables
+#### 3. Set-up resository action variables and secrets
 
 Follow to:
 
