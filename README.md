@@ -145,8 +145,8 @@ Configure build:
 - Select Docs-balancer if needed.
 - Specify tag (required field).
 - Set `Push to test-repo` to 'false'.
-- Set Docs version that will be installed inside images (empty by default = latest release Docs).
-- set `Get packages from:` to prod.
+- Set Docs version that will be installed inside images (empty by default = latest released Docs version).
+- Set `Get packages from:` to prod.
 
 Thats all, then run configured workflow.
 
