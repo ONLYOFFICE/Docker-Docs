@@ -122,7 +122,7 @@ The variable value should contain your account in hub.docker which will be used 
 
 `docker.io/onlyoffice/docs-docservice:<some_version>`
 
-Also please add two repository secrets for login in hub.dokcer:
+Also please add two repository secrets for login in hub.docker:
 
 - `DOCKER_HUB_USERNAME` - Stored your account name that will push images.
 
