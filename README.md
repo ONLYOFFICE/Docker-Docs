@@ -140,7 +140,7 @@ Configure build:
 
 - Select the image architecture, by default both (amd64/arm64) are built.
 - Select Docs editions, set `ee,de` if you need build both editions (Field can be empty if you dont need build Docs).
-- Select Docs-non-plugins if needed, that will build.
+- Select Docs-non-plugins if needed, that will build images without plugins.
 - Select Docs-utils if needed.
 - Select Docs-balancer if needed.
 - Specify tag (required field).
