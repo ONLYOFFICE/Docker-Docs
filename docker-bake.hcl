@@ -3,7 +3,7 @@ variable "TAG" {
     default = "" 
 }
 
-variable "COMPANY_NAME" { 
+variable "DOCKER_ORG" {
     default = "onlyoffice" 
 }
 
@@ -50,7 +50,7 @@ group "apps" {
 target "example" {
     target = "example"
     dockerfile = "${DOCKERFILE}"
-    tags = equal("docker.io",REGISTRY) ? ["${REGISTRY}/${COMPANY_NAME}/${PREFIX_NAME}-example${PRODUCT_EDITION}:${TAG}"] : [
+    tags = equal("docker.io",REGISTRY) ? ["${REGISTRY}/${DOCKER_ORG}/${PREFIX_NAME}-example${PRODUCT_EDITION}:${TAG}"] : [
                                           "${REGISTRY}/${PREFIX_NAME}-example${PRODUCT_EDITION}:${TAG}" ]
     platforms = ["${PLATFORM}"]
     args = {
@@ -61,7 +61,7 @@ target "example" {
 target "proxy" {
     target = "proxy"
     dockerfile = "${DOCKERFILE}"
-    tags = equal("docker.io",REGISTRY) ? ["${REGISTRY}/${COMPANY_NAME}/${PREFIX_NAME}-proxy${PRODUCT_EDITION}:${TAG}${NOPLUG_POSTFIX}"] : [
+    tags = equal("docker.io",REGISTRY) ? ["${REGISTRY}/${DOCKER_ORG}/${PREFIX_NAME}-proxy${PRODUCT_EDITION}:${TAG}${NOPLUG_POSTFIX}"] : [
                                           "${REGISTRY}/${PREFIX_NAME}-proxy${PRODUCT_EDITION}:${TAG}${NOPLUG_POSTFIX}" ]
     platforms = ["${PLATFORM}"]
     args = {
@@ -75,7 +75,7 @@ target "proxy" {
 target "converter" {
     target = "converter"
     dockerfile = "${DOCKERFILE}"
-    tags = equal("docker.io",REGISTRY) ? ["${REGISTRY}/${COMPANY_NAME}/${PREFIX_NAME}-converter${PRODUCT_EDITION}:${TAG}${NOPLUG_POSTFIX}"] : [
+    tags = equal("docker.io",REGISTRY) ? ["${REGISTRY}/${DOCKER_ORG}/${PREFIX_NAME}-converter${PRODUCT_EDITION}:${TAG}${NOPLUG_POSTFIX}"] : [
                                           "${REGISTRY}/${PREFIX_NAME}-converter${PRODUCT_EDITION}:${TAG}${NOPLUG_POSTFIX}" ]
     platforms = ["${PLATFORM}"]
     args = {
@@ -89,7 +89,7 @@ target "converter" {
 target "docservice" {
     target = "docservice"
     dockerfile = "${DOCKERFILE}"
-    tags = equal("docker.io",REGISTRY) ? ["${REGISTRY}/${COMPANY_NAME}/${PREFIX_NAME}-docservice${PRODUCT_EDITION}:${TAG}${NOPLUG_POSTFIX}"] : [
+    tags = equal("docker.io",REGISTRY) ? ["${REGISTRY}/${DOCKER_ORG}/${PREFIX_NAME}-docservice${PRODUCT_EDITION}:${TAG}${NOPLUG_POSTFIX}"] : [
                                           "${REGISTRY}/${PREFIX_NAME}-docservice${PRODUCT_EDITION}:${TAG}${NOPLUG_POSTFIX}" ]
     platforms = ["${PLATFORM}"]
     args = {
@@ -103,7 +103,7 @@ target "docservice" {
 target "utils" {
     target = "utils"
     dockerfile = "${DOCKERFILE}"
-    tags = equal("docker.io",REGISTRY) ? ["${REGISTRY}/${COMPANY_NAME}/${PREFIX_NAME}-utils:${TAG}"] : [
+    tags = equal("docker.io",REGISTRY) ? ["${REGISTRY}/${DOCKER_ORG}/${PREFIX_NAME}-utils:${TAG}"] : [
                                           "${REGISTRY}/${PREFIX_NAME}-utils:${TAG}" ]
     platforms = ["${PLATFORM}"]
     args = {
@@ -116,7 +116,7 @@ target "utils" {
 target "balancer" {
     target = "balancer"
     dockerfile = "${DOCKERFILE}"
-    tags = equal("docker.io",REGISTRY) ? ["${REGISTRY}/${COMPANY_NAME}/${PREFIX_NAME}-balancer:${TAG}"] : [
+    tags = equal("docker.io",REGISTRY) ? ["${REGISTRY}/${DOCKER_ORG}/${PREFIX_NAME}-balancer:${TAG}"] : [
                                           "${REGISTRY}/${PREFIX_NAME}-balancer:${TAG}" ]
     platforms = ["${PLATFORM}"]
 }
