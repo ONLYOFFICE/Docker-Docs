@@ -191,6 +191,7 @@ jobs:
            TEST_REPO: ${{ github.event.inputs.test-repo }}
            PRODUCT_EDITION: ${{ matrix.edition }}
            PACKAGE_URL: ${{  github.event.inputs.package-url }}
+           COMPANY_NAME: ${{ vars.COMPANY_NAME }}
         run: |
           : ${DS_VERSION_HASH:?Should be set!}
 
