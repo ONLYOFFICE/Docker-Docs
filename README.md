@@ -118,9 +118,7 @@ Settings >> Secrets and Variables >> Actions >> Variables >> Repository Variable
 
 Add variable with name `COMPANY_NAME` 
 
-The variable value should contain your account in hub.docker which will be used when pushing images in the tag, for example: 
-
-If the variable value is `onlyoffice`, the images will be push to:
+The variable value should contain your account in hub.docker which will be used when pushing images in the tag, for example, if the variable value is `onlyoffice`, the images will be push to:
 
 `docker.io/onlyoffice/docs-docservice:<some_version>`
 
