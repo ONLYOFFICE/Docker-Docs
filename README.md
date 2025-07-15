@@ -32,7 +32,7 @@ ONLYOFFICE Docs has two editions - [Enterprise, and Developer](https://github.co
 
 ## Building ONLYOFFICE Docs
 
-**NOTE:** You can setup your own ci based on our github actions (optional). To get more information please follow to [tutorial](#https://github.com/ONLYOFFICE/Docker-Docs/blob/master/.github/workflows/readme.md)
+**NOTE:** You can setup your own ci based on our github actions (optional). To get more information please follow to [tutorial](https://github.com/ONLYOFFICE/Docker-Docs/blob/master/.github/workflows/readme.md)
 
 ### Cloning this repository
 
