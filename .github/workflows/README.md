@@ -14,7 +14,7 @@ To do this:
 
 - Follow to the tab of actions in forked repository and enable them.
 
-#### 3. Set-up resository action variables and secrets
+#### 3. Set-up repository action variables and secrets
 
 Follow to:
 
