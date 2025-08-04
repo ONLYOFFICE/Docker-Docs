@@ -208,6 +208,6 @@ jobs:
             fi
           fi
 
-          docker buildx bake \
+          docker buildx bake --sbom=true --provenance=mode=max \
             -f docker-bake.hcl ${IMAGES} \
             --push
