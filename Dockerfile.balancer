@@ -6,8 +6,8 @@ ENV TZ=Etc/UTC \
     BALANCER_WORKER_CONNECTIONS=16384 \
     BALANCER_WORKER_PROCESSES=1
 
-RUN groupadd -g 101 ds && \
-    useradd -m -r -u 101 -g ds ds
+RUN groupadd -g 101 onlyoffice && \
+    useradd -m -r -u 101 -g onlyoffice ds
 
 RUN apt-get update -y && \
     apt-get install python3.10 vim -y && \
@@ -44,8 +44,8 @@ COPY config/balancer/lua/docs_balancer.lua /etc/nginx/lua/
 COPY config/balancer/balancer-lua.conf /etc/nginx/mnt_config/
 COPY --chmod=755 balancer-docker-entrypoint.py /docker_entrypoint.py
 
-RUN chown -R ds:ds /scripts /var/tmp/docs_cache /etc/nginx /usr/local/openresty /docker_entrypoint.py \
-    && chown -R ds:ds /run/openresty /var/tmp
+RUN chown -R ds:onlyoffice /scripts /var/tmp/docs_cache /etc/nginx /usr/local/openresty /docker_entrypoint.py \
+    && chown -R ds:onlyoffice /run/openresty /var/tmp
 
 EXPOSE 8080 8443
 

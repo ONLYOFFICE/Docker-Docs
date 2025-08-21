@@ -24,8 +24,8 @@ RUN dnf install sudo \
     pip3 install redis && \
     wget -O /usr/local/bin/dumb-init https://github.com/Yelp/dumb-init/releases/download/v1.2.5/dumb-init_1.2.5_$(uname -m) && \
     chmod +x /usr/local/bin/dumb-init && \
-    groupadd --system --gid 101 ds && \
-    useradd --system -g ds --no-create-home --shell /sbin/nologin --uid 101 ds && \
+    groupadd --system --gid 101 onlyoffice && \
+    useradd --system -g onlyoffice --no-create-home --shell /sbin/nologin --uid 101 ds && \
     rm -f /var/log/*log
 
 FROM ds-base AS ds-service
@@ -53,17 +53,17 @@ RUN useradd --no-create-home --shell /sbin/nologin nginx && \
         /usr/share/fonts/msttcore/*.ttf && \
     chmod a+r /etc/$COMPANY_NAME/documentserver*/*.json && \
     chmod a+r /etc/$COMPANY_NAME/documentserver/log4js/*.json
-COPY --chown=ds:ds \
+COPY --chown=ds:onlyoffice \
     config/nginx/includes/http-common.conf \
     config/nginx/includes/http-upstream.conf \
     /etc/$COMPANY_NAME/documentserver/nginx/includes/
-COPY --chown=ds:ds \
+COPY --chown=ds:onlyoffice \
     fonts/ \
     /var/www/$COMPANY_NAME/documentserver/core-fonts/custom/
-COPY --chown=ds:ds \
+COPY --chown=ds:onlyoffice \
     plugins/ \
     /var/www/$COMPANY_NAME/documentserver/sdkjs-plugins/
-COPY --chown=ds:ds \
+COPY --chown=ds:onlyoffice \
     dictionaries/ \
     /var/www/onlyoffice/documentserver/dictionaries/
 RUN documentserver-generate-allfonts.sh true && \
@@ -86,25 +86,25 @@ RUN dnf -y updateinfo && \
     dnf clean all && \
     rm -f /var/log/*log && \
     mkdir -p /etc/nginx/includes
-COPY --chown=ds:ds config/nginx/nginx.conf /etc/nginx/nginx.conf
-COPY --chown=ds:ds proxy-docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
-COPY --chown=ds:ds --chmod=644 --from=ds-service \
+COPY --chown=ds:onlyoffice config/nginx/nginx.conf /etc/nginx/nginx.conf
+COPY --chown=ds:onlyoffice proxy-docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+COPY --chown=ds:onlyoffice --chmod=644 --from=ds-service \
     /etc/$COMPANY_NAME/documentserver/nginx/ds.conf \
     /etc/nginx/conf.d/
-COPY --chown=ds:ds --chmod=644 --from=ds-service \
+COPY --chown=ds:onlyoffice --chmod=644 --from=ds-service \
     /etc/$COMPANY_NAME/documentserver*/nginx/includes/*.conf \
     /etc/nginx/includes/ds-cache.conf \
     /etc/nginx/includes/
-COPY --chown=ds:ds --from=ds-service \
+COPY --chown=ds:onlyoffice --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/fonts \
     /var/www/$COMPANY_NAME/documentserver/fonts
-COPY --chown=ds:ds --from=ds-service \
+COPY --chown=ds:onlyoffice --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/sdkjs \
     /var/www/$COMPANY_NAME/documentserver/sdkjs
-COPY --chown=ds:ds --from=ds-service \
+COPY --chown=ds:onlyoffice --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/sdkjs-plugins \
     /var/www/$COMPANY_NAME/documentserver/sdkjs-plugins
-COPY --chown=ds:ds --from=ds-service \
+COPY --chown=ds:onlyoffice --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/web-apps \
     /var/www/$COMPANY_NAME/documentserver/web-apps
 COPY --from=ds-service \
@@ -113,7 +113,7 @@ COPY --from=ds-service \
 COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/document-templates/new \
     /var/www/$COMPANY_NAME/documentserver/document-templates/new
-COPY --chown=ds:ds --from=ds-service \
+COPY --chown=ds:onlyoffice --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver-example/welcome \
     /var/www/$COMPANY_NAME/documentserver-example/welcome
 RUN sed 's|\(application\/zip.*\)|\1\n    application\/wasm wasm;|' \
@@ -134,12 +134,12 @@ RUN sed 's|\(application\/zip.*\)|\1\n    application\/wasm wasm;|' \
     mkdir -p \
         /var/lib/$COMPANY_NAME/documentserver/App_Data/cache/files \
         /var/lib/$COMPANY_NAME/documentserver/App_Data/docbuilder && \
-    chown -R ds:ds /var/lib/$COMPANY_NAME/documentserver && \
+    chown -R ds:onlyoffice /var/lib/$COMPANY_NAME/documentserver && \
     find \
         /var/www/$COMPANY_NAME/documentserver/fonts \
         -type f ! \
         -name "*.*" \
-        -exec sh -c 'gzip -cf9 $0 > $0.gz && chown ds:ds $0.gz' {} \; && \
+        -exec sh -c 'gzip -cf9 $0 > $0.gz && chown ds:onlyoffice $0.gz' {} \; && \
     find \
         /var/www/$COMPANY_NAME/documentserver/sdkjs \
         /var/www/$COMPANY_NAME/documentserver/sdkjs-plugins \
@@ -147,7 +147,7 @@ RUN sed 's|\(application\/zip.*\)|\1\n    application\/wasm wasm;|' \
         /var/www/$COMPANY_NAME/documentserver-example/welcome \
         -type f \
         \( -name *.js -o -name *.json -o -name *.htm -o -name *.html -o -name *.css \) \
-        -exec sh -c 'gzip -cf9 $0 > $0.gz && chown ds:ds $0.gz' {} \;
+        -exec sh -c 'gzip -cf9 $0 > $0.gz && chown ds:onlyoffice $0.gz' {} \;
 VOLUME /var/lib/$COMPANY_NAME
 USER ds
 ENTRYPOINT docker-entrypoint.sh
@@ -158,7 +158,7 @@ COPY --from=ds-service \
     /etc/$COMPANY_NAME/documentserver/default.json \
     /etc/$COMPANY_NAME/documentserver/production-linux.json \
     /etc/$COMPANY_NAME/documentserver/
-COPY --from=ds-service --chown=ds:ds \
+COPY --from=ds-service --chown=ds:onlyoffice \
     /etc/$COMPANY_NAME/documentserver/log4js/production.json \
     /etc/$COMPANY_NAME/documentserver/log4js/
 COPY --from=ds-service \
@@ -173,7 +173,7 @@ COPY --from=ds-service \
 COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/server/info \
     /var/www/$COMPANY_NAME/documentserver/server/info
-COPY --chown=ds:ds --from=ds-service \
+COPY --chown=ds:onlyoffice --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/web-apps/apps/api/wopi \
     /var/www/$COMPANY_NAME/documentserver/web-apps/apps/api/wopi
 COPY --from=ds-service \
@@ -189,7 +189,7 @@ COPY --from=ds-service \
     /etc/$COMPANY_NAME/documentserver/default.json \
     /etc/$COMPANY_NAME/documentserver/production-linux.json \
     /etc/$COMPANY_NAME/documentserver/
-COPY --from=ds-service --chown=ds:ds \
+COPY --from=ds-service --chown=ds:onlyoffice \
     /etc/$COMPANY_NAME/documentserver/log4js/production.json \
     /etc/$COMPANY_NAME/documentserver/log4js/
 COPY --from=ds-service \
@@ -223,7 +223,7 @@ COPY docker-entrypoint.sh /usr/local/bin/
 RUN mkdir -p \
         /var/lib/$COMPANY_NAME/documentserver/App_Data/cache/files \
         /var/lib/$COMPANY_NAME/documentserver/App_Data/docbuilder && \
-    chown -R ds:ds /var/lib/$COMPANY_NAME/documentserver
+    chown -R ds:onlyoffice /var/lib/$COMPANY_NAME/documentserver
 USER ds
 ENTRYPOINT dumb-init docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/FileConverter/converter
 
@@ -248,20 +248,20 @@ RUN apk update && \
     cp -r ./document-server-integration/web/documentserver-example/nodejs/. \
       /var/www/onlyoffice/documentserver-example/ && \
     rm -rf ./document-server-integration && \
-    addgroup -S -g 1001 ds && \
+    addgroup -S -g 1001 onlyoffice && \
     adduser \
       -S \
-      -G ds \
+      -G onlyoffice \
       -D \
       -h /var/www/onlyoffice/documentserver-example \
       -s /sbin/nologin \
       -u 1001 ds && \
-    chown -R ds:ds /var/www/onlyoffice/documentserver-example/ && \
+    chown -R ds:onlyoffice /var/www/onlyoffice/documentserver-example/ && \
     mkdir -p /var/lib/onlyoffice/documentserver-example/ && \
-    chown -R ds:ds /var/lib/onlyoffice/ && \
+    chown -R ds:onlyoffice /var/lib/onlyoffice/ && \
     mv files /var/lib/onlyoffice/documentserver-example/ && \
     mkdir -p /etc/onlyoffice/documentserver-example/ && \
-    chown -R ds:ds /etc/onlyoffice/ && \
+    chown -R ds:onlyoffice /etc/onlyoffice/ && \
     mv config/* /etc/onlyoffice/documentserver-example/ && \
     npm install
 
@@ -300,9 +300,9 @@ RUN apt update && \
     mkdir /oracle /dameng /scripts && \
     mv ~/oracle/instantclient/instantclient_23_7 /oracle/instantclient && \
     rm -rf ~/oracle && \
-    groupadd --system -g 1006 ds && \
-    useradd --system -g ds -d /home/ds -s /bin/bash -u 101 ds && \
-    chown -R ds:ds /scripts && \
+    groupadd --system -g 1006 onlyoffice && \
+    useradd --system -g onlyoffice -d /home/ds -s /bin/bash -u 101 ds && \
+    chown -R ds:onlyoffice /scripts && \
     chmod +x /usr/local/bin/dumb-init
 COPY scripts/sqlplus /usr/bin/sqlplus
 COPY scripts/disql /usr/bin/disql
