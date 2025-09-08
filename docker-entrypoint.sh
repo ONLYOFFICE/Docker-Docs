@@ -177,4 +177,55 @@ export NODE_CONFIG='{
   }
 }'
 
-exec "$@"
+EXEC_CMD=""
+BUILD_FONTS=false
+BUILD_PLUGINS=false
+BUILD_DICTIONARIES=false
+
+while getopts ":c:fpd" opt; do
+  case $opt in
+    c ) EXEC_CMD="$(envsubst <<<"$OPTARG")" ;;
+    f ) BUILD_FONTS=true ;;
+    p ) BUILD_PLUGINS=true ;;
+    d ) BUILD_DICTIONARIES=true ;;
+    \?) ;;
+  esac
+done
+
+shift $((OPTIND-1))
+if [[ "${BUILD_FONTS}" == "true" ]]; then
+  if [[ -f "/var/lib/$COMPANY_NAME/documentserver/buffer/fonts/build_fonts.txt" ]]; then
+    echo "The font build has already been completed, skipping ..."
+  else
+    echo -e "\e[0;32m Build Fonts \e[0m"
+    documentserver-generate-allfonts.sh true
+    mkdir /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/
+    if [[ "${CONTAINER_NAME}" == "docservice" ]]; then
+      cp -ra /var/www/onlyoffice/documentserver/sdkjs/common/Images/ /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/
+      cp -ra /var/www/onlyoffice/documentserver/sdkjs/slide/themes/ /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/
+      cp -a /var/www/onlyoffice/documentserver/sdkjs/common/AllFonts.js /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/
+    fi
+    echo "Completed" > /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/build_fonts.txt
+  fi
+else
+  echo -e "\e[0;32m Do not Build Fonts \e[0m"
+fi
+
+if [[ "${BUILD_PLUGINS}" == "true" ]]; then
+  echo -e "\e[0;32m Build PLUGINS \e[0m"
+else
+  echo -e "\e[0;32m Do not Build PLUGINS \e[0m"
+fi
+
+if [[ "${BUILD_DICTIONARIES}" == "true" ]]; then
+  echo -e "\e[0;32m Build DICTIONARIES \e[0m"
+else
+  echo -e "\e[0;32m Do not Build DICTIONARIES \e[0m"
+fi
+
+if [[ -n "${EXEC_CMD}" ]]; then
+  echo -e "\e[0;32m EXEC_CMD Exist \e[0m"
+  exec -- "$EXEC_CMD" "$@"
+else
+  echo -e "\e[0;32m EXEC_CMD does not exist \e[0m"
+fi

@@ -20,6 +20,7 @@ RUN dnf install sudo \
                 shadow-utils \
                 procps-ng \
                 tar \
+                gettext \
                 unzip \
                 libaio \
                 libnsl \
@@ -91,7 +92,7 @@ ENV DOCSERVICE_HOST_PORT=localhost:8000 \
     NGINX_WORKER_PROCESSES=1
 EXPOSE 8888
 RUN dnf -y updateinfo && \
-    dnf -y install gettext nginx httpd-tools && \
+    dnf -y install nginx httpd-tools && \
     dnf clean all && \
     rm -f /var/log/*log && \
     mkdir -p /etc/nginx/includes
@@ -159,7 +160,7 @@ RUN sed 's|\(application\/zip.*\)|\1\n    application\/wasm wasm;|' \
         -exec sh -c 'gzip -cf9 $0 > $0.gz && chown ds:ds $0.gz' {} \;
 VOLUME /var/lib/$COMPANY_NAME
 USER ds
-ENTRYPOINT docker-entrypoint.sh
+ENTRYPOINT ["docker-entrypoint.sh"]
 
 FROM ds-base AS docservice
 EXPOSE 8000
@@ -194,6 +195,13 @@ ENTRYPOINT dumb-init docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/
 HEALTHCHECK --interval=10s --timeout=3s CMD curl -sf http://localhost:8000/index.html
 
 FROM ds-base AS converter
+COPY documentserver-generate-allfonts.sh /usr/bin/documentserver-generate-allfonts.sh
+COPY --from=ds-service \
+    /var/www/$COMPANY_NAME/documentserver/server/tools/allfontsgen \
+    /var/www/$COMPANY_NAME/documentserver/server/tools/allfontsgen
+COPY --from=ds-service \
+    /var/www/$COMPANY_NAME/documentserver/server/tools/allthemesgen \
+    /var/www/$COMPANY_NAME/documentserver/server/tools/allthemesgen
 COPY --from=ds-service \
     /etc/$COMPANY_NAME/documentserver/default.json \
     /etc/$COMPANY_NAME/documentserver/production-linux.json \
@@ -201,6 +209,18 @@ COPY --from=ds-service \
 COPY --from=ds-service --chown=ds:ds \
     /etc/$COMPANY_NAME/documentserver/log4js/production.json \
     /etc/$COMPANY_NAME/documentserver/log4js/
+COPY --from=ds-service \
+    /var/www/$COMPANY_NAME/documentserver/sdkjs-plugins \
+    /var/www/$COMPANY_NAME/documentserver/sdkjs-plugins
+COPY --from=ds-service \
+    /var/www/$COMPANY_NAME/documentserver/web-apps/apps/common/main/resources/themes \
+    /var/www/$COMPANY_NAME/documentserver/web-apps/apps/common/main/resources/themes
+COPY --from=ds-service \
+    /var/www/$COMPANY_NAME/documentserver/server/DocService \
+    /var/www/$COMPANY_NAME/documentserver/server/DocService
+COPY --chown=ds:ds --from=ds-service \
+    /var/www/$COMPANY_NAME/documentserver/web-apps/apps/api/wopi \
+    /var/www/$COMPANY_NAME/documentserver/web-apps/apps/api/wopi
 COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/core-fonts \
     /var/www/$COMPANY_NAME/documentserver/core-fonts
@@ -234,7 +254,7 @@ RUN mkdir -p \
         /var/lib/$COMPANY_NAME/documentserver/App_Data/docbuilder && \
     chown -R ds:ds /var/lib/$COMPANY_NAME/documentserver
 USER ds
-ENTRYPOINT dumb-init docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/FileConverter/converter
+ENTRYPOINT ["dumb-init", "--", "docker-entrypoint.sh"]
 
 FROM node:20-alpine3.19 AS example
 LABEL maintainer Ascensio System SIA <support@onlyoffice.com>

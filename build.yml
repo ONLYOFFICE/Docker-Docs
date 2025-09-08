@@ -1,0 +1,26 @@
+services:
+  converter:
+    container_name: converter
+    build:
+      context: .
+      dockerfile: ${DOCKERFILE}
+      target: converter
+    image: ${ACCOUNT_NAME}/${PREFIX_NAME}-converter${PRODUCT_EDITION}:${DOCKER_TAG}
+    environment:
+      - DOCSERVICE_HOST_PORT=docservice:8000
+      - EXAMPLE_HOST_PORT=example:3000
+    stdin_open: true
+    restart: always
+
+  proxy:
+    container_name: proxy
+    build:
+      context: .
+      dockerfile: ${DOCKERFILE}
+      target: proxy
+    image: ${ACCOUNT_NAME}/${PREFIX_NAME}-proxy${PRODUCT_EDITION}:${DOCKER_TAG}
+    environment:
+      - DOCSERVICE_HOST_PORT=docservice:8000
+      - EXAMPLE_HOST_PORT=example:3000
+    stdin_open: true
+    restart: always

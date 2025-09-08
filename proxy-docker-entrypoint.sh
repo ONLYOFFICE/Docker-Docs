@@ -31,4 +31,60 @@ if [[ -n "$INFO_ALLOWED_USER" ]]; then
   sed -i '/(info)/a\  auth_basic \"Authentication Required\"\;' /tmp/proxy_nginx/includes/ds-docservice.conf
   sed -i '/auth_basic/a\  auth_basic_user_file \/tmp\/auth\;' /tmp/proxy_nginx/includes/ds-docservice.conf
 fi
+
+BUILD_FONTS=false
+BUILD_PLUGINS=false
+BUILD_DICTIONARIES=false
+
+while getopts ":fpd" opt; do
+  case $opt in
+    f ) BUILD_FONTS=true ;;
+    p ) BUILD_PLUGINS=true ;;
+    d ) BUILD_DICTIONARIES=true ;;
+    \?) ;;
+  esac
+done
+
+if [[ "${BUILD_FONTS}" == "true" ]]; then
+  if [[ -f "/var/lib/$COMPANY_NAME/documentserver/buffer/fonts/build_fonts.txt" ]]; then
+    echo "The font build has already been completed,skipping ..."
+  else
+    until cat  /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/build_fonts.txt
+    do
+      echo "Waiting for the build fonts to complete"
+      sleep 5
+    done
+    echo -e "\e[0;32m Build Fonts \e[0m"
+    cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/Images/* /var/www/$COMPANY_NAME/documentserver/sdkjs/common/Images/
+    cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/themes/* /var/www/$COMPANY_NAME/documentserver/sdkjs/slide/themes/
+    cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/AllFonts.js /var/www/$COMPANY_NAME/documentserver/sdkjs/common/
+    find /var/www/$COMPANY_NAME/documentserver/fonts \
+      -type f ! \
+      -name "*.*" \
+      -exec sh -c 'gzip -cf9 $0 > $0.gz && chown ds:ds $0.gz' {} \;
+    chmod 755 /var/www/$COMPANY_NAME/documentserver/sdkjs/common/Images/cursors/
+    find /var/www/$COMPANY_NAME/documentserver/sdkjs/common \
+      /var/www/$COMPANY_NAME/documentserver/sdkjs/slide/themes \
+      /var/www/$COMPANY_NAME/documentserver/sdkjs/common/Images \
+      -type f \
+      \( -name '*.js' -o -name '*.json' -o -name '*.htm' -o -name '*.html' -o -name '*.css' \) \
+      -exec sh -c 'gzip -cf9 $0 > $0.gz && chown ds:ds $0.gz' {} \;
+    chmod 555 /var/www/$COMPANY_NAME/documentserver/sdkjs/common/Images/cursors/
+  fi
+else
+  echo -e "\e[0;32m Do not Build Fonts \e[0m"
+fi
+
+if [[ "${BUILD_PLUGINS}" == "true" ]]; then
+  echo -e "\e[0;32m Build PLUGINS \e[0m"
+else
+  echo -e "\e[0;32m Do not Build PLUGINS \e[0m"
+fi
+
+if [[ "${BUILD_DICTIONARIES}" == "true" ]]; then
+  echo -e "\e[0;32m Build DICTIONARIES \e[0m"
+else
+  echo -e "\e[0;32m Do not Build DICTIONARIES \e[0m"
+fi
+
 exec nginx -c /tmp/proxy_nginx/nginx.conf -g 'daemon off;'
