@@ -83,6 +83,7 @@ RUN documentserver-generate-allfonts.sh true && \
 
 FROM ds-base AS proxy
 ENV DOCSERVICE_HOST_PORT=localhost:8000 \
+    ADMINPANEL_HOST_PORT=localhost:9000 \
     EXAMPLE_HOST_PORT=localhost:3000 \
     NGINX_ACCESS_LOG=off \
     NGINX_GZIP_PROXIED=off \
