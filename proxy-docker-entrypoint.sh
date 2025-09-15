@@ -32,6 +32,7 @@ if [[ -n "$INFO_ALLOWED_USER" ]]; then
   sed -i '/auth_basic/a\  auth_basic_user_file \/tmp\/auth\;' /tmp/proxy_nginx/includes/ds-docservice.conf
 fi
 
+WORK_DIR="/var/www/$COMPANY_NAME/documentserver"
 BUILD_FONTS=false
 BUILD_PLUGINS=false
 BUILD_DICTIONARIES=false
@@ -49,27 +50,27 @@ if [[ "${BUILD_FONTS}" == "true" ]]; then
   if [[ -f "/var/lib/$COMPANY_NAME/documentserver/buffer/fonts/build_fonts.txt" ]]; then
     echo "The font build has already been completed,skipping ..."
   else
-    until cat  /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/build_fonts.txt
+    until cat /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/build_fonts.txt
     do
       echo "Waiting for the build fonts to complete"
       sleep 5
     done
     echo -e "\e[0;32m Build Fonts \e[0m"
-    cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/Images/* /var/www/$COMPANY_NAME/documentserver/sdkjs/common/Images/
-    cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/themes/* /var/www/$COMPANY_NAME/documentserver/sdkjs/slide/themes/
-    cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/AllFonts.js /var/www/$COMPANY_NAME/documentserver/sdkjs/common/
-    find /var/www/$COMPANY_NAME/documentserver/fonts \
+    cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/Images/* $WORK_DIR/sdkjs/common/Images/
+    cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/themes/* $WORK_DIR/sdkjs/slide/themes/
+    cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/AllFonts.js $WORK_DIR/sdkjs/common/
+    find $WORK_DIR/fonts \
       -type f ! \
       -name "*.*" \
       -exec sh -c 'gzip -cf9 $0 > $0.gz && chown ds:ds $0.gz' {} \;
-    chmod 755 /var/www/$COMPANY_NAME/documentserver/sdkjs/common/Images/cursors/
-    find /var/www/$COMPANY_NAME/documentserver/sdkjs/common \
-      /var/www/$COMPANY_NAME/documentserver/sdkjs/slide/themes \
-      /var/www/$COMPANY_NAME/documentserver/sdkjs/common/Images \
+    chmod 755 $WORK_DIR/sdkjs/common/Images/cursors/
+    find $WORK_DIR/sdkjs/common \
+      $WORK_DIR/sdkjs/slide/themes \
+      $WORK_DIR/sdkjs/common/Images \
       -type f \
       \( -name '*.js' -o -name '*.json' -o -name '*.htm' -o -name '*.html' -o -name '*.css' \) \
       -exec sh -c 'gzip -cf9 $0 > $0.gz && chown ds:ds $0.gz' {} \;
-    chmod 555 /var/www/$COMPANY_NAME/documentserver/sdkjs/common/Images/cursors/
+    chmod 555 $WORK_DIR/sdkjs/common/Images/cursors/
   fi
 else
   echo -e "\e[0;32m Do not Build Fonts \e[0m"
@@ -82,7 +83,33 @@ else
 fi
 
 if [[ "${BUILD_DICTIONARIES}" == "true" ]]; then
-  echo -e "\e[0;32m Build DICTIONARIES \e[0m"
+  if [[ -f "/var/lib/$COMPANY_NAME/documentserver/buffer/dictionaries/build_dictionaries.txt" ]]; then
+    echo "The dictionaries build has already been completed,skipping ..."
+  else
+    until cat /var/lib/$COMPANY_NAME/documentserver/buffer/dictionaries/build_dictionaries.txt
+    do
+      echo "Waiting for the build fonts to complete"
+      sleep 5
+    done
+    echo -e "\e[0;32m Build Dictionaries \e[0m"
+    ( find $WORK_DIR/sdkjs/cell $WORK_DIR/sdkjs/word $WORK_DIR/sdkjs/slide $WORK_DIR/sdkjs/visio -maxdepth 1 -type f -name '*.js'
+      echo "$WORK_DIR/sdkjs/common/spell/spell/spell.js" ) | while read -r file; do
+        chmod 740 "$file"
+        dir=$(basename "$(dirname "$file")")
+        echo $dir
+        base_file=$(basename "$file")
+        echo $base_file
+        if [[ "${base_file}" == "spell.js" ]]; then
+          target_dir="$WORK_DIR/sdkjs/common/spell/$dir"
+        else
+          target_dir="$WORK_DIR/sdkjs/$dir"
+        fi
+        echo cp -a "/var/lib/$COMPANY_NAME/documentserver/buffer/dictionaries/$dir/$base_file" "$target_dir/"
+        cp -a "/var/lib/$COMPANY_NAME/documentserver/buffer/dictionaries/$dir/$base_file" "$target_dir/"
+        gzip -cf9 "$target_dir/$base_file" > "$target_dir/$base_file.gz"
+        chmod 440 "$target_dir/$base_file"
+    done
+  fi
 else
   echo -e "\e[0;32m Do not Build DICTIONARIES \e[0m"
 fi

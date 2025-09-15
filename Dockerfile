@@ -84,6 +84,7 @@ RUN documentserver-generate-allfonts.sh true && \
 
 FROM ds-base AS proxy
 ENV DOCSERVICE_HOST_PORT=localhost:8000 \
+    ADMINPANEL_HOST_PORT=localhost:9000 \
     EXAMPLE_HOST_PORT=localhost:3000 \
     NGINX_ACCESS_LOG=off \
     NGINX_GZIP_PROXIED=off \
@@ -117,7 +118,7 @@ COPY --chown=ds:ds --from=ds-service \
 COPY --chown=ds:ds --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/web-apps \
     /var/www/$COMPANY_NAME/documentserver/web-apps
-COPY --from=ds-service \
+COPY --chown=ds:ds --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/dictionaries \
     /var/www/$COMPANY_NAME/documentserver/dictionaries
 COPY --from=ds-service \
@@ -197,11 +198,17 @@ HEALTHCHECK --interval=10s --timeout=3s CMD curl -sf http://localhost:8000/index
 FROM ds-base AS converter
 COPY documentserver-generate-allfonts.sh /usr/bin/documentserver-generate-allfonts.sh
 COPY --from=ds-service \
+    /var/www/$COMPANY_NAME/documentserver/server/dictionaries/update.py \
+    /var/www/$COMPANY_NAME/documentserver/server/dictionaries/update.py
+COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/server/tools/allfontsgen \
     /var/www/$COMPANY_NAME/documentserver/server/tools/allfontsgen
 COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/server/tools/allthemesgen \
     /var/www/$COMPANY_NAME/documentserver/server/tools/allthemesgen
+COPY --chown=ds:ds --from=ds-service \
+    /var/www/$COMPANY_NAME/documentserver/dictionaries \
+    /var/www/$COMPANY_NAME/documentserver/dictionaries
 COPY --from=ds-service \
     /etc/$COMPANY_NAME/documentserver/default.json \
     /etc/$COMPANY_NAME/documentserver/production-linux.json \
