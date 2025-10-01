@@ -64,6 +64,11 @@ target "adminpanel" {
     tags = equal("docker.io",REGISTRY) ? ["${REGISTRY}/${COMPANY_NAME}/${PREFIX_NAME}-adminpanel:${TAG}"] : [
                                           "${REGISTRY}/${PREFIX_NAME}-adminpanel:${TAG}" ]
     platforms = ["${PLATFORM}"]
+    args = {
+        "PRODUCT_EDITION": "${PRODUCT_EDITION}"
+        "PRODUCT_BASEURL": "${PRODUCT_BASEURL}"
+        "RELEASE_VERSION": "${RELEASE_VERSION}"
+        "DS_VERSION_HASH": "${DS_VERSION_HASH}"
 }
 
 target "proxy" {
