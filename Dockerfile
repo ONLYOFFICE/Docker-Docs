@@ -120,6 +120,9 @@ COPY --chown=ds:ds --from=ds-service \
 COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/dictionaries \
     /var/www/$COMPANY_NAME/documentserver/dictionaries
+COPY --chown=ds:ds --from=ds-service \
+    /var/www/$COMPANY_NAME/documentserver/server/AdminPanel/client \
+    /var/www/$COMPANY_NAME/documentserver/server/AdminPanel/client
 COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/document-templates/new \
     /var/www/$COMPANY_NAME/documentserver/document-templates/new
@@ -236,6 +239,22 @@ RUN mkdir -p \
     chown -R ds:ds /var/lib/$COMPANY_NAME/documentserver
 USER ds
 ENTRYPOINT dumb-init docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/FileConverter/converter
+
+FROM ds-base AS adminpanel
+EXPOSE 9000
+COPY --from=ds-service \
+    /etc/$COMPANY_NAME/documentserver/default.json \
+    /etc/$COMPANY_NAME/documentserver/production-linux.json \
+    /etc/$COMPANY_NAME/documentserver/
+COPY --from=ds-service --chown=ds:ds \
+    /etc/$COMPANY_NAME/documentserver/log4js/production.json \
+    /etc/$COMPANY_NAME/documentserver/log4js/
+COPY --from=ds-service \
+    /var/www/$COMPANY_NAME/documentserver/server/AdminPanel/server \
+    /var/www/$COMPANY_NAME/documentserver/server/AdminPanel/server
+COPY docker-entrypoint.sh /usr/local/bin/
+USER ds
+ENTRYPOINT dumb-init docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/AdminPanel/server/adminpanel
 
 FROM node:20-alpine3.19 AS example
 LABEL maintainer Ascensio System SIA <support@onlyoffice.com>

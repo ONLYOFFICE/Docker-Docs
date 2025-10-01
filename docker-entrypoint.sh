@@ -118,6 +118,9 @@ export NODE_CONFIG='{
         "outbox": {
           "string": "'${JWT_SECRET_OUTBOX:-${JWT_SECRET}}'"
         },
+        "browser": {
+          "string": "'${JWT_SECRET}'"
+        },
         "session": {
           "string": "'${JWT_SECRET}'"
         }
