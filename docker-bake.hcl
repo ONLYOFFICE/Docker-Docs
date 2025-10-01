@@ -58,6 +58,14 @@ target "example" {
     }
 }
 
+target "adminpanel" {
+    target = "adminpanel"
+    dockerfile = "${DOCKERFILE}"
+    tags = equal("docker.io",REGISTRY) ? ["${REGISTRY}/${COMPANY_NAME}/${PREFIX_NAME}-adminpanel:${TAG}"] : [
+                                          "${REGISTRY}/${PREFIX_NAME}-adminpanel:${TAG}" ]
+    platforms = ["${PLATFORM}"]
+}
+
 target "proxy" {
     target = "proxy"
     dockerfile = "${DOCKERFILE}"

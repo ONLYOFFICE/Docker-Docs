@@ -30,7 +30,7 @@ on:
         default: true
       docs-utils:
         type: boolean
-        description: 'Build Docs-utils'
+        description: 'Build Docs-utils (utils example adminpanel)'
         default: true
       docs-balancer:
         type: boolean
@@ -134,7 +134,7 @@ jobs:
                               "name": "Build Docs utils", 
                               "dockerfile": "Dockerfile", 
                               "edition": "", 
-                              "images": "example utils"
+                              "images": "example utils adminpanel"
                       }
               ]')
             fi
