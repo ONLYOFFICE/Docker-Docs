@@ -69,6 +69,7 @@ target "adminpanel" {
         "PRODUCT_BASEURL": "${PRODUCT_BASEURL}"
         "RELEASE_VERSION": "${RELEASE_VERSION}"
         "DS_VERSION_HASH": "${DS_VERSION_HASH}"
+    }
 }
 
 target "proxy" {
