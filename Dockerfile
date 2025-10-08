@@ -120,9 +120,6 @@ COPY --chown=ds:ds --from=ds-service \
 COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/dictionaries \
     /var/www/$COMPANY_NAME/documentserver/dictionaries
-COPY --chown=ds:ds --from=ds-service \
-    /var/www/$COMPANY_NAME/documentserver/server/AdminPanel/client \
-    /var/www/$COMPANY_NAME/documentserver/server/AdminPanel/client
 COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/document-templates/new \
     /var/www/$COMPANY_NAME/documentserver/document-templates/new
@@ -249,9 +246,12 @@ COPY --from=ds-service \
 COPY --from=ds-service --chown=ds:ds \
     /etc/$COMPANY_NAME/documentserver/log4js/production.json \
     /etc/$COMPANY_NAME/documentserver/log4js/
-COPY --from=ds-service \
+COPY --chown=ds:ds --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/server/AdminPanel/server \
     /var/www/$COMPANY_NAME/documentserver/server/AdminPanel/server
+COPY --chown=ds:ds --from=ds-service \
+    /var/www/$COMPANY_NAME/documentserver/server/AdminPanel/client \
+    /client
 COPY docker-entrypoint.sh /usr/local/bin/
 USER ds
 ENTRYPOINT dumb-init docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/AdminPanel/server/adminpanel

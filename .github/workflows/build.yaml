@@ -99,7 +99,7 @@ jobs:
                               "name": "Build Docs Enterprise",
                               "dockerfile": "Dockerfile",
                               "edition": "-ee",
-                              "images": "proxy docservice converter"
+                              "images": "proxy docservice converter adminpanel"
                       }
                    ]')
                    ;;
@@ -110,7 +110,7 @@ jobs:
                               "name": "Build Docs Developer",
                               "dockerfile": "Dockerfile",
                               "edition": "-de",
-                              "images": "proxy docservice converter"
+                              "images": "proxy docservice converter adminpanel"
                       }
                    ]')
                    ;;
@@ -133,8 +133,8 @@ jobs:
                       {
                               "name": "Build Docs utils", 
                               "dockerfile": "Dockerfile", 
-                              "edition": "", 
-                              "images": "example utils adminpanel"
+                              "edition": "",
+                              "images": "example utils"
                       }
               ]')
             fi

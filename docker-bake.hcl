@@ -50,8 +50,8 @@ group "apps" {
 target "example" {
     target = "example"
     dockerfile = "${DOCKERFILE}"
-    tags = equal("docker.io",REGISTRY) ? ["${REGISTRY}/${COMPANY_NAME}/${PREFIX_NAME}-example${PRODUCT_EDITION}:${TAG}"] : [
-                                          "${REGISTRY}/${PREFIX_NAME}-example${PRODUCT_EDITION}:${TAG}" ]
+    tags = equal("docker.io",REGISTRY) ? ["${REGISTRY}/${COMPANY_NAME}/${PREFIX_NAME}-example:${TAG}"] : [
+                                          "${REGISTRY}/${PREFIX_NAME}-example:${TAG}" ]
     platforms = ["${PLATFORM}"]
     args = {
         "PRODUCT_EDITION": "${PRODUCT_EDITION}"
@@ -61,8 +61,8 @@ target "example" {
 target "adminpanel" {
     target = "adminpanel"
     dockerfile = "${DOCKERFILE}"
-    tags = equal("docker.io",REGISTRY) ? ["${REGISTRY}/${COMPANY_NAME}/${PREFIX_NAME}-adminpanel:${TAG}"] : [
-                                          "${REGISTRY}/${PREFIX_NAME}-adminpanel:${TAG}" ]
+    tags = equal("docker.io",REGISTRY) ? ["${REGISTRY}/${COMPANY_NAME}/${PREFIX_NAME}-adminpanel${PRODUCT_EDITION}:${TAG}"] : [
+                                          "${REGISTRY}/${PREFIX_NAME}-adminpanel${PRODUCT_EDITION}:${TAG}" ]
     platforms = ["${PLATFORM}"]
     args = {
         "PRODUCT_EDITION": "${PRODUCT_EDITION}"
