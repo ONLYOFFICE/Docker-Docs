@@ -190,6 +190,8 @@ COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/document-templates/new \
     /var/www/$COMPANY_NAME/documentserver/document-templates/new
 COPY docker-entrypoint.sh /usr/local/bin/
+RUN mkdir -p /var/www/$COMPANY_NAME/config && \
+    chown -R ds:ds /var/www/$COMPANY_NAME/config
 USER ds
 ENTRYPOINT dumb-init docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/DocService/docservice
 HEALTHCHECK --interval=10s --timeout=3s CMD curl -sf http://localhost:8000/index.html
@@ -232,8 +234,9 @@ COPY --from=ds-service \
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN mkdir -p \
         /var/lib/$COMPANY_NAME/documentserver/App_Data/cache/files \
+        /var/www/$COMPANY_NAME/config \
         /var/lib/$COMPANY_NAME/documentserver/App_Data/docbuilder && \
-    chown -R ds:ds /var/lib/$COMPANY_NAME/documentserver
+    chown -R ds:ds /var/lib/$COMPANY_NAME/documentserver /var/www/$COMPANY_NAME/config
 USER ds
 ENTRYPOINT dumb-init docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/FileConverter/converter
 
@@ -253,6 +256,8 @@ COPY --chown=ds:ds --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/server/AdminPanel/client \
     /client
 COPY docker-entrypoint.sh /usr/local/bin/
+RUN mkdir -p /var/www/$COMPANY_NAME/config && \
+    chown -R ds:ds /var/www/$COMPANY_NAME/config
 USER ds
 ENTRYPOINT dumb-init docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/AdminPanel/server/adminpanel
 

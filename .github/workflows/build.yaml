@@ -30,7 +30,7 @@ on:
         default: true
       docs-utils:
         type: boolean
-        description: 'Build Docs-utils (utils example adminpanel)'
+        description: 'Build Docs-utils (utils example)'
         default: true
       docs-balancer:
         type: boolean
