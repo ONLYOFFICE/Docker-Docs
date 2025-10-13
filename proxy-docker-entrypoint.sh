@@ -20,6 +20,11 @@ sed "s/\(client_max_body_size\).*/\1 $NGINX_CLIENT_MAX_BODY_SIZE;/" -i /tmp/prox
 if [[ ! -f "/proc/net/if_inet6" ]]; then
   sed '/listen\s\+\[::[0-9]*\].\+/d' -i /tmp/proxy_nginx/conf.d/ds.conf
 fi
+if [[ -n "$DOCS_SHARDS" ]]; then
+  welcome_page="/var/www/$COMPANY_NAME/documentserver-example/welcome/k8s.html"
+  sed -i 's/\(Kubernetes-Docs\)\(-Shards\)\?/\1-Shards/g' "$welcome_page"
+  gzip -cf9 "$welcome_page" > "$welcome_page.gz"
+fi
 if [[ -n "$INFO_ALLOWED_IP" ]]; then
   declare -a IP_ALL=($INFO_ALLOWED_IP)
   for ip in "${IP_ALL[@]}"; do
