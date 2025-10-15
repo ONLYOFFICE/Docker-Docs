@@ -16,12 +16,21 @@ RUN dnf install sudo \
                 shadow-utils \
                 procps-ng \
                 tar \
+                unzip \
+                libaio \
+                libnsl \
                 wget -y && \
     pip3 install redis && \
     wget -O /usr/local/bin/dumb-init https://github.com/Yelp/dumb-init/releases/download/v1.2.5/dumb-init_1.2.5_$(uname -m) && \
     chmod +x /usr/local/bin/dumb-init && \
+    mkdir -p /oracle/instantclient /opt/oracle /home/ds && \
+    wget -O /oracle/basic.zip https://download.oracle.com/otn_software/linux/instantclient/2370000/instantclient-basic-linux.x64-23.7.0.25.01.zip && \
+    unzip /oracle/basic.zip -d /oracle/instantclient && \
+    mv /oracle/instantclient/instantclient_23_7 /opt/oracle/instantclient_23_7 && \
+    rm -rf /oracle && \
     groupadd --system --gid 101 ds && \
     useradd --system -g ds --no-create-home --shell /sbin/nologin --uid 101 ds && \
+    chown -R ds:ds /home/ds && \
     rm -f /var/log/*log
 
 FROM ds-base AS ds-service
@@ -286,13 +295,14 @@ USER ds
 
 ENTRYPOINT /var/www/onlyoffice/documentserver-example/docker-entrypoint.sh npm start
 
-FROM python:3.11 AS builder
+FROM python:3.11-bookworm AS builder
 RUN pip install redis psycopg2  PyMySQL pika python-qpid-proton func_timeout requests kubernetes flask
-FROM python:3.11-slim AS utils
+FROM python:3.11-slim-bookworm AS utils
 ARG TARGETARCH
 ARG DS_VERSION_HASH
 ENV DS_VERSION_HASH=$DS_VERSION_HASH
 COPY --from=ds-base /usr/local/bin/dumb-init /usr/local/bin/dumb-init
+COPY --from=ds-base /opt/oracle/instantclient_23_7 /oracle/instantclient
 COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 RUN apt update && \
     apt-get install -y curl wget gnupg2 lsb-release jq xxd procps libaio1 unzip && \
@@ -307,18 +317,16 @@ RUN apt update && \
       -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl && \
     chmod +x ./kubectl && \
     mv ./kubectl /usr/local/bin/kubectl && \
-    mkdir -p ~/oracle/instantclient && \
-    wget -O ~/oracle/basic.zip https://download.oracle.com/otn_software/linux/instantclient/2370000/instantclient-basic-linux.x64-23.7.0.25.01.zip && \
-    wget -O ~/oracle/sqlplus.zip https://download.oracle.com/otn_software/linux/instantclient/2370000/instantclient-sqlplus-linux.x64-23.7.0.25.01.zip && \
-    unzip ~/oracle/basic.zip -d ~/oracle/instantclient && \
-    unzip -o ~/oracle/sqlplus.zip -d ~/oracle/instantclient && \
-    mkdir /oracle /dameng /scripts && \
-    mv ~/oracle/instantclient/instantclient_23_7 /oracle/instantclient && \
-    rm -rf ~/oracle && \
+    mkdir /oracle/sqlplus /dameng /scripts && \
+    wget -O /oracle/sqlplus/sqlplus.zip https://download.oracle.com/otn_software/linux/instantclient/2370000/instantclient-sqlplus-linux.x64-23.7.0.25.01.zip && \
+    unzip -o /oracle/sqlplus/sqlplus.zip -d /oracle/sqlplus && \
+    mv /oracle/sqlplus/instantclient_23_7/* /oracle/instantclient/ && \
+    rm -rf /oracle/sqlplus && \
     groupadd --system -g 1006 ds && \
     useradd --system -g ds -d /home/ds -s /bin/bash -u 101 ds && \
     chown -R ds:ds /scripts && \
-    chmod +x /usr/local/bin/dumb-init
+    chmod +x /usr/local/bin/dumb-init && \
+    rm -rf /var/lib/apt/lists/*
 COPY scripts/sqlplus /usr/bin/sqlplus
 COPY scripts/disql /usr/bin/disql
 COPY --from=onlyoffice/damengdb:8.1.2 /opt/dmdbms/bin /dameng
