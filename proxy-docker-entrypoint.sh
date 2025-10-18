@@ -48,7 +48,7 @@ done
 
 if [[ "${BUILD_FONTS}" == "true" ]]; then
   if [[ -f "/var/lib/$COMPANY_NAME/documentserver/buffer/fonts/build_fonts.txt" ]]; then
-    echo "The font build has already been completed,skipping ..."
+    echo "The fonts build has already been completed,skipping ..."
   else
     until cat /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/build_fonts.txt
     do
@@ -77,7 +77,22 @@ else
 fi
 
 if [[ "${BUILD_PLUGINS}" == "true" ]]; then
-  echo -e "\e[0;32m Build PLUGINS \e[0m"
+  if [[ -f "/var/lib/$COMPANY_NAME/documentserver/buffer/plugins/build_plugins.txt" ]]; then
+    echo "The plugins build has already been completed,skipping ..."
+  else
+    until cat /var/lib/$COMPANY_NAME/documentserver/buffer/plugins/build_plugins.txt
+    do
+      echo "Waiting for the build plugins to complete"
+      sleep 5
+    done
+    echo -e "\e[0;32m Build PLUGINS \e[0m"
+    cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/plugins/sdkjs-plugins/* $WORK_DIR/sdkjs-plugins/
+    find $WORK_DIR/sdkjs-plugins/* -type d -exec chmod u+w {} \;
+    find $WORK_DIR/sdkjs-plugins \
+      -type f \
+      \( -name '*.js' -o -name '*.json' -o -name '*.htm' -o -name '*.html' -o -name '*.css' \) \
+      -exec sh -c 'gzip -cf9 $0 > $0.gz && chown ds:ds $0.gz' {} \;
+  fi
 else
   echo -e "\e[0;32m Do not Build PLUGINS \e[0m"
 fi
@@ -88,7 +103,7 @@ if [[ "${BUILD_DICTIONARIES}" == "true" ]]; then
   else
     until cat /var/lib/$COMPANY_NAME/documentserver/buffer/dictionaries/build_dictionaries.txt
     do
-      echo "Waiting for the build fonts to complete"
+      echo "Waiting for the build dictionaries to complete"
       sleep 5
     done
     echo -e "\e[0;32m Build Dictionaries \e[0m"

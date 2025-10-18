@@ -172,7 +172,7 @@ COPY --from=ds-service \
 COPY --from=ds-service --chown=ds:ds \
     /etc/$COMPANY_NAME/documentserver/log4js/production.json \
     /etc/$COMPANY_NAME/documentserver/log4js/
-COPY --from=ds-service \
+COPY --chown=ds:ds --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/sdkjs-plugins \
     /var/www/$COMPANY_NAME/documentserver/sdkjs-plugins
 COPY --from=ds-service \
@@ -197,6 +197,7 @@ HEALTHCHECK --interval=10s --timeout=3s CMD curl -sf http://localhost:8000/index
 
 FROM ds-base AS converter
 COPY documentserver-generate-allfonts.sh /usr/bin/documentserver-generate-allfonts.sh
+COPY documentserver-pluginsmanager.sh /usr/bin/documentserver-pluginsmanager.sh
 COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/server/dictionaries/update.py \
     /var/www/$COMPANY_NAME/documentserver/server/dictionaries/update.py
@@ -206,6 +207,9 @@ COPY --from=ds-service \
 COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/server/tools/allthemesgen \
     /var/www/$COMPANY_NAME/documentserver/server/tools/allthemesgen
+COPY --from=ds-service \
+    /var/www/$COMPANY_NAME/documentserver/server/tools/pluginsmanager \
+    /var/www/$COMPANY_NAME/documentserver/server/tools/pluginsmanager
 COPY --chown=ds:ds --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/dictionaries \
     /var/www/$COMPANY_NAME/documentserver/dictionaries
@@ -216,7 +220,7 @@ COPY --from=ds-service \
 COPY --from=ds-service --chown=ds:ds \
     /etc/$COMPANY_NAME/documentserver/log4js/production.json \
     /etc/$COMPANY_NAME/documentserver/log4js/
-COPY --from=ds-service \
+COPY --chown=ds:ds --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/sdkjs-plugins \
     /var/www/$COMPANY_NAME/documentserver/sdkjs-plugins
 COPY --from=ds-service \
@@ -244,6 +248,12 @@ COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/server/FileConverter \
     /var/www/$COMPANY_NAME/documentserver/server/FileConverter
 COPY --from=ds-service \
+    /var/www/$COMPANY_NAME/documentserver/server/AdminPanel/server \
+    /var/www/$COMPANY_NAME/documentserver/server/AdminPanel/server
+COPY --chown=ds:ds --from=ds-service \
+    /var/www/$COMPANY_NAME/documentserver/server/AdminPanel/client \
+    /client
+COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/server/info \
     /var/www/$COMPANY_NAME/documentserver/server/info
 COPY --from=ds-service \
@@ -258,8 +268,9 @@ COPY --from=ds-service \
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN mkdir -p \
         /var/lib/$COMPANY_NAME/documentserver/App_Data/cache/files \
+        /var/www/$COMPANY_NAME/config \
         /var/lib/$COMPANY_NAME/documentserver/App_Data/docbuilder && \
-    chown -R ds:ds /var/lib/$COMPANY_NAME/documentserver
+    chown -R ds:ds /var/lib/$COMPANY_NAME/documentserver /var/www/$COMPANY_NAME/config
 USER ds
 ENTRYPOINT ["dumb-init", "--", "docker-entrypoint.sh"]
 
