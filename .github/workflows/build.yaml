@@ -30,7 +30,7 @@ on:
         default: true
       docs-utils:
         type: boolean
-        description: 'Build Docs-utils'
+        description: 'Build Docs-utils (utils example)'
         default: true
       docs-balancer:
         type: boolean
@@ -99,7 +99,7 @@ jobs:
                               "name": "Build Docs Enterprise",
                               "dockerfile": "Dockerfile",
                               "edition": "-ee",
-                              "images": "proxy docservice converter"
+                              "images": "proxy docservice converter adminpanel"
                       }
                    ]')
                    ;;
@@ -110,7 +110,7 @@ jobs:
                               "name": "Build Docs Developer",
                               "dockerfile": "Dockerfile",
                               "edition": "-de",
-                              "images": "proxy docservice converter"
+                              "images": "proxy docservice converter adminpanel"
                       }
                    ]')
                    ;;
@@ -133,7 +133,7 @@ jobs:
                       {
                               "name": "Build Docs utils", 
                               "dockerfile": "Dockerfile", 
-                              "edition": "", 
+                              "edition": "",
                               "images": "example utils"
                       }
               ]')
@@ -198,11 +198,14 @@ jobs:
             echo "Build in repo: 4testing"
             export PRODUCT_BASEURL=${{ secrets.PRODUCT_BASEURL_RC }}
             export RELEASE_VERSION="-${VERSION}.el7"
-          elif [[ "${TEST_REPO}" != "true" && -n "${VERSION}" ]]; then
+          fi
+
+          if [[ "${TEST_REPO}" != "true" && -n "${VERSION}" ]]; then
             echo "Build in repo: hub.docker"
             export RELEASE_VERSION="-${VERSION}"
             if [[ "${PACKAGE_URL}" == "s3" ]]; then
               echo "S3 package url was specified..."
+              export PREFIX_NAME="4testing-"
               export PRODUCT_BASEURL=${{ secrets.PRODUCT_BASEURL_RC }}
               export RELEASE_VERSION="-${VERSION}.el7"
             fi
