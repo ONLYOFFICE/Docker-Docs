@@ -266,6 +266,7 @@ COPY --from=ds-service \
     /ds/usr/lib64/* \
     /usr/lib64/
 COPY docker-entrypoint.sh /usr/local/bin/
+COPY init-docker-entrypoint.sh /init/
 RUN mkdir -p \
         /var/lib/$COMPANY_NAME/documentserver/App_Data/cache/files \
         /var/www/$COMPANY_NAME/config \

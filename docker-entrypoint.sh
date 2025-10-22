@@ -198,16 +198,15 @@ done
 
 shift $((OPTIND-1))
 if [[ "${BUILD_FONTS}" == "true" ]]; then
-  if [[ -f "/var/lib/$COMPANY_NAME/documentserver/buffer/fonts/build_fonts.txt" ]]; then
-    echo "The font build has already been completed,skipping ..."
-  else
-    echo -e "\e[0;32m Build Fonts \e[0m"
-    documentserver-generate-allfonts.sh true
-    mkdir /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/
-    if [[ "${CONTAINER_NAME}" == "docservice" ]]; then
-      cp -ra $WORK_DIR/sdkjs/common/Images/ /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/
-      cp -ra $WORK_DIR/sdkjs/slide/themes/ /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/
-      cp -a $WORK_DIR/sdkjs/common/AllFonts.js /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/
+  if [[ "${CONTAINER_NAME}" == "converter" ]]; then
+    if [[ -f "/var/lib/$COMPANY_NAME/documentserver/buffer/fonts/build_fonts.txt" ]]; then
+      echo "The fonts build has already been completed,skipping ..."
+    else
+      echo -e "\e[0;32m Build Fonts \e[0m"
+      cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/Images/* $WORK_DIR/sdkjs/common/Images/
+      cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/themes/* $WORK_DIR/sdkjs/slide/themes/
+      cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/AllFonts.js $WORK_DIR/sdkjs/common/
+      cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/bin/* $WORK_DIR/server/FileConverter/bin/
     fi
     echo "Completed" > /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/build_fonts.txt
   fi

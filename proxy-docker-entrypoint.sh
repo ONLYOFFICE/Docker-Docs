@@ -50,11 +50,6 @@ if [[ "${BUILD_FONTS}" == "true" ]]; then
   if [[ -f "/var/lib/$COMPANY_NAME/documentserver/buffer/fonts/build_fonts.txt" ]]; then
     echo "The fonts build has already been completed,skipping ..."
   else
-    until cat /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/build_fonts.txt
-    do
-      echo "Waiting for the build fonts to complete"
-      sleep 5
-    done
     echo -e "\e[0;32m Build Fonts \e[0m"
     cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/Images/* $WORK_DIR/sdkjs/common/Images/
     cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/themes/* $WORK_DIR/sdkjs/slide/themes/
@@ -71,6 +66,7 @@ if [[ "${BUILD_FONTS}" == "true" ]]; then
       \( -name '*.js' -o -name '*.json' -o -name '*.htm' -o -name '*.html' -o -name '*.css' \) \
       -exec sh -c 'gzip -cf9 $0 > $0.gz && chown ds:ds $0.gz' {} \;
     chmod 555 $WORK_DIR/sdkjs/common/Images/cursors/
+    echo "Completed" > /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/build_fonts.txt
   fi
 else
   echo -e "\e[0;32m Do not Build Fonts \e[0m"
