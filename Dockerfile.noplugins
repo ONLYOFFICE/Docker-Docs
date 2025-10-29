@@ -45,13 +45,12 @@ ENV TARGETARCH=$TARGETARCH \
 WORKDIR /ds
 RUN useradd --no-create-home --shell /sbin/nologin nginx && \
     dnf -y updateinfo && \
-    dnf -y install cabextract fontconfig xorg-x11-font-utils xorg-x11-server-utils cpio && \
+    dnf -y install cabextract fontconfig xorg-x11-font-utils xorg-x11-server-utils && \
     rpm -i https://downloads.sourceforge.net/project/mscorefonts2/rpms/msttcore-fonts-installer-2.6-1.noarch.rpm && \
     PRODUCT_URL=$(echo $PRODUCT_URL | sed "s/"$TARGETARCH"/"$(uname -m)"/g") && \
     PACKAGE_NAME=$(basename "$PRODUCT_URL") && \
     wget $PRODUCT_URL && \
     rpm -ivh $PACKAGE_NAME --noscripts --nodeps && \
-    rpm2cpio $PACKAGE_NAME | cpio -idmv ./usr/lib64/* && \
     mkdir -p /var/www/$COMPANY_NAME/documentserver/core-fonts/msttcore && \
     cp -vt \
         /var/www/$COMPANY_NAME/documentserver/core-fonts/msttcore \
@@ -218,9 +217,6 @@ COPY --from=ds-service \
 COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/document-templates/new \
     /var/www/$COMPANY_NAME/documentserver/document-templates/new
-COPY --from=ds-service \
-    /ds/usr/lib64/* \
-    /usr/lib64/
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN mkdir -p \
         /var/lib/$COMPANY_NAME/documentserver/App_Data/cache/files \
