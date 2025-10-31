@@ -61,22 +61,19 @@ if [[ "${BUILD_DICTIONARIES}" == "true" ]]; then
     echo "The dictionaries build has already been completed,skipping ..."
   else
     echo -e "\e[0;32m Build Dictionaries \e[0m"
-    ( find $WORK_DIR/sdkjs/cell $WORK_DIR/sdkjs/word $WORK_DIR/sdkjs/slide $WORK_DIR/sdkjs/visio -maxdepth 1 -type f -name '*.js'
+    ( find $WORK_DIR/sdkjs/cell $WORK_DIR/sdkjs/word $WORK_DIR/sdkjs/slide $WORK_DIR/sdkjs/visio -maxdepth 1 -type f \( -name '*.js' -o -name '*.bin' \)
       echo "$WORK_DIR/sdkjs/common/spell/spell/spell.js" ) | while read -r file; do
         chmod 740 "$file"
     done
     python3 $WORK_DIR/server/dictionaries/update.py
-    mkdir /var/lib/$COMPANY_NAME/documentserver/buffer/dictionaries/
-    if [[ "${CONTAINER_NAME}" == "docservice" ]]; then
-      mkdir -p /var/lib/$COMPANY_NAME/documentserver/buffer/dictionaries/spell
-      ( find $WORK_DIR/sdkjs/cell $WORK_DIR/sdkjs/word $WORK_DIR/sdkjs/slide $WORK_DIR/sdkjs/visio -maxdepth 1 -type f -name '*.js'
-        echo "$WORK_DIR/sdkjs/common/spell/spell/spell.js" ) | while read -r file; do
-          dir=$(basename "$(dirname "$file")")
-          mkdir -p "/var/lib/$COMPANY_NAME/documentserver/buffer/dictionaries/$dir"
-          cp -a "$file" "/var/lib/$COMPANY_NAME/documentserver/buffer/dictionaries/$dir/"
-      done
-    fi
-    echo "Completed" > /var/lib/$COMPANY_NAME/documentserver/buffer/dictionaries/build_dictionaries.txt
+    mkdir -p /var/lib/$COMPANY_NAME/documentserver/buffer/dictionaries/spell
+    ( find $WORK_DIR/sdkjs/cell $WORK_DIR/sdkjs/word $WORK_DIR/sdkjs/slide $WORK_DIR/sdkjs/visio -maxdepth 1 -type f \( -name '*.js' -o -name '*.bin' \)
+      echo "$WORK_DIR/sdkjs/common/spell/spell/spell.js" ) | while read -r file; do
+        dir=$(basename "$(dirname "$file")")
+        mkdir -p "/var/lib/$COMPANY_NAME/documentserver/buffer/dictionaries/$dir"
+        cp -a "$file" "/var/lib/$COMPANY_NAME/documentserver/buffer/dictionaries/$dir/"
+    done
+  echo "Ok"
   fi
 else
   echo -e "\e[0;32m Build DICTIONARIES NOT \e[0m"
