@@ -66,7 +66,6 @@ if [[ "${BUILD_FONTS}" == "true" ]]; then
       \( -name '*.js' -o -name '*.json' -o -name '*.htm' -o -name '*.html' -o -name '*.css' \) \
       -exec sh -c 'gzip -cf9 $0 > $0.gz && chown ds:ds $0.gz' {} \;
     chmod 555 $WORK_DIR/sdkjs/common/Images/cursors/
-    echo "Completed" > /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/build_fonts.txt
   fi
 else
   echo -e "\e[0;32m Do not Build Fonts \e[0m"
@@ -76,11 +75,6 @@ if [[ "${BUILD_PLUGINS}" == "true" ]]; then
   if [[ -f "/var/lib/$COMPANY_NAME/documentserver/buffer/plugins/build_plugins.txt" ]]; then
     echo "The plugins build has already been completed,skipping ..."
   else
-    until cat /var/lib/$COMPANY_NAME/documentserver/buffer/plugins/build_plugins.txt
-    do
-      echo "Waiting for the build plugins to complete"
-      sleep 5
-    done
     echo -e "\e[0;32m Build PLUGINS \e[0m"
     cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/plugins/sdkjs-plugins/* $WORK_DIR/sdkjs-plugins/
     find $WORK_DIR/sdkjs-plugins/* -type d -exec chmod u+w {} \;
@@ -88,6 +82,7 @@ if [[ "${BUILD_PLUGINS}" == "true" ]]; then
       -type f \
       \( -name '*.js' -o -name '*.json' -o -name '*.htm' -o -name '*.html' -o -name '*.css' \) \
       -exec sh -c 'gzip -cf9 $0 > $0.gz && chown ds:ds $0.gz' {} \;
+    echo "Completed" > /var/lib/$COMPANY_NAME/documentserver/buffer/plugins/build_plugins.txt
   fi
 else
   echo -e "\e[0;32m Do not Build PLUGINS \e[0m"
@@ -115,7 +110,6 @@ if [[ "${BUILD_DICTIONARIES}" == "true" ]]; then
         gzip -cf9 "$target_dir/$base_file" > "$target_dir/$base_file.gz"
         chmod 440 "$target_dir/$base_file"
     done
-    echo "Completed" > /var/lib/$COMPANY_NAME/documentserver/buffer/dictionaries/build_dictionaries.txt
   fi
 else
   echo -e "\e[0;32m Do not Build DICTIONARIES \e[0m"
