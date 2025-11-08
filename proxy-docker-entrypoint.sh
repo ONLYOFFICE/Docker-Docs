@@ -47,26 +47,23 @@ while getopts ":fpd" opt; do
 done
 
 if [[ "${BUILD_FONTS}" == "true" ]]; then
-  if [[ -f "/var/lib/$COMPANY_NAME/documentserver/buffer/fonts/build_fonts.txt" ]]; then
-    echo "The fonts build has already been completed,skipping ..."
-  else
-    echo -e "\e[0;32m Build Fonts \e[0m"
-    cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/Images/* $WORK_DIR/sdkjs/common/Images/
-    cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/themes/* $WORK_DIR/sdkjs/slide/themes/
-    cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/AllFonts.js $WORK_DIR/sdkjs/common/
-    find $WORK_DIR/fonts \
-      -type f ! \
-      -name "*.*" \
-      -exec sh -c 'gzip -cf9 $0 > $0.gz && chown ds:ds $0.gz' {} \;
-    chmod 755 $WORK_DIR/sdkjs/common/Images/cursors/
-    find $WORK_DIR/sdkjs/common \
-      $WORK_DIR/sdkjs/slide/themes \
-      $WORK_DIR/sdkjs/common/Images \
-      -type f \
-      \( -name '*.js' -o -name '*.json' -o -name '*.htm' -o -name '*.html' -o -name '*.css' \) \
-      -exec sh -c 'gzip -cf9 $0 > $0.gz && chown ds:ds $0.gz' {} \;
-    chmod 555 $WORK_DIR/sdkjs/common/Images/cursors/
-  fi
+  echo -e "\e[0;32m Build Fonts \e[0m"
+  cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/Images/* $WORK_DIR/sdkjs/common/Images/
+  cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/themes/* $WORK_DIR/sdkjs/slide/themes/
+  cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/fonts/* $WORK_DIR/fonts/
+  cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/AllFonts.js $WORK_DIR/sdkjs/common/
+  find $WORK_DIR/fonts \
+    -type f ! \
+    -name "*.*" \
+    -exec sh -c 'gzip -cf9 $0 > $0.gz && chown ds:ds $0.gz' {} \;
+  chmod 755 $WORK_DIR/sdkjs/common/Images/cursors/
+  find $WORK_DIR/sdkjs/common \
+    $WORK_DIR/sdkjs/slide/themes \
+    $WORK_DIR/sdkjs/common/Images \
+    -type f \
+    \( -name '*.js' -o -name '*.json' -o -name '*.htm' -o -name '*.html' -o -name '*.css' \) \
+    -exec sh -c 'gzip -cf9 $0 > $0.gz && chown ds:ds $0.gz' {} \;
+  chmod 555 $WORK_DIR/sdkjs/common/Images/cursors/
 else
   echo -e "\e[0;32m Do not Build Fonts \e[0m"
 fi

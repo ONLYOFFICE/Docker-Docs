@@ -21,22 +21,21 @@ done
 echo "$EXEC_CMD"
 
 if [[ "${BUILD_FONTS}" == "true" ]]; then
-  if [[ -f "/var/lib/$COMPANY_NAME/documentserver/buffer/fonts/build_fonts.txt" ]]; then
-    echo "The fonts build has already been completed,skipping ..."
-  else
-    echo -e "\e[0;32m Build Fonts \e[0m"
-    documentserver-generate-allfonts.sh true
-    mkdir -p /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/bin
-    cp -ra $WORK_DIR/sdkjs/common/Images/ /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/
-    cp -ra $WORK_DIR/sdkjs/slide/themes/ /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/
-    cp -a $WORK_DIR/sdkjs/common/AllFonts.js /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/
-    if [[ "${CONTAINER_NAME}" == "converter" ]]; then
-      cp -a $WORK_DIR/server/FileConverter/bin/AllFonts.js \
-            $WORK_DIR/server/FileConverter/bin/font_selection.bin \
-            $WORK_DIR/server/FileConverter/bin/fonts.log \
-            /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/bin/
-    fi
+  if [[ -d "/var/lib/$COMPANY_NAME/documentserver/buffer/fonts" ]]; then
+    chmod 755 -R /var/lib/$COMPANY_NAME/documentserver/buffer/fonts
+    rm -rf /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/
   fi
+  echo -e "\e[0;32m Build Fonts \e[0m"
+  documentserver-generate-allfonts.sh true
+  mkdir -p /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/bin
+  cp -ra $WORK_DIR/sdkjs/common/Images/ /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/
+  cp -ra $WORK_DIR/sdkjs/slide/themes/ /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/
+  cp -ra $WORK_DIR/fonts /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/
+  cp -a $WORK_DIR/sdkjs/common/AllFonts.js /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/
+  cp -a $WORK_DIR/server/FileConverter/bin/AllFonts.js \
+        $WORK_DIR/server/FileConverter/bin/font_selection.bin \
+        $WORK_DIR/server/FileConverter/bin/fonts.log \
+        /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/bin/
 else
   echo -e "\e[0;32m Build Fonts NOT \e[0m"
 fi
