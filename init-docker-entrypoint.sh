@@ -56,24 +56,25 @@ else
 fi
 
 if [[ "${BUILD_DICTIONARIES}" == "true" ]]; then
-  if [[ -f "/var/lib/$COMPANY_NAME/documentserver/buffer/dictionaries/build_dictionaries.txt" ]]; then
-    echo "The dictionaries build has already been completed,skipping ..."
-  else
-    echo -e "\e[0;32m Build Dictionaries \e[0m"
-    ( find $WORK_DIR/sdkjs/cell $WORK_DIR/sdkjs/word $WORK_DIR/sdkjs/slide $WORK_DIR/sdkjs/visio -maxdepth 1 -type f \( -name '*.js' -o -name '*.bin' \)
-      echo "$WORK_DIR/sdkjs/common/spell/spell/spell.js" ) | while read -r file; do
-        chmod 740 "$file"
-    done
-    python3 $WORK_DIR/server/dictionaries/update.py
-    mkdir -p /var/lib/$COMPANY_NAME/documentserver/buffer/dictionaries/spell
-    ( find $WORK_DIR/sdkjs/cell $WORK_DIR/sdkjs/word $WORK_DIR/sdkjs/slide $WORK_DIR/sdkjs/visio -maxdepth 1 -type f \( -name '*.js' -o -name '*.bin' \)
-      echo "$WORK_DIR/sdkjs/common/spell/spell/spell.js" ) | while read -r file; do
-        dir=$(basename "$(dirname "$file")")
-        mkdir -p "/var/lib/$COMPANY_NAME/documentserver/buffer/dictionaries/$dir"
-        cp -a "$file" "/var/lib/$COMPANY_NAME/documentserver/buffer/dictionaries/$dir/"
-    done
-  echo "Ok"
+  if [[ -d "/var/lib/$COMPANY_NAME/documentserver/buffer/dictionaries" ]]; then
+    chmod 755 -R /var/lib/$COMPANY_NAME/documentserver/buffer/dictionaries
+    rm -rf /var/lib/$COMPANY_NAME/documentserver/buffer/dictionaries
   fi
+  echo -e "\e[0;32m Build Dictionaries \e[0m"
+  ( find $WORK_DIR/sdkjs/cell $WORK_DIR/sdkjs/word $WORK_DIR/sdkjs/slide $WORK_DIR/sdkjs/visio -maxdepth 1 -type f \( -name '*.js' -o -name '*.bin' \)
+    echo "$WORK_DIR/sdkjs/common/spell/spell/spell.js" ) | while read -r file; do
+      chmod 740 "$file"
+  done
+  python3 $WORK_DIR/server/dictionaries/update.py
+  mkdir -p /var/lib/$COMPANY_NAME/documentserver/buffer/dictionaries/spell
+  ( find $WORK_DIR/sdkjs/cell $WORK_DIR/sdkjs/word $WORK_DIR/sdkjs/slide $WORK_DIR/sdkjs/visio -maxdepth 1 -type f \( -name '*.js' -o -name '*.bin' \)
+    echo "$WORK_DIR/sdkjs/common/spell/spell/spell.js" ) | while read -r file; do
+      dir=$(basename "$(dirname "$file")")
+      mkdir -p "/var/lib/$COMPANY_NAME/documentserver/buffer/dictionaries/$dir"
+      cp -a "$file" "/var/lib/$COMPANY_NAME/documentserver/buffer/dictionaries/$dir/"
+  done
+  cp -ra $WORK_DIR/dictionaries /var/lib/$COMPANY_NAME/documentserver/buffer/dictionaries/
+  echo "Ok"
 else
   echo -e "\e[0;32m Build DICTIONARIES NOT \e[0m"
 fi

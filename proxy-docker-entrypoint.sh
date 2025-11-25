@@ -86,28 +86,30 @@ else
 fi
 
 if [[ "${BUILD_DICTIONARIES}" == "true" ]]; then
-  if [[ -f "/var/lib/$COMPANY_NAME/documentserver/buffer/dictionaries/build_dictionaries.txt" ]]; then
-    echo "The dictionaries build has already been completed,skipping ..."
-  else
-    echo -e "\e[0;32m Build Dictionaries \e[0m"
-    ( find $WORK_DIR/sdkjs/cell $WORK_DIR/sdkjs/word $WORK_DIR/sdkjs/slide $WORK_DIR/sdkjs/visio -maxdepth 1 -type f -name '*.js'
-      echo "$WORK_DIR/sdkjs/common/spell/spell/spell.js" ) | while read -r file; do
-        chmod 740 "$file"
-        dir=$(basename "$(dirname "$file")")
-        echo $dir
-        base_file=$(basename "$file")
-        echo $base_file
-        if [[ "${base_file}" == "spell.js" ]]; then
-          target_dir="$WORK_DIR/sdkjs/common/spell/$dir"
-        else
-          target_dir="$WORK_DIR/sdkjs/$dir"
-        fi
-        echo cp -a "/var/lib/$COMPANY_NAME/documentserver/buffer/dictionaries/$dir/$base_file" "$target_dir/"
-        cp -a "/var/lib/$COMPANY_NAME/documentserver/buffer/dictionaries/$dir/$base_file" "$target_dir/"
-        gzip -cf9 "$target_dir/$base_file" > "$target_dir/$base_file.gz"
-        chmod 440 "$target_dir/$base_file"
-    done
+  echo -e "\e[0;32m Build Dictionaries \e[0m"
+  ( find $WORK_DIR/sdkjs/cell $WORK_DIR/sdkjs/word $WORK_DIR/sdkjs/slide $WORK_DIR/sdkjs/visio -maxdepth 1 -type f -name '*.js'
+    echo "$WORK_DIR/sdkjs/common/spell/spell/spell.js" ) | while read -r file; do
+      chmod 740 "$file"
+      dir=$(basename "$(dirname "$file")")
+      echo $dir
+      base_file=$(basename "$file")
+      echo $base_file
+      if [[ "${base_file}" == "spell.js" ]]; then
+        target_dir="$WORK_DIR/sdkjs/common/spell/$dir"
+      else
+        target_dir="$WORK_DIR/sdkjs/$dir"
+      fi
+      echo cp -a "/var/lib/$COMPANY_NAME/documentserver/buffer/dictionaries/$dir/$base_file" "$target_dir/"
+      cp -a "/var/lib/$COMPANY_NAME/documentserver/buffer/dictionaries/$dir/$base_file" "$target_dir/"
+      gzip -cf9 "$target_dir/$base_file" > "$target_dir/$base_file.gz"
+      chmod 440 "$target_dir/$base_file"
+  done
+  if [ "$(ls -A $WORK_DIR/dictionaries/)" ]; then
+    echo "$WORK_DIR/dictionaries/ not empty"
+    chmod 755 -R $WORK_DIR/dictionaries/*
+    rm -rf $WORK_DIR/dictionaries/*
   fi
+  cp -ra /var/lib/$COMPANY_NAME/documentserver/buffer/dictionaries/dictionaries/* $WORK_DIR/dictionaries/
 else
   echo -e "\e[0;32m Do not Build DICTIONARIES \e[0m"
 fi
