@@ -41,16 +41,14 @@ else
 fi
 
 if [[ "${BUILD_PLUGINS}" == "true" ]]; then
-  if [[ "${CONTAINER_NAME}" != "converter" ]]; then
-    if [[ -f "/var/lib/$COMPANY_NAME/documentserver/buffer/plugins/build_plugins.txt" ]]; then
-      echo "The plugins build has already been completed,skipping ..."
-    else
-      echo -e "\e[0;32m Build PLUGINS \e[0m"
-      documentserver-pluginsmanager.sh --update=\"/var/www/$COMPANY_NAME/documentserver/sdkjs-plugins/plugin-list-default.json\"
-      mkdir -p "/var/lib/$COMPANY_NAME/documentserver/buffer/plugins/"
-      cp -ra "$WORK_DIR/sdkjs-plugins/" "/var/lib/$COMPANY_NAME/documentserver/buffer/plugins/"
-    fi
+  if [[ -d "/var/lib/$COMPANY_NAME/documentserver/buffer/plugins" ]]; then
+    chmod 755 -R /var/lib/$COMPANY_NAME/documentserver/buffer/plugins
+    rm -rf /var/lib/$COMPANY_NAME/documentserver/buffer/plugins
   fi
+  echo -e "\e[0;32m Build PLUGINS \e[0m"
+  documentserver-pluginsmanager.sh --update=\"/var/www/$COMPANY_NAME/documentserver/sdkjs-plugins/plugin-list-default.json\"
+  mkdir -p "/var/lib/$COMPANY_NAME/documentserver/buffer/plugins/"
+  cp -ra "$WORK_DIR/sdkjs-plugins" "/var/lib/$COMPANY_NAME/documentserver/buffer/plugins/"
 else
   echo -e "\e[0;32m Build PLUGINS NOT \e[0m"
 fi
