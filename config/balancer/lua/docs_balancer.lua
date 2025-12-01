@@ -31,8 +31,8 @@ function _M.balance_ep()
      local decoded_table = cjson.decode(data)
      local address = decoded_table[1].address
      if address == "none" then
-       ngx.sleep(1)
-       print("No active shards found, waiting...")
+       ngx.log(ngx.ERR, "No active backend found")
+       return ngx.exit(ngx.HTTP_SERVICE_UNAVAILABLE)
      end
    until address ~= "none"
    local decoded_data = cjson.decode(data)
@@ -71,8 +71,8 @@ function _M.balance_ep()
        local decoded_reserved_table = cjson.decode(reserved_data)
        local address = decoded_reserved_table[1].address
        if address == "none" then
-         ngx.sleep(1)
-         print("No active shards found, waiting...")
+         ngx.log(ngx.ERR, "No active backend found")
+         return ngx.exit(ngx.HTTP_SERVICE_UNAVAILABLE)
        end
      until address ~= "none"
      local reserved_decoded_data = cjson.decode(reserved_data)
