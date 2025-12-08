@@ -69,8 +69,8 @@ else
 fi
 
 if [[ "${BUILD_PLUGINS}" == "true" ]]; then
-  if [[ -f "/var/lib/$COMPANY_NAME/documentserver/buffer/plugins/build_plugins.txt" ]]; then
-    rm -rf /var/lib/$COMPANY_NAME/documentserver/buffer/plugins/build_plugins.txt
+  if [[ -f "$WORK_DIR/sdkjs-plugins/build_plugins.txt" ]]; then
+    rm -rf $WORK_DIR/sdkjs-plugins/build_plugins.txt
   fi
   echo -e "\e[0;32m Build PLUGINS \e[0m"
   cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/plugins/sdkjs-plugins/* $WORK_DIR/sdkjs-plugins/
@@ -79,7 +79,7 @@ if [[ "${BUILD_PLUGINS}" == "true" ]]; then
     -type f \
     \( -name '*.js' -o -name '*.json' -o -name '*.htm' -o -name '*.html' -o -name '*.css' \) \
     -exec sh -c 'gzip -cf9 $0 > $0.gz && chown ds:ds $0.gz' {} \;
-  echo "Completed" > /var/lib/$COMPANY_NAME/documentserver/buffer/plugins/build_plugins.txt
+  echo "Completed" > $WORK_DIR/sdkjs-plugins/build_plugins.txt
 else
   echo -e "\e[0;32m Do not Build PLUGINS \e[0m"
 fi

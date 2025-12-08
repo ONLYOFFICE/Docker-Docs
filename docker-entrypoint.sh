@@ -212,15 +212,16 @@ fi
 
 if [[ "${BUILD_PLUGINS}" == "true" ]]; then
   if [[ "${CONTAINER_NAME}" != "converter" ]]; then
-    if [[ -f "/var/lib/$COMPANY_NAME/documentserver/buffer/plugins/build_plugins.txt" ]]; then
+    if [[ -f "$WORK_DIR/sdkjs-plugins/build_plugins.txt" ]]; then
       echo "The plugins build has already been completed,skipping ..."
     else
-      until cat /var/lib/$COMPANY_NAME/documentserver/buffer/plugins/build_plugins.txt
+      until cat $WORK_DIR/sdkjs-plugins/build_plugins.txt
       do
         echo "Waiting for the build plugins to complete"
         sleep 5
       done
     fi
+    rm -rf $WORK_DIR/sdkjs-plugins/build_plugins.txt
   fi
 else
   echo -e "\e[0;32m Do not Build PLUGINS \e[0m"
