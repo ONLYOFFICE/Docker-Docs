@@ -113,4 +113,17 @@ else
   echo -e "\e[0;32m Do not Build DICTIONARIES \e[0m"
 fi
 
+if [[ "$BUILD_FONTS" == "true" || "$BUILD_PLUGINS" == "true" || "$BUILD_DICTIONARIES" == "true" ]]; then
+  echo "set \$cache_tag \"$DS_VERSION_HASH\";" > /tmp/proxy_nginx/includes/ds-cache.conf
+  API_PATH="$WORK_DIR/web-apps/apps/api/documents/api.js"
+  echo $(dirname "$API_PATH")
+  echo $API_PATH
+  chmod 755 $(dirname "$API_PATH")
+  cp -f ${API_PATH}.tpl ${API_PATH}
+  sed -i "s/{{HASH_POSTFIX}}/${DS_VERSION_HASH}/g" ${API_PATH}
+  rm -f ${API_PATH}.gz
+  gzip -cf9 "$API_PATH" > "$API_PATH.gz"
+  chmod 555 $(dirname "$API_PATH")
+fi
+
 exec nginx -c /tmp/proxy_nginx/nginx.conf -g 'daemon off;'
