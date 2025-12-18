@@ -1,4 +1,4 @@
-FROM amazonlinux:2023 AS ds-base
+FROM fedora:43 AS ds-base
 
 LABEL maintainer Ascensio System SIA <support@onlyoffice.com>
 
@@ -10,7 +10,9 @@ ENV COMPANY_NAME=$COMPANY_NAME \
     NODE_ENV=production-linux \
     NODE_CONFIG_DIR=/etc/$COMPANY_NAME/documentserver
 
-RUN dnf install sudo \
+RUN dnf -y updateinfo list --security && \
+    dnf update --security -y && \
+    dnf install sudo \
                 python3-pip \
                 findutils \
                 shadow-utils \
@@ -19,6 +21,7 @@ RUN dnf install sudo \
                 unzip \
                 libaio \
                 libnsl \
+                nano \
                 wget -y && \
     pip3 install redis && \
     wget -O /usr/local/bin/dumb-init https://github.com/Yelp/dumb-init/releases/download/v1.2.5/dumb-init_1.2.5_$(uname -m) && \
@@ -44,9 +47,7 @@ ENV TARGETARCH=$TARGETARCH \
     DS_VERSION_HASH=$DS_VERSION_HASH
 WORKDIR /ds
 RUN useradd --no-create-home --shell /sbin/nologin nginx && \
-    dnf -y updateinfo && \
-    dnf -y install cabextract fontconfig xorg-x11-font-utils xorg-x11-server-utils && \
-    rpm -i https://downloads.sourceforge.net/project/mscorefonts2/rpms/msttcore-fonts-installer-2.6-1.noarch.rpm && \
+    dnf -y install https://download.onlyoffice.com/install/misc/linux/msttcore-fonts-installer-2.6-1.noarch.rpm && \
     PRODUCT_URL=$(echo $PRODUCT_URL | sed "s/"$TARGETARCH"/"$(uname -m)"/g") && \
     PACKAGE_NAME=$(basename "$PRODUCT_URL") && \
     wget $PRODUCT_URL && \
@@ -84,8 +85,7 @@ ENV DOCSERVICE_HOST_PORT=localhost:8000 \
     NGINX_WORKER_CONNECTIONS=4096 \
     NGINX_WORKER_PROCESSES=1
 EXPOSE 8888
-RUN dnf -y updateinfo && \
-    dnf -y install gettext nginx httpd-tools && \
+RUN dnf -y install gettext nginx httpd-tools && \
     dnf clean all && \
     rm -f /var/log/*log && \
     mkdir -p /etc/nginx/includes
