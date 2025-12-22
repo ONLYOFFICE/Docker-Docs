@@ -1,0 +1,38 @@
+services:
+  proxy:
+    build:
+      context: .
+      dockerfile: ${DOCKERFILE}
+      target: proxy
+    image: ${ACCOUNT_NAME}/${PREFIX_NAME}-proxy${PRODUCT_EDITION}:${DOCKER_TAG}
+       
+  base:
+    build:
+      context: .
+      dockerfile: ${DOCKERFILE}
+      target: ds-run
+    image: ${ACCOUNT_NAME}/${PREFIX_NAME}-base${PRODUCT_EDITION}:${DOCKER_TAG}
+
+  utils:
+    container_name: utils
+    build:
+      context: .
+      dockerfile: ${DOCKERFILE}
+      target: utils
+    image: ${ACCOUNT_NAME}/${PREFIX_NAME}-utils:${DOCKER_TAG}
+    stdin_open: true
+    restart: always
+
+  metrics:
+    build:
+      context: .
+      dockerfile: ${DOCKERFILE}
+      target: metrics
+    expose:
+      - '8125'
+      - '8126'
+
+  postgresql:
+    build:
+      context: .
+      target: db

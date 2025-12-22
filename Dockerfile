@@ -26,6 +26,7 @@ RUN dnf -y updateinfo list --security && \
                 libaio \
                 libnsl \
                 nano \
+                gettext \
                 wget -y && \
     pip3 install redis && \
     wget -O /usr/local/bin/dumb-init https://github.com/Yelp/dumb-init/releases/download/v1.2.5/dumb-init_1.2.5_$(uname -m) && \
@@ -116,7 +117,7 @@ COPY --chown=ds:ds --from=ds-service \
 COPY --chown=ds:ds --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/web-apps \
     /var/www/$COMPANY_NAME/documentserver/web-apps
-COPY --from=ds-service \
+COPY --chown=ds:ds --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/dictionaries \
     /var/www/$COMPANY_NAME/documentserver/dictionaries
 COPY --from=ds-service \
@@ -159,10 +160,26 @@ RUN sed 's|\(application\/zip.*\)|\1\n    application\/wasm wasm;|' \
         -exec sh -c 'gzip -cf9 $0 > $0.gz && chown ds:ds $0.gz' {} \;
 VOLUME /var/lib/$COMPANY_NAME
 USER ds
-ENTRYPOINT docker-entrypoint.sh
+ENTRYPOINT ["docker-entrypoint.sh"]
 
-FROM ds-base AS docservice
-EXPOSE 8000
+FROM ds-base AS ds-run
+COPY scripts/documentserver-generate-allfonts.sh /usr/bin/documentserver-generate-allfonts.sh
+COPY scripts/documentserver-pluginsmanager.sh /usr/bin/documentserver-pluginsmanager.sh
+COPY --from=ds-service \
+    /var/www/$COMPANY_NAME/documentserver/server/dictionaries/update.py \
+    /var/www/$COMPANY_NAME/documentserver/server/dictionaries/update.py
+COPY --from=ds-service \
+    /var/www/$COMPANY_NAME/documentserver/server/tools/allfontsgen \
+    /var/www/$COMPANY_NAME/documentserver/server/tools/allfontsgen
+COPY --from=ds-service \
+    /var/www/$COMPANY_NAME/documentserver/server/tools/allthemesgen \
+    /var/www/$COMPANY_NAME/documentserver/server/tools/allthemesgen
+COPY --from=ds-service \
+    /var/www/$COMPANY_NAME/documentserver/server/tools/pluginsmanager \
+    /var/www/$COMPANY_NAME/documentserver/server/tools/pluginsmanager
+COPY --chown=ds:ds --from=ds-service \
+    /var/www/$COMPANY_NAME/documentserver/dictionaries \
+    /var/www/$COMPANY_NAME/documentserver/dictionaries
 COPY --from=ds-service \
     /etc/$COMPANY_NAME/documentserver/default.json \
     /etc/$COMPANY_NAME/documentserver/production-linux.json \
@@ -170,39 +187,15 @@ COPY --from=ds-service \
 COPY --from=ds-service --chown=ds:ds \
     /etc/$COMPANY_NAME/documentserver/log4js/production.json \
     /etc/$COMPANY_NAME/documentserver/log4js/
-COPY --from=ds-service \
+COPY --chown=ds:ds --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/sdkjs-plugins \
     /var/www/$COMPANY_NAME/documentserver/sdkjs-plugins
 COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/web-apps/apps/common/main/resources/themes \
     /var/www/$COMPANY_NAME/documentserver/web-apps/apps/common/main/resources/themes
-COPY --from=ds-service \
-    /var/www/$COMPANY_NAME/documentserver/server/DocService \
-    /var/www/$COMPANY_NAME/documentserver/server/DocService
-COPY --from=ds-service \
-    /var/www/$COMPANY_NAME/documentserver/server/info \
-    /var/www/$COMPANY_NAME/documentserver/server/info
 COPY --chown=ds:ds --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/web-apps/apps/api/wopi \
     /var/www/$COMPANY_NAME/documentserver/web-apps/apps/api/wopi
-COPY --from=ds-service \
-    /var/www/$COMPANY_NAME/documentserver/document-templates/new \
-    /var/www/$COMPANY_NAME/documentserver/document-templates/new
-COPY docker-entrypoint.sh /usr/local/bin/
-RUN mkdir -p /var/www/$COMPANY_NAME/config && \
-    chown -R ds:ds /var/www/$COMPANY_NAME/config
-USER ds
-ENTRYPOINT dumb-init docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/DocService/docservice
-HEALTHCHECK --interval=10s --timeout=3s CMD curl -sf http://localhost:8000/index.html
-
-FROM ds-base AS converter
-COPY --from=ds-service \
-    /etc/$COMPANY_NAME/documentserver/default.json \
-    /etc/$COMPANY_NAME/documentserver/production-linux.json \
-    /etc/$COMPANY_NAME/documentserver/
-COPY --from=ds-service --chown=ds:ds \
-    /etc/$COMPANY_NAME/documentserver/log4js/production.json \
-    /etc/$COMPANY_NAME/documentserver/log4js/
 COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/core-fonts \
     /var/www/$COMPANY_NAME/documentserver/core-fonts
@@ -216,8 +209,17 @@ COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/sdkjs \
     /var/www/$COMPANY_NAME/documentserver/sdkjs
 COPY --from=ds-service \
+    /var/www/$COMPANY_NAME/documentserver/server/DocService \
+    /var/www/$COMPANY_NAME/documentserver/server/DocService
+COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/server/FileConverter \
     /var/www/$COMPANY_NAME/documentserver/server/FileConverter
+COPY --from=ds-service \
+    /var/www/$COMPANY_NAME/documentserver/server/AdminPanel/server \
+    /var/www/$COMPANY_NAME/documentserver/server/AdminPanel/server
+COPY --chown=ds:ds --from=ds-service \
+    /var/www/$COMPANY_NAME/documentserver/server/AdminPanel/client \
+    /client
 COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/server/info \
     /var/www/$COMPANY_NAME/documentserver/server/info
@@ -228,34 +230,14 @@ COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/document-templates/new \
     /var/www/$COMPANY_NAME/documentserver/document-templates/new
 COPY docker-entrypoint.sh /usr/local/bin/
+COPY init-docker-entrypoint.sh /init/
 RUN mkdir -p \
         /var/lib/$COMPANY_NAME/documentserver/App_Data/cache/files \
         /var/www/$COMPANY_NAME/config \
         /var/lib/$COMPANY_NAME/documentserver/App_Data/docbuilder && \
     chown -R ds:ds /var/lib/$COMPANY_NAME/documentserver /var/www/$COMPANY_NAME/config
 USER ds
-ENTRYPOINT dumb-init docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/FileConverter/converter
-
-FROM ds-base AS adminpanel
-EXPOSE 9000
-COPY --from=ds-service \
-    /etc/$COMPANY_NAME/documentserver/default.json \
-    /etc/$COMPANY_NAME/documentserver/production-linux.json \
-    /etc/$COMPANY_NAME/documentserver/
-COPY --from=ds-service --chown=ds:ds \
-    /etc/$COMPANY_NAME/documentserver/log4js/production.json \
-    /etc/$COMPANY_NAME/documentserver/log4js/
-COPY --chown=ds:ds --from=ds-service \
-    /var/www/$COMPANY_NAME/documentserver/server/AdminPanel/server \
-    /var/www/$COMPANY_NAME/documentserver/server/AdminPanel/server
-COPY --chown=ds:ds --from=ds-service \
-    /var/www/$COMPANY_NAME/documentserver/server/AdminPanel/client \
-    /client
-COPY docker-entrypoint.sh /usr/local/bin/
-RUN mkdir -p /var/www/$COMPANY_NAME/config && \
-    chown -R ds:ds /var/www/$COMPANY_NAME/config
-USER ds
-ENTRYPOINT dumb-init docker-entrypoint.sh /var/www/$COMPANY_NAME/documentserver/server/AdminPanel/server/adminpanel
+ENTRYPOINT ["dumb-init", "--", "docker-entrypoint.sh"]
 
 FROM node:20-alpine3.19 AS example
 LABEL maintainer Ascensio System SIA <support@onlyoffice.com>

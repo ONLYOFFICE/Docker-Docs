@@ -1,10 +1,6 @@
 services:
   proxy:
     container_name: proxy
-    build:
-      context: .
-      dockerfile: ${DOCKERFILE}
-      target: proxy
     image: ${ACCOUNT_NAME}/${PREFIX_NAME}-proxy${PRODUCT_EDITION}:${DOCKER_TAG}
     environment:
       - DOCSERVICE_HOST_PORT=docservice:8000
@@ -23,11 +19,10 @@ services:
       start_period: 10s
        
   docservice:
-    build:
-      context: .
-      dockerfile: ${DOCKERFILE}
-      target: docservice
-    image: ${ACCOUNT_NAME}/${PREFIX_NAME}-docservice${PRODUCT_EDITION}:${DOCKER_TAG}
+    image: ${ACCOUNT_NAME}/${PREFIX_NAME}-base${PRODUCT_EDITION}:${DOCKER_TAG}
+    command:
+      - -c
+      - /var/www/${COMPANY_NAME}/documentserver/server/DocService/docservice
     deploy:
       replicas: 1
     environment:
@@ -66,13 +61,11 @@ services:
       retries: 5
       start_period: 10s
 
-
   converter:
-    build:
-      context: .
-      dockerfile: ${DOCKERFILE}
-      target: converter
-    image: ${ACCOUNT_NAME}/${PREFIX_NAME}-converter${PRODUCT_EDITION}:${DOCKER_TAG}
+    image: ${ACCOUNT_NAME}/${PREFIX_NAME}-base${PRODUCT_EDITION}:${DOCKER_TAG}
+    command:
+      - -c
+      - /var/www/${COMPANY_NAME}/documentserver/server/FileConverter/converter
     deploy:
       replicas: 2
     environment:
@@ -102,21 +95,43 @@ services:
     volumes:
      - common_data:/var/lib/${COMPANY_NAME}
 
+  adminpanel:
+    container_name: adminpanel
+    image: ${ACCOUNT_NAME}/${PREFIX_NAME}-base${PRODUCT_EDITION}:${DOCKER_TAG}
+    environment:
+      - DB_HOST=postgresql
+      - DB_NAME=mydb
+      - DB_USER=myuser
+      - REDIST_SERVER_HOST=redis
+      - AMQP_HOST=rabbitmq
+      - METRICS_HOST=metrics
+      - METRICS_ENABLED=true
+      - JWT_ENABLED=${JWT_ENABLED}
+      - JWT_HEADER=${JWT_HEADER}
+      - JWT_SECRET=${JWT_SECRET}
+    depends_on:
+      proxy:
+        condition: service_started
+      postgresql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      metrics:
+        condition: service_started
+    stdin_open: true
+    restart: always
+    expose:
+      - '9000'
+
   utils:
     container_name: utils
-    build:
-      context: .
-      dockerfile: ${DOCKERFILE}
-      target: utils
     image: ${ACCOUNT_NAME}/${PREFIX_NAME}-utils:${DOCKER_TAG}
     stdin_open: true
     restart: always
 
   metrics:
-    build:
-      context: .
-      dockerfile: ${DOCKERFILE}
-      target: metrics
     container_name: metrics
     expose:
       - '8125'
@@ -173,9 +188,6 @@ services:
 
   postgresql:
     container_name: postgresql
-    build:
-      context: .
-      target: db
     environment:
       - POSTGRES_DB=mydb
       - POSTGRES_USER=myuser

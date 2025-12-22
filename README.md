@@ -93,7 +93,7 @@ docker login
 To publish the images, run the following command:
 
 ```bash
-docker-compose push
+docker-compose -f build.yml push
 ```
 
 ## Running ONLYOFFICE Docs
