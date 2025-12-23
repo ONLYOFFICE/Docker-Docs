@@ -181,3 +181,4 @@ export NODE_CONFIG='{
 }'
 
 exec "$@"
+Run fonts adding, please wait...

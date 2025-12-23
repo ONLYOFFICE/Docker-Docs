@@ -92,7 +92,7 @@ ENV DOCSERVICE_HOST_PORT=localhost:8000 \
     NGINX_WORKER_CONNECTIONS=4096 \
     NGINX_WORKER_PROCESSES=1
 EXPOSE 8888
-RUN dnf -y install gettext nginx httpd-tools && \
+RUN dnf -y install nginx httpd-tools && \
     dnf clean all && \
     rm -f /var/log/*log && \
     mkdir -p /etc/nginx/includes
