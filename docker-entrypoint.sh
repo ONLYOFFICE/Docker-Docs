@@ -180,5 +180,77 @@ export NODE_CONFIG='{
   }
 }'
 
-exec "$@"
-Run fonts adding, please wait...
+WORK_DIR="/var/www/$COMPANY_NAME/documentserver"
+EXEC_CMD=""
+BUILD_FONTS=false
+BUILD_PLUGINS=false
+BUILD_DICTIONARIES=false
+
+while getopts ":c:fpd" opt; do
+  case $opt in
+    c ) EXEC_CMD="$(envsubst <<<"$OPTARG")" ;;
+    f ) BUILD_FONTS=true ;;
+    p ) BUILD_PLUGINS=true ;;
+    d ) BUILD_DICTIONARIES=true ;;
+    \?) ;;
+  esac
+done
+
+shift $((OPTIND-1))
+
+if [[ "${BUILD_FONTS}" == "true" ]]; then
+  if [[ "${CONTAINER_NAME}" == "converter" ]]; then
+    echo -e "\e[0;32m Run fonts adding, please wait... \e[0m"
+    cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/Images/* $WORK_DIR/sdkjs/common/Images/
+    cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/themes/* $WORK_DIR/sdkjs/slide/themes/
+    cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/fonts/* $WORK_DIR/fonts/
+    cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/AllFonts.js $WORK_DIR/sdkjs/common/
+    cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/bin/* $WORK_DIR/server/FileConverter/bin/
+  fi
+fi
+
+if [[ "${BUILD_PLUGINS}" == "true" ]]; then
+  if [[ "${CONTAINER_NAME}" != "converter" ]]; then
+    if [[ -f "$WORK_DIR/sdkjs-plugins/build_plugins.txt" ]]; then
+      echo "Plugins have already been added, skipping..."
+    else
+      until cat $WORK_DIR/sdkjs-plugins/build_plugins.txt
+      do
+        echo "Waiting for plugins to be added"
+        sleep 5
+      done
+    fi
+    rm -rf $WORK_DIR/sdkjs-plugins/build_plugins.txt
+  fi
+fi
+
+if [[ "${BUILD_DICTIONARIES}" == "true" ]]; then
+  if [[ "${CONTAINER_NAME}" == "converter" ]]; then
+    echo -e "\e[0;32m Run Dictionaries adding, please wait... \e[0m"
+    ( find $WORK_DIR/sdkjs/cell $WORK_DIR/sdkjs/word $WORK_DIR/sdkjs/slide $WORK_DIR/sdkjs/visio -maxdepth 1 -type f \( -name '*.js' -o -name '*.bin' \)
+      echo "$WORK_DIR/sdkjs/common/spell/spell/spell.js" ) | while read -r file; do
+        chmod 740 "$file"
+        dir=$(basename "$(dirname "$file")")
+        base_file=$(basename "$file")
+        if [[ "${base_file}" == "spell.js" ]]; then
+          target_dir="$WORK_DIR/sdkjs/common/spell/$dir"
+        else
+          target_dir="$WORK_DIR/sdkjs/$dir"
+        fi
+        cp -a "/var/lib/$COMPANY_NAME/documentserver/buffer/dictionaries/$dir/$base_file" "$target_dir/"
+        chmod 440 "$target_dir/$base_file"
+    done
+    if [ "$(ls -A $WORK_DIR/dictionaries/)" ]; then
+      echo "$WORK_DIR/dictionaries/ not empty, it is being cleaned..."
+      chmod 755 -R $WORK_DIR/dictionaries/*
+      rm -rf $WORK_DIR/dictionaries/*
+    fi
+    cp -ra /var/lib/$COMPANY_NAME/documentserver/buffer/dictionaries/dictionaries/* $WORK_DIR/dictionaries/
+  fi
+fi
+
+if [[ -n "${EXEC_CMD}" ]]; then
+  exec -- "$EXEC_CMD" "$@"
+else
+  echo -e "\e[0;31m EXEC_CMD does not exist \e[0m"
+fi
