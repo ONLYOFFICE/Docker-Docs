@@ -54,4 +54,6 @@ rm -f \
   $DIR/sdkjs/common/Images/*.gz \
   $DIR/sdkjs/slide/themes/themes.js.gz
 
+echo Done
+
 echo "Fonts build is complete"
