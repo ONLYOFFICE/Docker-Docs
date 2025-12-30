@@ -200,27 +200,35 @@ shift $((OPTIND-1))
 
 if [[ "${BUILD_FONTS}" == "true" ]]; then
   if [[ "${CONTAINER_NAME}" == "converter" ]]; then
-    echo -e "\e[0;32m Run fonts adding, please wait... \e[0m"
-    cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/Images/* $WORK_DIR/sdkjs/common/Images/
-    cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/themes/* $WORK_DIR/sdkjs/slide/themes/
-    cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/fonts/* $WORK_DIR/fonts/
-    cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/AllFonts.js $WORK_DIR/sdkjs/common/
-    cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/bin/* $WORK_DIR/server/FileConverter/bin/
+    if [ "$(find "$WORK_DIR/fonts" -mindepth 1 -print -quit)" ]; then
+      echo "Fonts have already been added, skipping..."
+    else
+      echo -e "\e[0;32m Run fonts adding, please wait... \e[0m"
+      cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/Images/* $WORK_DIR/sdkjs/common/Images/
+      cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/themes/* $WORK_DIR/sdkjs/slide/themes/
+      cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/fonts/* $WORK_DIR/fonts/
+      cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/AllFonts.js $WORK_DIR/sdkjs/common/
+      cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/bin/* $WORK_DIR/server/FileConverter/bin/
+    fi
   fi
 fi
 
 if [[ "${BUILD_PLUGINS}" == "true" ]]; then
   if [[ "${CONTAINER_NAME}" != "converter" ]]; then
-    if [[ -f "$WORK_DIR/sdkjs-plugins/build_plugins.txt" ]]; then
+    if [ "$(find "$WORK_DIR/sdkjs-plugins" -mindepth 1 -print -quit)" ]; then
       echo "Plugins have already been added, skipping..."
     else
-      until cat $WORK_DIR/sdkjs-plugins/build_plugins.txt
-      do
-        echo "Waiting for plugins to be added"
-        sleep 5
-      done
+      if [[ -f "$WORK_DIR/sdkjs-plugins/build_plugins.txt" ]]; then
+        echo "Plugins added successfully"
+      else
+        until cat $WORK_DIR/sdkjs-plugins/build_plugins.txt
+        do
+          echo "Waiting for plugins to be added"
+          sleep 5
+        done
+      fi
+      rm -rf $WORK_DIR/sdkjs-plugins/build_plugins.txt
     fi
-    rm -rf $WORK_DIR/sdkjs-plugins/build_plugins.txt
   fi
 fi
 

@@ -60,37 +60,45 @@ while getopts ":fpd" opt; do
 done
 
 if [[ "${BUILD_FONTS}" == "true" ]]; then
-  echo -e "\e[0;32m Run Fonts adding, please wait... \e[0m"
-  cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/Images/* $WORK_DIR/sdkjs/common/Images/
-  cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/themes/* $WORK_DIR/sdkjs/slide/themes/
-  cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/fonts/* $WORK_DIR/fonts/
-  cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/AllFonts.js $WORK_DIR/sdkjs/common/
-  find $WORK_DIR/fonts \
-    -type f ! \
-    -name "*.*" \
-    -exec sh -c 'gzip -cf9 $0 > $0.gz && chown ds:ds $0.gz' {} \;
-  chmod 755 $WORK_DIR/sdkjs/common/Images/cursors/
-  find $WORK_DIR/sdkjs/common \
-    $WORK_DIR/sdkjs/slide/themes \
-    $WORK_DIR/sdkjs/common/Images \
-    -type f \
-    \( -name '*.js' -o -name '*.json' -o -name '*.htm' -o -name '*.html' -o -name '*.css' \) \
-    -exec sh -c 'gzip -cf9 $0 > $0.gz && chown ds:ds $0.gz' {} \;
-  chmod 555 $WORK_DIR/sdkjs/common/Images/cursors/
+  if [ "$(find "$WORK_DIR/fonts" -mindepth 1 -print -quit)" ]; then
+    echo "Fonts have already been added, skipping..."
+  else
+    echo -e "\e[0;32m Run Fonts adding, please wait... \e[0m"
+    cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/Images/* $WORK_DIR/sdkjs/common/Images/
+    cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/themes/* $WORK_DIR/sdkjs/slide/themes/
+    cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/fonts/* $WORK_DIR/fonts/
+    cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/fonts/AllFonts.js $WORK_DIR/sdkjs/common/
+    find $WORK_DIR/fonts \
+      -type f ! \
+      -name "*.*" \
+      -exec sh -c 'gzip -cf9 $0 > $0.gz && chown ds:ds $0.gz' {} \;
+    chmod 755 $WORK_DIR/sdkjs/common/Images/cursors/
+    find $WORK_DIR/sdkjs/common \
+      $WORK_DIR/sdkjs/slide/themes \
+      $WORK_DIR/sdkjs/common/Images \
+      -type f \
+      \( -name '*.js' -o -name '*.json' -o -name '*.htm' -o -name '*.html' -o -name '*.css' \) \
+      -exec sh -c 'gzip -cf9 $0 > $0.gz && chown ds:ds $0.gz' {} \;
+    chmod 555 $WORK_DIR/sdkjs/common/Images/cursors/
+  fi
 fi
 
 if [[ "${BUILD_PLUGINS}" == "true" ]]; then
-  if [[ -f "$WORK_DIR/sdkjs-plugins/build_plugins.txt" ]]; then
-    rm -rf $WORK_DIR/sdkjs-plugins/build_plugins.txt
+  if [ "$(find "$WORK_DIR/sdkjs-plugins" -mindepth 1 -print -quit)" ]; then
+    echo "Plugins have already been added, skipping..."
+  else
+    if [[ -f "$WORK_DIR/sdkjs-plugins/build_plugins.txt" ]]; then
+      rm -rf $WORK_DIR/sdkjs-plugins/build_plugins.txt
+    fi
+    echo -e "\e[0;32m Run Plugins adding, please wait... \e[0m"
+    cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/plugins/sdkjs-plugins/* $WORK_DIR/sdkjs-plugins/
+    find $WORK_DIR/sdkjs-plugins/* -type d -exec chmod u+w {} \;
+    find $WORK_DIR/sdkjs-plugins \
+      -type f \
+      \( -name '*.js' -o -name '*.json' -o -name '*.htm' -o -name '*.html' -o -name '*.css' \) \
+      -exec sh -c 'gzip -cf9 $0 > $0.gz && chown ds:ds $0.gz' {} \;
+    echo "Completed" > $WORK_DIR/sdkjs-plugins/build_plugins.txt
   fi
-  echo -e "\e[0;32m Run Plugins adding, please wait... \e[0m"
-  cp -a /var/lib/$COMPANY_NAME/documentserver/buffer/plugins/sdkjs-plugins/* $WORK_DIR/sdkjs-plugins/
-  find $WORK_DIR/sdkjs-plugins/* -type d -exec chmod u+w {} \;
-  find $WORK_DIR/sdkjs-plugins \
-    -type f \
-    \( -name '*.js' -o -name '*.json' -o -name '*.htm' -o -name '*.html' -o -name '*.css' \) \
-    -exec sh -c 'gzip -cf9 $0 > $0.gz && chown ds:ds $0.gz' {} \;
-  echo "Completed" > $WORK_DIR/sdkjs-plugins/build_plugins.txt
 fi
 
 if [[ "${BUILD_DICTIONARIES}" == "true" ]]; then
