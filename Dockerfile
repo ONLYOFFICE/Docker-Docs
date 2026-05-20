@@ -302,6 +302,7 @@ RUN apk update && \
     git clone \
       --depth 1 \
       --recurse-submodules \
+      --branch master \
       https://github.com/ONLYOFFICE/document-server-integration.git && \
     mkdir -p /var/www/onlyoffice/documentserver-example && \
     cp -r ./document-server-integration/web/documentserver-example/nodejs/. \
