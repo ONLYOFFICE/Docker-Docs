@@ -287,6 +287,8 @@ CMD ["adminpanel"]
 FROM node:20-alpine3.19 AS example
 LABEL maintainer Ascensio System SIA <support@onlyoffice.com>
 
+ARG EXAMPLE_BRANCH=master
+
 ENV LANG=en_US.UTF-8 \
     LANGUAGE=en_US:en \
     LC_ALL=en_US.UTF-8 \
@@ -300,7 +302,7 @@ RUN apk update && \
     git clone \
       --depth 1 \
       --recurse-submodules \
-      --branch master \
+      --branch "${EXAMPLE_BRANCH}" \
       https://github.com/ONLYOFFICE/document-server-integration.git && \
     mkdir -p /var/www/onlyoffice/documentserver-example && \
     cp -r ./document-server-integration/web/documentserver-example/nodejs/. \
