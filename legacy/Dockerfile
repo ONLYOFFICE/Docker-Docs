@@ -76,10 +76,10 @@ COPY --chown=ds:ds \
 COPY --chown=ds:ds \
     dictionaries/ \
     /var/www/onlyoffice/documentserver/dictionaries/
-RUN documentserver-generate-allfonts.sh true && \
+RUN documentserver-generate-allfonts true && \
     python3 /var/www/onlyoffice/documentserver/server/dictionaries/update.py && \
-    documentserver-flush-cache.sh -h $DS_VERSION_HASH -r false && \
-    documentserver-pluginsmanager.sh -r false \
+    documentserver-flush-cache -h $DS_VERSION_HASH -r false && \
+    documentserver-pluginsmanager -r false \
     --update=\"/var/www/$COMPANY_NAME/documentserver/sdkjs-plugins/plugin-list-default.json\"
 
 FROM ds-base AS proxy

@@ -37,7 +37,7 @@ build_fonts() {
   chmod 755 "$WORK_DIR/sdkjs/common/Images"
   chmod 755 "$WORK_DIR/sdkjs/slide/themes"
   chmod 755 "$WORK_DIR/server/FileConverter/bin"
-  /usr/local/bin/documentserver-generate-allfonts.sh true true
+  /usr/local/bin/documentserver-generate-allfonts true true
   mkdir -p "$buffer_dir/bin"
   cp -ra "$WORK_DIR/sdkjs/common/Images/" "$buffer_dir/"
   cp -ra "$WORK_DIR/sdkjs/slide/themes/" "$buffer_dir/"
@@ -65,7 +65,7 @@ build_plugins() {
     chmod 755 -R "$WORK_DIR/sdkjs-plugins/marketplace"
     rm -rf "$WORK_DIR/sdkjs-plugins/marketplace"
   fi
-  /usr/local/bin/documentserver-pluginsmanager.sh -r false -k true --update=\"/var/www/$COMPANY_NAME/documentserver/sdkjs-plugins/plugin-list-default.json\"
+  /usr/local/bin/documentserver-pluginsmanager -r false -k true --update=\"/var/www/$COMPANY_NAME/documentserver/sdkjs-plugins/plugin-list-default.json\"
   mkdir -p "$buffer_dir"
   cp -ra "$WORK_DIR/sdkjs-plugins" "$buffer_dir/"
   echo -e "\e[0;32m Changed files have been added successfully \e[0m"
