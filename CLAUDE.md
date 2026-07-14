@@ -9,7 +9,7 @@ Docker, Docker Compose, Docker BuildX, Bash, Python 3.11, Lua (OpenResty), Nginx
 ## Project Structure
 
 ```
-Dockerfile                     — Main multi-stage image (14 targets: ds-base, ds-service, docs, proxy, docservice, converter, adminpanel, example, builder, utils, metrics, db, mysqldb, db-mariadb)
+Dockerfile                     — Main multi-stage image (targets: ds-base, ds-service, docs, proxy, docservice, converter, adminpanel, example, builder, utils, metrics, db, mysqldb, db-mariadb)
 Dockerfile.balancer            — OpenResty-based load balancer
 Dockerfile.noplugins           — Lightweight build without plugins
 legacy/                        — Legacy Dockerfiles (Dockerfile, Dockerfile.noplugins)
@@ -54,7 +54,7 @@ curl http://localhost/healthcheck  # Should return "true"
 
 ## Key Patterns
 
-- Multi-stage Dockerfile with 14 build targets (services + base/intermediate stages + databases)
+- Multi-stage Dockerfile with build targets for services, base/intermediate stages, and databases
 - Three editions: Community, Enterprise (-ee), Developer (-de)
 - Horizontal scaling of docservice and converter
 - Non-root container execution (user `ds`, UID 101)
