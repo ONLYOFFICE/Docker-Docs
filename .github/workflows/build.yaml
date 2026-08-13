@@ -164,6 +164,7 @@ jobs:
            PRODUCT_EDITION: ${{ matrix.edition }}
            PACKAGE_URL: ${{ github.event.inputs.package-url }}
            REF_BRANCH: ${{ github.ref_name }}
+           GITEA_TOKEN: ${{ secrets.GITEA_TOKEN }}
         run: |
           : ${DS_VERSION_HASH:?Should be set!}
 
@@ -186,19 +187,23 @@ jobs:
             export RELEASE_VERSION="-${VERSION}.el7"
           fi
 
-          ## Set-up example branch dynamicaly ##
+          ## Use the internal Gitea source for the example in CI ##
+          GITEA_HOST="git.onlyoffice.com"
           TARGET_REPO="ONLYOFFICE/document-server-integration"
+          export EXAMPLE_REPO="https://${GITEA_HOST}/${TARGET_REPO}.git"
+
+          ## Set-up example branch dynamicaly (probe Gitea) ##
           STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-          -H "Accept: application/vnd.github+json" \
-          -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-          "https://api.github.com/repos/${TARGET_REPO}/branches/${REF_BRANCH}")
+          -H "Accept: application/json" \
+          -H "Authorization: token ${GITEA_TOKEN}" \
+          "https://${GITEA_HOST}/api/v1/repos/${TARGET_REPO}/branches/${REF_BRANCH}")
 
           if [ "$STATUS" = "200" ]; then
             export EXAMPLE_BRANCH="${REF_BRANCH}"
-            echo "Branch '${REF_BRANCH}' found in ${TARGET_REPO}"
+            echo "Branch '${REF_BRANCH}' found in ${GITEA_HOST}/${TARGET_REPO}"
           else
             export EXAMPLE_BRANCH=develop
-            echo "Branch '${REF_BRANCH}' not found, falling back to 'develop'"
+            echo "Branch '${REF_BRANCH}' not found in ${GITEA_HOST}/${TARGET_REPO} (HTTP ${STATUS}), falling back to 'develop'"
           fi
 
           ## Execute build ##
