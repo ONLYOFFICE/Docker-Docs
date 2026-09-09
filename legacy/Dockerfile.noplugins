@@ -1,4 +1,4 @@
-FROM fedora:43 AS ds-base
+FROM fedora:44 AS ds-base
 
 LABEL maintainer Ascensio System SIA <support@onlyoffice.com>
 
