@@ -19,7 +19,7 @@ def init_logger(name):
 
 
 def set_nginx_parameter():
-    logger_endpoints_ds.info('Running the setting of values in Nginx config')
+    logger_entrypoint_balancer.info('Running the setting of values in Nginx config')
     nginx_worker_processes = os.environ.get('BALANCER_WORKER_PROCESSES')
     nginx_worker_connections = os.environ.get('BALANCER_WORKER_CONNECTIONS')
     nginx_worker_timeout = os.environ.get('BALANCER_WORKER_TIMEOUT')
@@ -33,9 +33,9 @@ def set_nginx_parameter():
         with open(path, "w") as config_write:
             config_write.write(worker_shutdown)
     except Exception as msg_set_nginx_conf:
-        logger_endpoints_ds.error(f'Failed when trying to set a value in the Nginx config... {msg_set_nginx_conf}\n')
+        logger_entrypoint_balancer.error(f'Failed when trying to set a value in the Nginx config... {msg_set_nginx_conf}\n')
     else:
-        logger_endpoints_ds.info('Setting values in Nginx config is completed\n')
+        logger_entrypoint_balancer.info('Setting values in Nginx config is completed\n')
 
 
 def running_services():
@@ -51,19 +51,23 @@ def running_services():
         running_cm_observer = ["python3", "/scripts/balancer-cm-observer.py"]
         running_get_ds_ep = ["python3", "/scripts/ds-ep-observer.py"]
         running_get_ds_pod = ["python3", "/scripts/ds-pod-observer.py"]
-        all_cmd = [running_nginx, running_cm_observer, running_get_ds_ep]
+        all_cmd = [
+            ('openresty', running_nginx),
+            ('balancer-cm-observer.py', running_cm_observer),
+            ('ds-ep-observer.py', running_get_ds_ep)
+        ]
         try:
             disc.list_namespaced_endpoint_slice(namespace=ns, label_selector=label_name, _preload_content=False)
         except Exception as msg_get_ep_slices:
-            logger_endpoints_ds.warning(f'EndpointSlice API probe failed: {msg_get_ep_slices}')
-            all_cmd.append(running_get_ds_pod)
+            logger_entrypoint_balancer.warning(f'EndpointSlice API probe failed: {msg_get_ep_slices}')
+            all_cmd.append(('ds-pod-observer.py', running_get_ds_pod))
         else:
-            logger_endpoints_ds.info('EndpointSlice API probe successfully')
-        for cmd in all_cmd:
+            logger_entrypoint_balancer.info('EndpointSlice API probe successfully')
+        for name, cmd in all_cmd:
             cmd_process = subprocess.Popen(cmd)
-            logger_endpoints_ds.info(f'The "{cmd_process.pid}" process has been running')
+            logger_entrypoint_balancer.info(f'The "{name}" process has been running with PID {cmd_process.pid}')
     except Exception as msg_running_services:
-        logger_endpoints_ds.error(f'Failed when trying to run the service... {msg_running_services}\n')
+        logger_entrypoint_balancer.error(f'Failed when trying to run the service... {msg_running_services}\n')
 
 
 def loop(forever_scheduler):
@@ -72,7 +76,7 @@ def loop(forever_scheduler):
 
 
 init_logger('balancer')
-logger_endpoints_ds = logging.getLogger('balancer.ds')
+logger_entrypoint_balancer = logging.getLogger('balancer.ds')
 set_nginx_parameter()
 running_services()
 scheduler = sched.scheduler(time.time, time.sleep)

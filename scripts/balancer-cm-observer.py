@@ -78,8 +78,8 @@ def reload_nginx():
         logger_cm_observer.error(f'Failed nginx reload attempt: "{quit_msg}"\n')
 
 # Init logger
-init_logger('balancer')
-logger_cm_observer = logging.getLogger('balancer.cm')
+init_logger('configmap')
+logger_cm_observer = logging.getLogger('configmap.balancer')
 
 # Start watching for changes
 watch_configmap_changes()
