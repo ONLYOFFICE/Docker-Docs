@@ -110,6 +110,7 @@ COPY --chown=ds:ds config/nginx/nginx.conf /etc/nginx/nginx.conf
 COPY --chown=ds:ds --from=ds-service \
     /usr/bin/documentserver-generate-allfonts \
     /usr/bin/documentserver-pluginsmanager \
+    /usr/bin/documentserver-admin \
     /usr/local/bin/
 COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/server/dictionaries/update.py \
@@ -193,7 +194,6 @@ RUN sed 's,\(listen.\+:\)\([0-9]\+\)\(.*;\),'"\18888\3"',' \
     sed -i 's/etc\/nginx/tmp\/proxy_nginx/g' /etc/nginx/nginx.conf && \
     sed -i 's/etc\/nginx/tmp\/proxy_nginx/g' /etc/nginx/conf.d/ds.conf && \
     sed 's/\(X-Forwarded-For\).*/\1 example.com;/' -i /etc/nginx/includes/ds-example.conf && \
-    sed 's/\(index\).*/\1 k8s.html;/' -i /etc/nginx/includes/ds-example.conf && \
     chmod 755 /var/log/nginx && \
     ln -sf /dev/stdout /var/log/nginx/access.log && \
     ln -sf /dev/stderr /var/log/nginx/error.log && \

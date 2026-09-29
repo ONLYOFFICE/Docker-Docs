@@ -27,17 +27,21 @@ if [[ ! -f "/proc/net/if_inet6" ]]; then
 fi
 
 WELCOME_PATH="/var/www/$COMPANY_NAME/documentserver-example/welcome"
+INDEX_PAGE="$WELCOME_PATH/index.html"
 WELCOME_PAGE="$WELCOME_PATH/k8s.html"
 ADMIN_PANEL_DISABLED_PAGE="$WELCOME_PATH/admin-disabled.html"
 EXAMPLE_DISABLED_PAGE="$WELCOME_PATH/example-disabled.html"
+sed -Ei 's/(data-platform=")[^"]*/\1k8s/' "$INDEX_PAGE"
 if [[ -n "$DOCS_SHARDS" ]]; then
-  sed -i 's/\(Kubernetes-Docs\)\(-Shards\)\?/\1-Shards/g' "$WELCOME_PAGE"
+  sed -i 's/\(Kubernetes-Docs\)\(-Shards\)\?/\1-Shards/g' "$WELCOME_PAGE" "$INDEX_PAGE"
   sed -Ei 's|<pre>sudo systemctl start ds-(adminpanel\|example).*</pre>|<pre>\helm upgrade documentserver onlyoffice/docs-shards --set \1.enabled=true</pre>|g' "$ADMIN_PANEL_DISABLED_PAGE" "$EXAMPLE_DISABLED_PAGE"
+  sed -i 's|\(helm upgrade documentserver onlyoffice/docs\)\(-shards\)\?|\1-shards|g' "$INDEX_PAGE"
 else
   sed -Ei 's|<pre>sudo systemctl start ds-(adminpanel\|example).*</pre>|<pre>\helm upgrade documentserver onlyoffice/docs --set \1.enabled=true</pre>|g' "$ADMIN_PANEL_DISABLED_PAGE" "$EXAMPLE_DISABLED_PAGE"
 fi
 
 for page in \
+  "$INDEX_PAGE" \
   "$WELCOME_PAGE" \
   "$ADMIN_PANEL_DISABLED_PAGE" \
   "$EXAMPLE_DISABLED_PAGE"
