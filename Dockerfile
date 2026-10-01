@@ -105,7 +105,10 @@ ENV DOCSERVICE_HOST_PORT=localhost:8000 \
     NGINX_GZIP_PROXIED=any \
     NGINX_CLIENT_MAX_BODY_SIZE=100m \
     NGINX_WORKER_CONNECTIONS=4096 \
-    NGINX_WORKER_PROCESSES=1
+    NGINX_WORKER_PROCESSES=1 \
+    # Default runtimeConfig location for CLI tools run via exec;
+    # services get the same path from docker-entrypoint.sh
+    NODE_CONFIG="{\"runtimeConfig\":{\"filePath\":\"/var/www/${COMPANY_NAME}/config/runtime.json\"}}"
 COPY --chown=ds:ds config/nginx/nginx.conf /etc/nginx/nginx.conf
 COPY --chown=ds:ds --from=ds-service \
     /usr/bin/documentserver-generate-allfonts \
