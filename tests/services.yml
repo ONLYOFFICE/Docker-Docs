@@ -36,7 +36,7 @@ services:
       - WOPI_ENABLED=false
       - JWT_ENABLED=true
       - JWT_HEADER=Authorization
-      - JWT_SECRET=secret
+      - JWT_SECRET=developer-only-not-a-real-secret
     depends_on:
       - proxy
       - redis
@@ -68,7 +68,7 @@ services:
       - METRICS_ENABLED=true
       - JWT_ENABLED=true
       - JWT_HEADER=Authorization
-      - JWT_SECRET=secret
+      - JWT_SECRET=developer-only-not-a-real-secret
     depends_on:
       - proxy
       - redis

@@ -141,7 +141,7 @@ Below is the complete list of parameters for `onlyoffice/docs-proxy`.
 - **DOCSERVICE_HOST_PORT**: Defaults to `localhost:8000`.
 - **EXAMPLE_HOST_PORT**: Defaults to `localhost:3000`.
 - **NGINX_ACCESS_LOG**: Defines the nginx config [access_log](https://nginx.org/en/docs/http/ngx_http_log_module.html#access_log) directive. Defaults to `off`.
-- **NGINX_GZIP_PROXIED**: Defines the nginx config [gzip_proxied](https://nginx.org/en/docs/http/ngx_http_gzip_module.html#gzip_proxied) directive. Defaults to `off`.
+- **NGINX_GZIP_PROXIED**: Defines the nginx config [gzip_proxied](https://nginx.org/en/docs/http/ngx_http_gzip_module.html#gzip_proxied) directive. Defaults to `any`.
 - **NGINX_CLIENT_MAX_BODY_SIZE**: Defines the nginx config [client_max_body_size](https://nginx.org/en/docs/http/ngx_http_core_module.html#client_max_body_size) directive. Defaults to `100m`.
 - **NGINX_WORKER_CONNECTIONS**: Defines the nginx config [worker_connections](https://nginx.org/en/docs/ngx_core_module.html#worker_connections) directive. Defaults to `4096`.
 - **NGINX_WORKER_PROCESSES**: Defines the nginx config [worker_processes](https://nginx.org/en/docs/ngx_core_module.html#worker_processes) directive.
@@ -177,7 +177,7 @@ Below is the complete list of parameters for `onlyoffice/docs-docservice`, `only
 - **JWT_ENABLED**: Specifies the enabling the JSON Web Token validation by the ONLYOFFICE Docs. Common for inbox and outbox requests. Defaults to `true`.
 - **JWT_ENABLED_INBOX**: Specifies the enabling the JSON Web Token validation by the ONLYOFFICE Docs only for inbox requests. Default, the value of the variable `JWT_ENABLED` is used.
 - **JWT_ENABLED_OUTBOX**: Specifies the enabling the JSON Web Token validation by the ONLYOFFICE Docs only for outbox requests. Default, the value of the variable `JWT_ENABLED` is used.
-- **JWT_SECRET**: Defines the secret key to validate the JSON Web Token in the request to the ONLYOFFICE Docs. Common for inbox and outbox requests. Defaults to `secret`.
+- **JWT_SECRET**: Defines the secret key to validate the JSON Web Token in the request to the ONLYOFFICE Docs. Common for inbox and outbox requests. Defaults to `developer-only-not-a-real-secret`.
 - **JWT_SECRET_INBOX**: Defines the secret key to validate the JSON Web Token in the request to the ONLYOFFICE Docs only for inbox requests. Default, the value of the variable `JWT_SECRET` is used.
 - **JWT_SECRET_OUTBOX**: Defines the secret key to validate the JSON Web Token in the request to the ONLYOFFICE Docs only for outbox requests. Default, the value of the variable `JWT_SECRET` is used.
 - **JWT_HEADER**: Defines the http header that will be used to send the JSON Web Token. Common for inbox and outbox requests. Defaults to `Authorization`.
@@ -186,7 +186,7 @@ Below is the complete list of parameters for `onlyoffice/docs-docservice`, `only
 - **JWT_IN_BODY**: Specifies the enabling the token validation in the request body to the ONLYOFFICE Docs. Defaults to `false`.
 - **LOG_LEVEL**: Defines the type and severity of a logged event. Default to `WARN`. Possible values are `ALL`, `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, `FATAL`, `MARK`, `OFF`.
 - **LOG_TYPE**: Defines the format of a logged event. Default to `pattern`. Possible values are `pattern`, `json`, `basic`, `coloured`, `messagePassThrough`, `dummy`.
-- **LOG_PATTERN**: Defines the log [pattern](https://github.com/log4js-node/log4js-node/blob/master/docs/layouts.md#pattern-format) if `LOG_TYPE=pattern`. Default to `[%d] [%p] [%X{DOCID}] [%X{USERID}] %c - %.10000m`.
+- **LOG_PATTERN**: Defines the log [pattern](https://github.com/log4js-node/log4js-node/blob/master/docs/layouts.md#pattern-format) if `LOG_TYPE=pattern`. Default to `[%d] [%p] [%X{TENANT}] [%X{DOCID}] [%X{USERID}] %c - %.10000m`.
 - **METRICS_ENABLED**: Specifies the enabling StatsD for ONLYOFFICE Docs. Defaults to `false`.
 - **METRICS_HOST**: Defines StatsD listening host. Defaults to `localhost`.
 - **METRICS_PORT**: Defines StatsD listening port. Defaults to `8125`.
@@ -199,7 +199,7 @@ Below is the complete list of parameters for `onlyoffice/docs-docservice`, `only
 Below is the complete list of parameters for `onlyoffice/docs-example`.
 - **DS_URL**: Specifies ONLYOFFICE Docs server address. Defaults to `/`. You have specyfing this field to correct work ONLYOFFICE Docs Example. Example `http://onlyoffice-docs-address/`.
 - **JWT_ENABLED**: Specifies the enabling the JSON Web Token validation by the ONLYOFFICE Docs. Defaults to `false`.
-- **JWT_SECRET**: Defines the secret key to validate the JSON Web Token in the request to the ONLYOFFICE Docs. Defaults to `secret`.
+- **JWT_SECRET**: Defines the secret key to validate the JSON Web Token in the request to the ONLYOFFICE Docs. Defaults to `developer-only-not-a-real-secret`.
 - **JWT_HEADER**: Defines the http header that will be used to send the JSON Web Token. Defaults to `Authorization`.
 - **WOPI_ENABLED**: Specifies the enabling the wopi handlers. Defaults to `false`.
 - **WOPI_PRIVATE_KEY**: Defines the private key that signs the ONLYOFFICE Docs request

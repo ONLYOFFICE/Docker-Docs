@@ -1,4 +1,4 @@
-FROM fedora:43 AS ds-base
+FROM fedora:44 AS ds-base
 
 LABEL maintainer Ascensio System SIA <support@onlyoffice.com>
 
@@ -72,9 +72,9 @@ COPY --chown=ds:ds \
 COPY --chown=ds:ds \
     dictionaries/ \
     /var/www/onlyoffice/documentserver/dictionaries/
-RUN documentserver-generate-allfonts.sh true && \
+RUN documentserver-generate-allfonts true && \
     python3 /var/www/onlyoffice/documentserver/server/dictionaries/update.py && \
-    documentserver-flush-cache.sh -h $DS_VERSION_HASH -r false
+    documentserver-flush-cache -h $DS_VERSION_HASH -r false
 
 FROM ds-base AS proxy
 ENV DOCSERVICE_HOST_PORT=localhost:8000 \

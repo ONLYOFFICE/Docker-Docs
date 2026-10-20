@@ -163,6 +163,7 @@ jobs:
            TEST_REPO: ${{ github.event.inputs.test-repo }}
            PRODUCT_EDITION: ${{ matrix.edition }}
            PACKAGE_URL: ${{ github.event.inputs.package-url }}
+           REF_BRANCH: ${{ github.ref_name }}
         run: |
           : ${DS_VERSION_HASH:?Should be set!}
 
@@ -185,6 +186,22 @@ jobs:
             export RELEASE_VERSION="-${VERSION}.el7"
           fi
 
+          ## Set-up example branch dynamicaly ##
+          TARGET_REPO="ONLYOFFICE/document-server-integration"
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+          -H "Accept: application/vnd.github+json" \
+          -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+          "https://api.github.com/repos/${TARGET_REPO}/branches/${REF_BRANCH}")
+
+          if [ "$STATUS" = "200" ]; then
+            export EXAMPLE_BRANCH="${REF_BRANCH}"
+            echo "Branch '${REF_BRANCH}' found in ${TARGET_REPO}"
+          else
+            export EXAMPLE_BRANCH=develop
+            echo "Branch '${REF_BRANCH}' not found, falling back to 'develop'"
+          fi
+
+          ## Execute build ##
           docker buildx bake --sbom=true --provenance=mode=max \
             -f docker-bake.hcl ${IMAGES} \
             --push

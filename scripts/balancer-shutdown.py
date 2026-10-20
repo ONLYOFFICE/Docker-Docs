@@ -104,12 +104,14 @@ def ngx_shutdown():
 def shutdown_services():
     services = [
             'ds-ep-observer.py',
-            'ds-pod-observer.py',
             'balancer-cm-observer.py'
             ]
+    pod_observer_pid = get_pid_by_name('ds-pod-observer.py')
+    if pod_observer_pid:
+        services.append('ds-pod-observer.py')
     try:
         for service in services:
-            pid = get_pid_by_name(service)
+            pid = pod_observer_pid if service == 'ds-pod-observer.py' else get_pid_by_name(service)
             if pid:
                 kill(pid, True)
                 logger_shutdown.info(f"Successfully killed service '{service}' with PID {pid}")

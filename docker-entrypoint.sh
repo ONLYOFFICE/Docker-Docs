@@ -135,7 +135,7 @@ export NODE_CONFIG='{
       },
       "secret": {
         "inbox": {
-          "string": "'${JWT_SECRET_INBOX:-${JWT_SECRET:=secret}}'"
+          "string": "'${JWT_SECRET_INBOX:-${JWT_SECRET:=developer-only-not-a-real-secret}}'"
         },
         "outbox": {
           "string": "'${JWT_SECRET_OUTBOX:-${JWT_SECRET}}'"

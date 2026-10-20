@@ -39,6 +39,10 @@ variable "PLATFORM" {
     default = ""
 }
 
+variable "EXAMPLE_BRANCH" {
+    default = "master"
+}
+
 group "apps" {
     targets = ["proxy", "converter", "docservice", "example"]
 }
@@ -51,6 +55,7 @@ target "example" {
     platforms = ["${PLATFORM}"]
     args = {
         "PRODUCT_EDITION": "${PRODUCT_EDITION}"
+        "EXAMPLE_BRANCH": "${EXAMPLE_BRANCH}"
     }
 }
 

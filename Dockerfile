@@ -2,7 +2,7 @@ ARG POSTGRES_VERSION="15"
 ARG MYSQL_VERSION="latest"
 ARG MARIADB_VERSION="latest"
 
-FROM fedora:43 AS ds-base
+FROM fedora:44 AS ds-base
 
 LABEL maintainer Ascensio System SIA <support@onlyoffice.com>
 
@@ -80,10 +80,10 @@ COPY --chown=ds:ds \
 COPY --chown=ds:ds \
     dictionaries/ \
     /var/www/onlyoffice/documentserver/dictionaries/
-RUN documentserver-generate-allfonts.sh true && \
+RUN documentserver-generate-allfonts true && \
     python3 /var/www/onlyoffice/documentserver/server/dictionaries/update.py && \
-    documentserver-flush-cache.sh -h $DS_VERSION_HASH -r false && \
-    documentserver-pluginsmanager.sh -r false \
+    documentserver-flush-cache -h $DS_VERSION_HASH -r false && \
+    documentserver-pluginsmanager -r false \
     --update=\"/var/www/$COMPANY_NAME/documentserver/sdkjs-plugins/plugin-list-default.json\"
 
 # --------------------------------------------------------------------------------
@@ -102,14 +102,18 @@ ENV DOCSERVICE_HOST_PORT=localhost:8000 \
     ADMINPANEL_HOST_PORT=localhost:9000 \
     EXAMPLE_HOST_PORT=localhost:3000 \
     NGINX_ACCESS_LOG=off \
-    NGINX_GZIP_PROXIED=off \
+    NGINX_GZIP_PROXIED=any \
     NGINX_CLIENT_MAX_BODY_SIZE=100m \
     NGINX_WORKER_CONNECTIONS=4096 \
-    NGINX_WORKER_PROCESSES=1
+    NGINX_WORKER_PROCESSES=1 \
+    # Default runtimeConfig location for CLI tools run via exec;
+    # services get the same path from docker-entrypoint.sh
+    NODE_CONFIG="{\"runtimeConfig\":{\"filePath\":\"/var/www/${COMPANY_NAME}/config/runtime.json\"}}"
 COPY --chown=ds:ds config/nginx/nginx.conf /etc/nginx/nginx.conf
 COPY --chown=ds:ds --from=ds-service \
-    /usr/bin/documentserver-generate-allfonts.sh \
-    /usr/bin/documentserver-pluginsmanager.sh \
+    /usr/bin/documentserver-generate-allfonts \
+    /usr/bin/documentserver-pluginsmanager \
+    /usr/bin/documentserver-admin \
     /usr/local/bin/
 COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/server/dictionaries/update.py \
@@ -188,12 +192,11 @@ RUN sed 's,\(listen.\+:\)\([0-9]\+\)\(.*;\),'"\18888\3"',' \
         -i /etc/nginx/conf.d/ds.conf && \
     sed '/access_log.*/d' -i /etc/nginx/includes/ds-common.conf && \
     sed '/error_log.*/d' -i /etc/nginx/includes/ds-common.conf && \
-    echo -e "\ngzip_proxied \$NGINX_GZIP_PROXIED;\n" >> /etc/nginx/includes/ds-common.conf && \
+    sed 's/\(gzip_proxied\).*/\1 $NGINX_GZIP_PROXIED;/' -i /etc/nginx/includes/ds-common.conf && \
     sed 's/#*\s*\(gzip_static\).*/\1 on;/g' -i /etc/nginx/includes/ds-docservice.conf && \
     sed -i 's/etc\/nginx/tmp\/proxy_nginx/g' /etc/nginx/nginx.conf && \
     sed -i 's/etc\/nginx/tmp\/proxy_nginx/g' /etc/nginx/conf.d/ds.conf && \
     sed 's/\(X-Forwarded-For\).*/\1 example.com;/' -i /etc/nginx/includes/ds-example.conf && \
-    sed 's/\(index\).*/\1 k8s.html;/' -i /etc/nginx/includes/ds-example.conf && \
     chmod 755 /var/log/nginx && \
     ln -sf /dev/stdout /var/log/nginx/access.log && \
     ln -sf /dev/stderr /var/log/nginx/error.log && \
@@ -287,6 +290,8 @@ CMD ["adminpanel"]
 FROM node:20-alpine3.19 AS example
 LABEL maintainer Ascensio System SIA <support@onlyoffice.com>
 
+ARG EXAMPLE_BRANCH=master
+
 ENV LANG=en_US.UTF-8 \
     LANGUAGE=en_US:en \
     LC_ALL=en_US.UTF-8 \
@@ -300,7 +305,7 @@ RUN apk update && \
     git clone \
       --depth 1 \
       --recurse-submodules \
-      --branch master \
+      --branch "${EXAMPLE_BRANCH}" \
       https://github.com/ONLYOFFICE/document-server-integration.git && \
     mkdir -p /var/www/onlyoffice/documentserver-example && \
     cp -r ./document-server-integration/web/documentserver-example/nodejs/. \
