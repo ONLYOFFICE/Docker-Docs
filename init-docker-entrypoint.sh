@@ -59,6 +59,7 @@ build_plugins() {
   cleanup_dir "$buffer_dir"
   chmod 755 "$WORK_DIR/sdkjs-plugins"
   if [[ -n "$PLUGINS_LIST_DEFAULT" ]]; then
+    find "$WORK_DIR/sdkjs-plugins" -mindepth 1 -maxdepth 1 -type d -name '{*' -exec chmod -R u+w -- {} +
     find "$WORK_DIR/sdkjs-plugins" -mindepth 1 -maxdepth 1 -name '{*' -exec rm -rf -- {} +
   fi
   if [[ "${PLUGINS_MARKET_DISABLED}" == "true" ]]; then
