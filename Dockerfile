@@ -287,54 +287,36 @@ CMD ["converter"]
 FROM docs AS adminpanel
 CMD ["adminpanel"]
 
-FROM node:20-alpine3.19 AS example
-LABEL maintainer Ascensio System SIA <support@onlyoffice.com>
-
-ARG EXAMPLE_BRANCH=master
-
-ENV LANG=en_US.UTF-8 \
-    LANGUAGE=en_US:en \
-    LC_ALL=en_US.UTF-8 \
-    NODE_ENV=production-linux \
-    NODE_CONFIG_DIR=/etc/onlyoffice/documentserver-example/
-
-WORKDIR /var/www/onlyoffice/documentserver-example/
-
-RUN apk update && \
-    apk add git && \
-    git clone \
-      --depth 1 \
-      --recurse-submodules \
-      --branch "${EXAMPLE_BRANCH}" \
-      https://github.com/ONLYOFFICE/document-server-integration.git && \
-    mkdir -p /var/www/onlyoffice/documentserver-example && \
-    cp -r ./document-server-integration/web/documentserver-example/nodejs/. \
-      /var/www/onlyoffice/documentserver-example/ && \
-    rm -rf ./document-server-integration && \
-    addgroup -S -g 1001 ds && \
-    adduser \
-      -S \
-      -G ds \
-      -D \
-      -h /var/www/onlyoffice/documentserver-example \
-      -s /sbin/nologin \
-      -u 1001 ds && \
-    chown -R ds:ds /var/www/onlyoffice/documentserver-example/ && \
-    mkdir -p /var/lib/onlyoffice/documentserver-example/ && \
-    chown -R ds:ds /var/lib/onlyoffice/ && \
-    mv files /var/lib/onlyoffice/documentserver-example/ && \
-    mkdir -p /etc/onlyoffice/documentserver-example/ && \
-    chown -R ds:ds /etc/onlyoffice/ && \
-    mv config/* /etc/onlyoffice/documentserver-example/ && \
-    ln -s /etc/onlyoffice/documentserver-example/data.json \
-    /var/www/onlyoffice/documentserver-example/config/data.json && \
-    npm install
-
+# --------------------------------------------------------------------
+# Example: ONLYOFFICE Docs integration example (Node.js test app)
+#
+# Built from the same documentserver package as the other images:
+# the prebuilt `example` binary and its configs are copied from
+# ds-service, so the example always matches the packaged Docs version
+# --------------------------------------------------------------------
+FROM ds-base AS example
+ENV NODE_ENV=production-linux \
+    NODE_CONFIG_DIR=/etc/$COMPANY_NAME/documentserver-example \
+    NODE_DISABLE_COLORS=1
+RUN groupmod -g 1001 ds && \
+    usermod -u 1001 -g 1001 ds
+COPY --chown=ds:ds --from=ds-service \
+    /etc/$COMPANY_NAME/documentserver-example/default.json \
+    /etc/$COMPANY_NAME/documentserver-example/production-linux.json \
+    /etc/$COMPANY_NAME/documentserver-example/data.json \
+    /etc/$COMPANY_NAME/documentserver-example/
+COPY --chown=ds:ds --from=ds-service \
+    /var/www/$COMPANY_NAME/documentserver-example/example \
+    /var/www/$COMPANY_NAME/documentserver-example/example
+COPY --chown=ds:ds --from=ds-service \
+    /var/lib/$COMPANY_NAME/documentserver-example \
+    /var/lib/$COMPANY_NAME/documentserver-example
+COPY example-docker-entrypoint.sh /usr/local/bin/
+WORKDIR /var/www/$COMPANY_NAME/documentserver-example
 EXPOSE 3000
-
 USER ds
-
-ENTRYPOINT ["/var/www/onlyoffice/documentserver-example/docker-entrypoint.sh", "npm", "start"]
+ENTRYPOINT ["dumb-init", "--", "example-docker-entrypoint.sh"]
+CMD ["./example"]
 
 FROM python:3.11-bookworm AS builder
 RUN pip install redis psycopg2  PyMySQL pika python-qpid-proton func_timeout requests kubernetes==35.0.0 flask
