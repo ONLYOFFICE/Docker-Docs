@@ -157,7 +157,7 @@ Below is the complete list of parameters for `onlyoffice/docs-docservice`, `only
 - **DB_NAME**: The name of a database to use. Should be existing on startup.
 - **DB_USER**: The new user name with superuser permissions for the database account.
 - **DB_PWD**: The password set for the database account.
-- **DB_SCHEMA**: Database schema name. The name must be in lowercase.
+- **DB_SCHEMA**: Database schema name. The name must be in lowercase. Should be existing on startup.
 - **AMQP_TYPE**: Defines the message broker type. Defaults to `rabbitmq`. Possible values are `rabbitmq` or `activemq`.
 - **AMQP_PROTO**: The protocol for the connection to AMQP server. Default to `amqp`. Possible values are `amqp`, `amqps`.
 - **AMQP_USER**: The username for the AMQP server account.
