@@ -78,6 +78,10 @@ fi
 # PostgreSQL schema (search_path) for Docs services
 # --------------------------------------------------------------------
 if [[ "${DB_TYPE:-postgres}" == "postgres" && -n "${DB_SCHEMA}" && "${DB_SCHEMA}" != "public" ]]; then
+  if [[ ! "${DB_SCHEMA}" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]]; then
+    echo "Invalid DB_SCHEMA: must match ^[A-Za-z_][A-Za-z0-9_]*$" >&2
+    exit 2
+  fi
   DB_PG_POOL_EXTRA_OPTIONS=',
         "pgPoolExtraOptions": {
           "options": "-c search_path='${DB_SCHEMA}'"
