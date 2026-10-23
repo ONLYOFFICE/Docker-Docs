@@ -301,7 +301,11 @@ ENV NODE_ENV=production-linux \
     NODE_CONFIG_DIR=/etc/$COMPANY_NAME/documentserver-example \
     NODE_DISABLE_COLORS=1 \
     PKG_NATIVE_CACHE_PATH=/tmp/.cache
-RUN groupadd --system --gid 1001 ds && \
+# wget is used by the docker-compose healthcheck
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends wget && \
+    rm -rf /var/lib/apt/lists/* && \
+    groupadd --system --gid 1001 ds && \
     useradd --system -g ds --no-create-home --shell /sbin/nologin --uid 1001 ds
 COPY --from=ds-base /usr/local/bin/dumb-init /usr/local/bin/dumb-init
 COPY --chown=ds:ds --from=ds-service \
