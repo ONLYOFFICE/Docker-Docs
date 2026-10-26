@@ -294,12 +294,20 @@ CMD ["adminpanel"]
 # the prebuilt `example` binary and its configs are copied from
 # ds-service, so the example always matches the packaged Docs version
 # --------------------------------------------------------------------
-FROM ds-base AS example
+FROM debian:trixie-slim AS example
+LABEL maintainer Ascensio System SIA <support@onlyoffice.com>
+ARG COMPANY_NAME=onlyoffice
 ENV NODE_ENV=production-linux \
     NODE_CONFIG_DIR=/etc/$COMPANY_NAME/documentserver-example \
-    NODE_DISABLE_COLORS=1
-RUN groupmod -g 1001 ds && \
-    usermod -u 1001 -g 1001 ds
+    NODE_DISABLE_COLORS=1 \
+    PKG_NATIVE_CACHE_PATH=/tmp/.cache
+# wget is used by the docker-compose healthcheck
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends wget && \
+    rm -rf /var/lib/apt/lists/* && \
+    groupadd --system --gid 1001 ds && \
+    useradd --system -g ds --no-create-home --shell /sbin/nologin --uid 1001 ds
+COPY --from=ds-base /usr/local/bin/dumb-init /usr/local/bin/dumb-init
 COPY --chown=ds:ds --from=ds-service \
     /etc/$COMPANY_NAME/documentserver-example/default.json \
     /etc/$COMPANY_NAME/documentserver-example/production-linux.json \
