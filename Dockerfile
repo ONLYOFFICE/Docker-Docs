@@ -287,7 +287,7 @@ CMD ["converter"]
 FROM docs AS adminpanel
 CMD ["adminpanel"]
 
-FROM node:20-alpine3.19 AS example
+FROM node:24-alpine3.24 AS example
 LABEL maintainer Ascensio System SIA <support@onlyoffice.com>
 
 ARG EXAMPLE_BRANCH=master
