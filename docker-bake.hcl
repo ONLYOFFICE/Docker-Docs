@@ -15,6 +15,10 @@ variable "PRODUCT_EDITION" {
     default = ""
 }
 
+variable "UTILS_EDITION" {
+    default = "-ee"
+}
+
 variable "DOCKERFILE" {
     default = "Dockerfile"
 }
@@ -136,6 +140,7 @@ target "utils" {
                                           "${REGISTRY}/docs-utils:${TAG}" ]
     platforms = ["${PLATFORM}"]
     args = {
+        "PRODUCT_EDITION": "${UTILS_EDITION}"
         "DS_VERSION_HASH": "${DS_VERSION_HASH}"
         "PRODUCT_BASEURL": "${PRODUCT_BASEURL}"
         "RELEASE_VERSION": "${RELEASE_VERSION}"
