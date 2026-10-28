@@ -113,7 +113,6 @@ COPY --chown=ds:ds config/nginx/nginx.conf /etc/nginx/nginx.conf
 COPY --chown=ds:ds --from=ds-service \
     /usr/bin/documentserver-generate-allfonts.sh \
     /usr/bin/documentserver-pluginsmanager.sh \
-    /usr/bin/documentserver-admin \
     /usr/local/bin/
 COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/server/dictionaries/update.py \
