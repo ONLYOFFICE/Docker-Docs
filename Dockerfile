@@ -80,10 +80,10 @@ COPY --chown=ds:ds \
 COPY --chown=ds:ds \
     dictionaries/ \
     /var/www/onlyoffice/documentserver/dictionaries/
-RUN documentserver-generate-allfonts true && \
+RUN documentserver-generate-allfonts.sh true && \
     python3 /var/www/onlyoffice/documentserver/server/dictionaries/update.py && \
-    documentserver-flush-cache -h $DS_VERSION_HASH -r false && \
-    documentserver-pluginsmanager -r false \
+    documentserver-flush-cache.sh -h $DS_VERSION_HASH -r false && \
+    documentserver-pluginsmanager.sh -r false \
     --update=\"/var/www/$COMPANY_NAME/documentserver/sdkjs-plugins/plugin-list-default.json\"
 
 # --------------------------------------------------------------------------------
@@ -111,8 +111,8 @@ ENV DOCSERVICE_HOST_PORT=localhost:8000 \
     NODE_CONFIG="{\"runtimeConfig\":{\"filePath\":\"/var/www/${COMPANY_NAME}/config/runtime.json\"}}"
 COPY --chown=ds:ds config/nginx/nginx.conf /etc/nginx/nginx.conf
 COPY --chown=ds:ds --from=ds-service \
-    /usr/bin/documentserver-generate-allfonts \
-    /usr/bin/documentserver-pluginsmanager \
+    /usr/bin/documentserver-generate-allfonts.sh \
+    /usr/bin/documentserver-pluginsmanager.sh \
     /usr/bin/documentserver-admin \
     /usr/local/bin/
 COPY --from=ds-service \
