@@ -75,6 +75,22 @@ else
 fi
 
 # --------------------------------------------------------------------
+# PostgreSQL schema (search_path) for Docs services
+# --------------------------------------------------------------------
+if [[ "${DB_TYPE:-postgres}" == "postgres" && -n "${DB_SCHEMA}" && "${DB_SCHEMA}" != "public" ]]; then
+  if [[ ! "${DB_SCHEMA}" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]]; then
+    echo "Invalid DB_SCHEMA: must match ^[A-Za-z_][A-Za-z0-9_]*$" >&2
+    exit 2
+  fi
+  DB_PG_POOL_EXTRA_OPTIONS=',
+        "pgPoolExtraOptions": {
+          "options": "-c search_path='${DB_SCHEMA}'"
+        }'
+else
+  DB_PG_POOL_EXTRA_OPTIONS=''
+fi
+
+# --------------------------------------------------------------------
 # NODE_CONFIG (exported for Docs services)
 # --------------------------------------------------------------------
 export NODE_CONFIG='{
@@ -95,7 +111,7 @@ export NODE_CONFIG='{
         "dbPort": '${DB_PORT:-5432}',
         "dbUser": "'${DB_USER:=onlyoffice}'",
         "dbName": "'${DB_NAME:-${DB_USER}}'",
-        "dbPass": "'${DB_PWD:-onlyoffice}'"
+        "dbPass": "'${DB_PWD:-onlyoffice}'"'"${DB_PG_POOL_EXTRA_OPTIONS}"'
       },
       "redis": {
         "name": "'${REDIS_CONNECTOR_NAME:-redis}'",

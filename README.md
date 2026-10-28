@@ -152,11 +152,12 @@ Below is the complete list of parameters for `onlyoffice/docs-proxy`.
 
 Below is the complete list of parameters for `onlyoffice/docs-docservice`, `onlyoffice/docs-converter`.
 - **DB_TYPE**: The database type. Supported values are `postgres`, `mariadb` or `mysql`. Defaults to `postgres`.
-- **DB_HOST**: The IP address or the name of the host where the PostgreSQL server is running.
-- **DB_PORT**: The PostgreSQL server port number. Default to `5432`.
-- **DB_NAME**: The name of a PostgreSQL database to be created on the image startup.
-- **DB_USER**: The new user name with superuser permissions for the PostgreSQL account.
-- **DB_PWD**: The password set for the PostgreSQL account.
+- **DB_HOST**: The IP address or the name of the host where the database server is running.
+- **DB_PORT**: The database server port number. Default to `5432`.
+- **DB_NAME**: The name of a database to use. Should be existing on startup.
+- **DB_USER**: The new user name with superuser permissions for the database account.
+- **DB_PWD**: The password set for the database account.
+- **DB_SCHEMA**: Database schema name. The name must be in lowercase. Should be existing on startup.
 - **AMQP_TYPE**: Defines the message broker type. Defaults to `rabbitmq`. Possible values are `rabbitmq` or `activemq`.
 - **AMQP_PROTO**: The protocol for the connection to AMQP server. Default to `amqp`. Possible values are `amqp`, `amqps`.
 - **AMQP_USER**: The username for the AMQP server account.
