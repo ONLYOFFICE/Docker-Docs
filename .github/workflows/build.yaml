@@ -197,8 +197,8 @@ jobs:
             export EXAMPLE_BRANCH="${REF_BRANCH}"
             echo "Branch '${REF_BRANCH}' found in ${TARGET_REPO}"
           else
-            export EXAMPLE_BRANCH=develop
-            echo "Branch '${REF_BRANCH}' not found, falling back to 'develop'"
+            export EXAMPLE_BRANCH=master
+            echo "Branch '${REF_BRANCH}' not found, falling back to 'master'"
           fi
 
           ## Execute build ##
