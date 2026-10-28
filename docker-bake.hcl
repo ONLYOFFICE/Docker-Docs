@@ -16,7 +16,7 @@ variable "PRODUCT_EDITION" {
 }
 
 variable "UTILS_EDITION" {
-    default = "-ee"
+    default = "-de"
 }
 
 variable "DOCKERFILE" {
