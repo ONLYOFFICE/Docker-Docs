@@ -174,6 +174,7 @@ Below is the complete list of parameters for `onlyoffice/docs-docservice`, `only
 - **REDIS_SENTINEL_GROUP_NAME**: Name of a group of Redis instances composed of a master and one or more slaves. Default to `mymaster`.
 - **REDIS_SENTINEL_PWD**: The password set for the Redis Sentinel nodes. Default to empty.
 - **REDIS_CLUSTER_NODES**: List of nodes in the Redis cluster. There is no need to specify every node in the cluster, 3 should be enough. You can specify multiple values separated by a space. It must be specified in the `host:port` format.
+- **REDIS_CLUSTER_TLS_ENABLED**: Enables TLS for the connection to the Redis cluster (`rediss://` scheme for root nodes and `socket.tls` for all cluster nodes). Used if `REDIS_CLUSTER_NODES` is set. Defaults to `false`.
 - **JWT_ENABLED**: Specifies the enabling the JSON Web Token validation by the ONLYOFFICE Docs. Common for inbox and outbox requests. Defaults to `true`.
 - **JWT_ENABLED_INBOX**: Specifies the enabling the JSON Web Token validation by the ONLYOFFICE Docs only for inbox requests. Default, the value of the variable `JWT_ENABLED` is used.
 - **JWT_ENABLED_OUTBOX**: Specifies the enabling the JSON Web Token validation by the ONLYOFFICE Docs only for outbox requests. Default, the value of the variable `JWT_ENABLED` is used.
