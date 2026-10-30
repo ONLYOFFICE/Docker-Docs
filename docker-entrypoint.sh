@@ -60,16 +60,25 @@ else
 fi
 
 if [[ -n "$REDIS_CLUSTER_NODES" ]]; then
+  # TLS for Redis Cluster (node-redis): the URL scheme of root nodes must match
+  # socket.tls, and TLS for discovered nodes must be set via "defaults.socket"
+  if [[ "${REDIS_CLUSTER_TLS_ENABLED:-false}" == "true" ]]; then
+    REDIS_CLUSTER_SCHEME="rediss"
+    REDIS_CLUSTER_SOCKET=', "socket": { "tls": true }'
+  else
+    REDIS_CLUSTER_SCHEME="redis"
+    REDIS_CLUSTER_SOCKET=''
+  fi
   declare -a REDIS_CLUSTER_NODES_ALL=($REDIS_CLUSTER_NODES)
   REDIS_CLUSTER_NODES_ARRAY=()
   for node in "${REDIS_CLUSTER_NODES_ALL[@]}"; do
-    REDIS_CLUSTER_NODES_ARRAY+=('{ "url": "redis://'$node'" }')
+    REDIS_CLUSTER_NODES_ARRAY+=('{ "url": "'$REDIS_CLUSTER_SCHEME'://'$node'" }')
   done
   OLD_IFS="$IFS"
   IFS=","
   NODES=$(echo "${REDIS_CLUSTER_NODES_ARRAY[*]}")
   IFS="$OLD_IFS"
-  REDIS_CLUSTER='"rootNodes": [ '$NODES' ], "defaults": { "username": "'${REDIS_SERVER_USER:-default}'", "password": "'$REDIS_SERVER_PWD'" }'
+  REDIS_CLUSTER='"rootNodes": [ '$NODES' ], "defaults": { "username": "'${REDIS_SERVER_USER:-default}'", "password": "'$REDIS_SERVER_PWD'"'$REDIS_CLUSTER_SOCKET' }'
 else
   REDIS_CLUSTER=''
 fi
