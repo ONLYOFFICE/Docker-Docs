@@ -59,6 +59,22 @@ else
   REDIS_SENTINEL='[ { "host": "'${REDIS_SERVER_HOST:-localhost}'", "port": '${REDIS_SERVER_PORT:-6379}' } ],'
 fi
 
+# TLS for Redis Standalone (node-redis): "options.socket.tls"
+if [[ "${REDIS_SERVER_TLS_ENABLED:-false}" == "true" ]]; then
+  REDIS_SERVER_TLS=', "socket": { "tls": true }'
+else
+  REDIS_SERVER_TLS=''
+fi
+
+# TLS for Redis Sentinel (ioredis):
+#   - "sentinelTLS" for connections to Sentinel nodes
+#   - "tls" + "enableTLSForSentinelMode" for connections to master/replicas
+if [[ "${REDIS_SENTINEL_TLS_ENABLED:-false}" == "true" ]]; then
+  REDIS_SENTINEL_TLS=', "sentinelTLS": {}, "tls": {}, "enableTLSForSentinelMode": true'
+else
+  REDIS_SENTINEL_TLS=''
+fi
+
 if [[ -n "$REDIS_CLUSTER_NODES" ]]; then
   # TLS for Redis Cluster (node-redis): the URL scheme of root nodes must match
   # socket.tls, and TLS for discovered nodes must be set via "defaults.socket"
@@ -129,7 +145,7 @@ export NODE_CONFIG='{
         "options": {
           "user": "'${REDIS_SERVER_USER:-default}'",
           "password": "'${REDIS_SERVER_PWD}'",
-          "db": "'${REDIS_SERVER_DB_NUM:-0}'"
+          "db": "'${REDIS_SERVER_DB_NUM:-0}'"'${REDIS_SERVER_TLS}'
         },
         "optionsCluster": { '${REDIS_CLUSTER}' },
         "iooptions": {
@@ -138,7 +154,7 @@ export NODE_CONFIG='{
           "sentinelPassword": "'${REDIS_SENTINEL_PWD}'",
           "username": "'${REDIS_SERVER_USER:-default}'",
           "password": "'${REDIS_SERVER_PWD}'",
-          "db": "'${REDIS_SERVER_DB_NUM:-0}'"
+          "db": "'${REDIS_SERVER_DB_NUM:-0}'"'${REDIS_SENTINEL_TLS}'
         }
       },
       "token": {

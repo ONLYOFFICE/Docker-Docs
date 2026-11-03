@@ -171,9 +171,11 @@ Below is the complete list of parameters for `onlyoffice/docs-docservice`, `only
 - **REDIS_SERVER_USER**: The Redis user name.
 - **REDIS_SERVER_PWD**: The password set for the Redis account.
 - **REDIS_SERVER_DB_NUM**: Number of the redis logical database to be [selected](https://redis.io/commands/select/). Default to `0`.
+- **REDIS_SERVER_TLS_ENABLED**: Enables TLS for the connection to Redis Standalone (`socket.tls`). Not used if `REDIS_CLUSTER_NODES` is set or `REDIS_CONNECTOR_NAME` is set to `ioredis`. Defaults to `false`.
 - **REDIS_SENTINEL_NODES**: List of Redis Sentinel Nodes. There is no need to specify every node, 3 should be enough. You can specify multiple values separated by a space. It must be specified in the `host:port` format.
 - **REDIS_SENTINEL_GROUP_NAME**: Name of a group of Redis instances composed of a master and one or more slaves. Default to `mymaster`.
 - **REDIS_SENTINEL_PWD**: The password set for the Redis Sentinel nodes. Default to empty.
+- **REDIS_SENTINEL_TLS_ENABLED**: Enables TLS for the connection to Redis Sentinel nodes and to the master/replicas discovered via Sentinel. Used if `REDIS_CONNECTOR_NAME` is set to `ioredis`. Defaults to `false`.
 - **REDIS_CLUSTER_NODES**: List of nodes in the Redis cluster. There is no need to specify every node in the cluster, 3 should be enough. You can specify multiple values separated by a space. It must be specified in the `host:port` format.
 - **REDIS_CLUSTER_TLS_ENABLED**: Enables TLS for the connection to the Redis cluster (`rediss://` scheme for root nodes and `socket.tls` for all cluster nodes). Used if `REDIS_CLUSTER_NODES` is set. Defaults to `false`.
 - **JWT_ENABLED**: Specifies the enabling the JSON Web Token validation by the ONLYOFFICE Docs. Common for inbox and outbox requests. Defaults to `true`.
