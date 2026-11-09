@@ -59,9 +59,19 @@ else
   REDIS_SENTINEL='[ { "host": "'${REDIS_SERVER_HOST:-localhost}'", "port": '${REDIS_SERVER_PORT:-6379}' } ],'
 fi
 
+# Redis TLS certificate verification (Standalone, Cluster, Sentinel)
+# Verification is disabled only if REDIS_TLS_VERIFY=false
+if [[ "${REDIS_TLS_VERIFY:-true}" == "false" ]]; then
+  REDIS_TLS_REJECT=', "rejectUnauthorized": false'
+  REDIS_IO_TLS='{ "rejectUnauthorized": false }'
+else
+  REDIS_TLS_REJECT=''
+  REDIS_IO_TLS='{}'
+fi
+
 # TLS for Redis Standalone (node-redis): "options.socket.tls"
 if [[ "${REDIS_SERVER_TLS_ENABLED:-false}" == "true" ]]; then
-  REDIS_SERVER_TLS=', "socket": { "tls": true }'
+  REDIS_SERVER_TLS=', "socket": { "tls": true'"${REDIS_TLS_REJECT}"' }'
 else
   REDIS_SERVER_TLS=''
 fi
@@ -70,7 +80,7 @@ fi
 #   - "sentinelTLS" for connections to Sentinel nodes
 #   - "tls" + "enableTLSForSentinelMode" for connections to master/replicas
 if [[ "${REDIS_SENTINEL_TLS_ENABLED:-false}" == "true" ]]; then
-  REDIS_SENTINEL_TLS=', "sentinelTLS": {}, "tls": {}, "enableTLSForSentinelMode": true'
+  REDIS_SENTINEL_TLS=', "sentinelTLS": '"${REDIS_IO_TLS}"', "tls": '"${REDIS_IO_TLS}"', "enableTLSForSentinelMode": true'
 else
   REDIS_SENTINEL_TLS=''
 fi
@@ -80,7 +90,7 @@ if [[ -n "$REDIS_CLUSTER_NODES" ]]; then
   # socket.tls, and TLS for discovered nodes must be set via "defaults.socket"
   if [[ "${REDIS_CLUSTER_TLS_ENABLED:-false}" == "true" ]]; then
     REDIS_CLUSTER_SCHEME="rediss"
-    REDIS_CLUSTER_SOCKET=', "socket": { "tls": true }'
+    REDIS_CLUSTER_SOCKET=', "socket": { "tls": true'"${REDIS_TLS_REJECT}"' }'
   else
     REDIS_CLUSTER_SCHEME="redis"
     REDIS_CLUSTER_SOCKET=''
@@ -151,6 +161,7 @@ export NODE_CONFIG='{
         "iooptions": {
           "sentinels": '${REDIS_SENTINEL}'
           "name": "'${REDIS_SENTINEL_GROUP_NAME:-mymaster}'",
+          "sentinelUsername": "'${REDIS_SENTINEL_USERNAME}'",
           "sentinelPassword": "'${REDIS_SENTINEL_PWD}'",
           "username": "'${REDIS_SERVER_USER:-default}'",
           "password": "'${REDIS_SERVER_PWD}'",

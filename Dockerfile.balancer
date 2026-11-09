@@ -10,7 +10,7 @@ RUN groupadd -g 101 ds && \
     useradd -m -r -u 101 -g ds ds
 
 RUN apt-get update -y && \
-    apt-get install python3.10 vim -y && \
+    apt-get install python3.10 vim ca-certificates -y && \
     apt-get install python3-pip -y && \
     luarocks install lua-cjson && \
     luarocks install lua-resty-redis-connector && \
