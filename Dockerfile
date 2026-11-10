@@ -67,7 +67,7 @@ RUN dnf -y install https://download.onlyoffice.com/install/misc/linux/msttcore-f
         /usr/share/fonts/msttcore/*.ttf && \
     chmod a+r /etc/$COMPANY_NAME/documentserver*/*.json && \
     chmod a+r /etc/$COMPANY_NAME/documentserver/log4js/*.json
-COPY --chown=ds:ds \
+COPY \
     config/nginx/includes/http-common.conf \
     config/nginx/includes/http-upstream.conf \
     /etc/$COMPANY_NAME/documentserver/nginx/includes/
@@ -109,7 +109,7 @@ ENV DOCSERVICE_HOST_PORT=localhost:8000 \
     # Default runtimeConfig location for CLI tools run via exec;
     # services get the same path from docker-entrypoint.sh
     NODE_CONFIG="{\"runtimeConfig\":{\"filePath\":\"/var/www/${COMPANY_NAME}/config/runtime.json\"}}"
-COPY --chown=ds:ds config/nginx/nginx.conf /etc/nginx/nginx.conf
+COPY config/nginx/nginx.conf /etc/nginx/nginx.conf
 COPY --chown=ds:ds --from=ds-service \
     /usr/bin/documentserver-generate-allfonts \
     /usr/bin/documentserver-pluginsmanager \
@@ -127,10 +127,10 @@ COPY --from=ds-service \
 COPY --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver/server/tools/pluginsmanager \
     /var/www/$COMPANY_NAME/documentserver/server/tools/pluginsmanager
-COPY --chown=ds:ds --chmod=644 --from=ds-service \
+COPY --chmod=644 --from=ds-service \
     /etc/$COMPANY_NAME/documentserver/nginx/ds.conf \
     /etc/nginx/conf.d/
-COPY --chown=ds:ds --chmod=644 --from=ds-service \
+COPY --chmod=644 --from=ds-service \
     /etc/$COMPANY_NAME/documentserver*/nginx/includes/*.conf \
     /etc/nginx/includes/ds-cache.conf \
     /etc/nginx/includes/
@@ -188,7 +188,10 @@ COPY --chown=ds:ds --from=ds-service \
     /var/www/$COMPANY_NAME/documentserver-example/welcome
 COPY docker-entrypoint.sh proxy-docker-entrypoint.sh /usr/local/bin/
 COPY init-docker-entrypoint.sh /init/
-RUN sed 's,\(listen.\+:\)\([0-9]\+\)\(.*;\),'"\18888\3"',' \
+RUN FC_BIN=/var/www/$COMPANY_NAME/documentserver/server/FileConverter/bin && \
+    chown ds:ds "$FC_BIN/AllFonts.js" "$FC_BIN/font_selection.bin" "$FC_BIN/fonts.log" && \
+    chmod 644 "$FC_BIN/AllFonts.js" "$FC_BIN/font_selection.bin" "$FC_BIN/fonts.log" && \
+    sed 's,\(listen.\+:\)\([0-9]\+\)\(.*;\),'"\18888\3"',' \
         -i /etc/nginx/conf.d/ds.conf && \
     sed '/access_log.*/d' -i /etc/nginx/includes/ds-common.conf && \
     sed '/error_log.*/d' -i /etc/nginx/includes/ds-common.conf && \
@@ -216,7 +219,7 @@ RUN sed 's,\(listen.\+:\)\([0-9]\+\)\(.*;\),'"\18888\3"',' \
         /var/www/$COMPANY_NAME/documentserver/web-apps \
         /var/www/$COMPANY_NAME/documentserver-example/welcome \
         -type f \
-        \( -name *.js -o -name *.json -o -name *.htm -o -name *.html -o -name *.css \) \
+        \( -name '*.js' -o -name '*.json' -o -name '*.htm' -o -name '*.html' -o -name '*.css' \) \
         -exec sh -c 'gzip -cf9 $0 > $0.gz && chown ds:ds $0.gz' {} \;
 VOLUME /var/lib/$COMPANY_NAME
 USER ds
@@ -308,7 +311,7 @@ RUN apt-get update && \
     groupadd --system --gid 1001 ds && \
     useradd --system -g ds --no-create-home --shell /sbin/nologin --uid 1001 ds
 COPY --from=ds-base /usr/local/bin/dumb-init /usr/local/bin/dumb-init
-COPY --chown=ds:ds --from=ds-service \
+COPY --from=ds-service \
     /etc/$COMPANY_NAME/documentserver-example/default.json \
     /etc/$COMPANY_NAME/documentserver-example/production-linux.json \
     /etc/$COMPANY_NAME/documentserver-example/data.json \
