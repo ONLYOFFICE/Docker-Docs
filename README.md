@@ -165,6 +165,7 @@ Below is the complete list of parameters for `onlyoffice/docs-docservice`, `only
 - **AMQP_HOST**: The IP address or the name of the host where the AMQP server is running.
 - **AMQP_PORT**: The port for the connection to AMQP server. Default to `5672`.
 - **AMQP_VHOST**: The virtual host for the connection to AMQP server. Default to `/`.
+- **AMQP_QUEUE_TYPE**: Defines the type of RabbitMQ queues used by Docs. Default to `classic`. Possible values are `classic` or `quorum`. `quorum` requires a RabbitMQ cluster and replicates queues across its nodes. Not used if `AMQP_TYPE` is set to `activemq`.
 - **REDIS_CONNECTOR_NAME**: Defines which connector to use to connect to Redis. Default to `redis`. If you need to connect to Redis Sentinel, set the value `ioredis`.
 - **REDIS_SERVER_HOST**: The IP address or the name of the host where the Redis server is running.
 - **REDIS_SERVER_PORT**:  The Redis server port number. Default to `6379`.

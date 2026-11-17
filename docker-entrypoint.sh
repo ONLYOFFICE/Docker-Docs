@@ -126,6 +126,30 @@ else
 fi
 
 # --------------------------------------------------------------------
+# RabbitMQ queue type (classic | quorum)
+# Nothing is added for "classic" so that queue options from local.json keep working
+# --------------------------------------------------------------------
+case "${AMQP_QUEUE_TYPE:-classic}" in
+  classic)
+    RABBITMQ_QUEUES=''
+    ;;
+  quorum)
+    # Quorum queues do not support "x-max-priority", so "maxPriority" is reset
+    # "queuepubsub" stays classic as quorum queues cannot be exclusive
+    QQ_OPTS='"durable": true, "arguments": { "x-queue-type": "quorum" }'
+    RABBITMQ_QUEUES=',
+    "queueconverttask": { "options": { '"${QQ_OPTS}"', "maxPriority": null } },
+    "queueconvertresponse": { "options": { '"${QQ_OPTS}"' } },
+    "queueconvertdead": { "options": { '"${QQ_OPTS}"' } },
+    "queuedelayed": { "options": { '"${QQ_OPTS}"' } }'
+    ;;
+  *)
+    echo "Invalid AMQP_QUEUE_TYPE: ${AMQP_QUEUE_TYPE} (use: classic|quorum)" >&2
+    exit 2
+    ;;
+esac
+
+# --------------------------------------------------------------------
 # NODE_CONFIG (exported for Docs services)
 # --------------------------------------------------------------------
 export NODE_CONFIG='{
@@ -220,7 +244,7 @@ export NODE_CONFIG='{
     }
   },
   "rabbitmq": {
-    "url": "'${AMQP_URI:-${AMQP_PROTO:-amqp}://${AMQP_USER}:${AMQP_PWD}@${AMQP_HOST}:${AMQP_PORT}${AMQP_VHOST:-/}}'"
+    "url": "'${AMQP_URI:-${AMQP_PROTO:-amqp}://${AMQP_USER}:${AMQP_PWD}@${AMQP_HOST}:${AMQP_PORT}${AMQP_VHOST:-/}}'"'"${RABBITMQ_QUEUES}"'
   },
   "wopi": {
     "enable": '${WOPI_ENABLED:-false}',
