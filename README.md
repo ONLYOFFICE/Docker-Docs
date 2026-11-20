@@ -201,6 +201,7 @@ Below is the complete list of parameters for `onlyoffice/docs-docservice`, `only
 - **ALLOW_META_IP_ADDRESS**: Defines if it is allowed to connect meta address or not. Defaults to `false`.
 - **ALLOW_IP_ADDRESS_LIST**: Defines the list of IP addresses allowed to connect. This values are preferred than denyAddressList. Defaults to `[]`.
 - **DENY_IP_ADDRESS_LIST**: Defines the list of IP addresses deny to connect. Defaults to `[]`.
+- **IP_FILTER_RULES**: Defines the IP filter rules (`services.CoAuthoring.ipfilter.rules`). Rules are separated by `;`, each rule has the format `allowed <address>` or `deny <address>`, where `<address>` is an IP address, a domain name or `*`. Rules are applied in the specified order. Example: `allowed my.example.com; allowed 192.168.1.1; deny *`. If not set, the default rule `allowed *` is used.
 
 Below is the complete list of parameters for `onlyoffice/docs-example`.
 - **DS_URL**: Specifies ONLYOFFICE Docs server address. Defaults to `/`. You have specyfing this field to correct work ONLYOFFICE Docs Example. Example `http://onlyoffice-docs-address/`.

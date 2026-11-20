@@ -126,6 +126,46 @@ else
 fi
 
 # --------------------------------------------------------------------
+# IP filter rules (services.CoAuthoring.ipfilter.rules)
+# Format: "<allowed|deny> <address>; <allowed|deny> <address>; ..."
+# Example: IP_FILTER_RULES='allowed my.example.com; deny *'
+# --------------------------------------------------------------------
+IP_FILTER=''
+if [[ -n "${IP_FILTER_RULES}" ]]; then
+  IP_FILTER_RULES_ARRAY=()
+  IFS=';' read -ra IP_FILTER_RULES_ALL <<< "${IP_FILTER_RULES//[$'\r\n']/;}"
+  for rule in "${IP_FILTER_RULES_ALL[@]}"; do
+    read -r action address extra <<< "${rule}"
+    [[ -z "${action}" ]] && continue
+    if [[ -z "${address}" || -n "${extra}" || "${address}" == *[\"\\]* ]]; then
+      echo "Invalid IP_FILTER_RULES rule: '${rule}' (use: allowed <address> | deny <address>)" >&2
+      exit 2
+    fi
+    case "${action}" in
+      allowed) allowed=true ;;
+      deny) allowed=false ;;
+      *)
+        echo "Invalid IP_FILTER_RULES action: '${action}' (use: allowed | deny)" >&2
+        exit 2
+        ;;
+    esac
+    IP_FILTER_RULES_ARRAY+=("{ \"address\": \"${address}\", \"allowed\": ${allowed} }")
+  done
+  if [[ ${#IP_FILTER_RULES_ARRAY[@]} -eq 0 ]]; then
+    echo "Invalid IP_FILTER_RULES: no rules found (use: allowed <address> | deny <address>)" >&2
+    exit 2
+  fi
+  OLD_IFS="$IFS"
+  IFS=","
+  RULES="${IP_FILTER_RULES_ARRAY[*]}"
+  IFS="$OLD_IFS"
+  IP_FILTER=',
+      "ipfilter": {
+        "rules": [ '"${RULES}"' ]
+      }'
+fi
+
+# --------------------------------------------------------------------
 # NODE_CONFIG (exported for Docs services)
 # --------------------------------------------------------------------
 export NODE_CONFIG='{
@@ -204,7 +244,7 @@ export NODE_CONFIG='{
         "allowMetaIPAddress": '${ALLOW_META_IP_ADDRESS:-false}',
         "allowIPAddressList": '${ALLOW_IP_ADDRESS_LIST:-[]}',
         "denyIPAddressList": '${DENY_IP_ADDRESS_LIST:-[]}'
-      }
+      }'"${IP_FILTER}"'
     }
   },
   "queue": {
